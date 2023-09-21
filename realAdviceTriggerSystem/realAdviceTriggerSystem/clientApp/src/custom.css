@@ -1,0 +1,91 @@
+/* Provide sufficient contrast against white background */
+a {
+  color: #0366d6;
+}
+
+code {
+  color: #E01A76;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}
+
+.client-setting label {
+    margin-bottom: 0.25rem;
+}
+
+.btn-site {
+    border: 0;
+    background-color: #2580f1;
+    color: white;
+    padding: 0.25rem 1rem;
+}
+
+.btn-site-expand {
+    border: 0;
+    background-color: black;
+    color: white;
+    padding: 0.25rem 1rem;
+}
+
+.sub-heading {
+    color: #2580f1;
+}
+
+.card {
+    box-shadow: 0px 0px 5px 0px #efefef;
+    padding: 1.5rem;
+    border-radius: 0.25rem;
+    margin-bottom: 1.5rem;
+    border: 0;
+}
+
+.name-tiles {
+    background-color: #2580f1;
+    padding: 0.25rem 1rem;
+    border-radius: 0.25rem;
+    margin-right: 0.5rem;
+    color: white;
+}
+
+.office-active {
+    background-color: #494949;
+}
+
+.multi-select .dropdown-container {
+    border-radius: 0.375rem;
+}
+
+.multi-select .dropdown-heading {
+    height: 36px;
+}
+
+.clients-container {
+    box-shadow: 0px 0px 5px 0px #efefef;
+    padding: 1.5rem;
+    border-radius: 0.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.table {
+    /*box-shadow: 0px 0px 5px 0px #efef;*/
+    background-color: #efef;
+}
+
+    .table tr {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 1rem;
+    }
+
+    .table td {
+        border-bottom: 0px;
+    }
+
+.new-layout-modal .modal-dialog {
+    max-width: 70%;
+}
