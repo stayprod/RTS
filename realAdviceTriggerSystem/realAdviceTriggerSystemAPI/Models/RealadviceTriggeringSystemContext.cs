@@ -200,15 +200,19 @@ public partial class RealadviceTriggeringSystemContext : DbContext
                 .HasColumnName("c_target_2");
             entity.Property(e => e.DurationType)
                 .HasMaxLength(200)
-                .HasDefaultValueSql("''")
                 .HasColumnName("duration_type");
             entity.Property(e => e.DurationValue)
                 .HasColumnType("int(11)")
                 .HasColumnName("duration_value");
             entity.Property(e => e.KeyMoment)
                 .HasMaxLength(200)
-                .HasDefaultValueSql("''")
                 .HasColumnName("key_moment");
+            entity.Property(e => e.Language)
+                .HasMaxLength(50)
+                .HasColumnName("language");
+            entity.Property(e => e.Layoutid)
+                .HasColumnType("int(11)")
+                .HasColumnName("layoutid");
             entity.Property(e => e.Officeid)
                 .HasColumnType("int(11)")
                 .HasColumnName("officeid");
@@ -218,13 +222,14 @@ public partial class RealadviceTriggeringSystemContext : DbContext
             entity.Property(e => e.TargetParticipant2)
                 .HasColumnType("text")
                 .HasColumnName("target_participant_2");
+            entity.Property(e => e.Texte)
+                .HasColumnType("text")
+                .HasColumnName("texte");
             entity.Property(e => e.TriggerName)
                 .HasMaxLength(200)
-                .HasDefaultValueSql("''")
                 .HasColumnName("trigger_name");
             entity.Property(e => e.TriggerType)
                 .HasMaxLength(200)
-                .HasDefaultValueSql("''")
                 .HasColumnName("trigger_type");
         });
 

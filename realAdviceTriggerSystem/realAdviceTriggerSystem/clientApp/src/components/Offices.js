@@ -42,7 +42,27 @@ export const Offices = (props) => {
         };
         axios.post('https://api.whise.eu/v1/admin/offices/list', { "clientId": clientId }, config) // ASP.NET Core API endpoint with header
             .then(response => {
-                setOfficesList(response.data.offices);
+                let finalArrayToSet = [];
+                response.data.offices.forEach(item => {
+                    let existedOffInDb = client.localclient.office.filter(_off => {
+                        return _off.whiseOfficeid == item.id
+                    })
+                    if (existedOffInDb.length > 0) {
+                        item.warning = false;
+                        let isAlreadyPushed = finalArrayToSet.includes(item, 0);
+                        if (isAlreadyPushed == false) {
+                            finalArrayToSet.push(item);
+                        }
+                    }
+                    else {
+                        item.warning = true;
+                        let isAlreadyPushed = finalArrayToSet.includes(item, 0);
+                        if (isAlreadyPushed == false) {
+                            finalArrayToSet.push(item);
+                        }
+                    }
+                })
+                setOfficesList(finalArrayToSet);
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
@@ -52,28 +72,33 @@ export const Offices = (props) => {
     return (
         <div className="pt-4 px-5">
             {
-                officesList.length > 0 ? officesList.map((item, i) => (
-                    <table className={i == officesList.length - 1 ? "table mb-0" : "table"} id='expandable-table'>
-                        <tbody id='table-body'>
-                            <tr>
-                                <td>
-                                    <span className="tableTitleSpan fw-bold">Office Name:</span> {item.name}<br />
-                                    <span className="tableTitleSpan fw-bold">Office ID: </span>{item.id}<br />
-                                    <span className="tableTitleSpan fw-bold">Status:</span> {item.statusId}<br />
-                                    {
-                                        client.localclient.office != undefined ? "" : 
-                                        <span>
-                                            <FontAwesomeIcon icon={faExclamationTriangle} /><span>Warning!</span>
-                                        </span>
-                                    }
-                                </td>
-                                <td>
-                                    <button className="btn-site" onClick={officeSettingClickHandler} officedetail={JSON.stringify(item)}>Settings</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                )) : ""
+                officesList.length > 0 ? officesList.map((item, i) => {
+                    //let existedOffInDb = client.localclient.office.filter(_off => {
+                    //    return _off.whiseOfficeid == item.id
+                    //})
+                    return (
+                        <table className={i == officesList.length - 1 ? "table mb-0" : "table"} id='expandable-table'>
+                            <tbody id='table-body'>
+                                <tr>
+                                    <td>
+                                        <span className="tableTitleSpan fw-bold">Office Name:</span> {item.name}<br />
+                                        <span className="tableTitleSpan fw-bold">Office ID: </span>{item.id}<br />
+                                        <span className="tableTitleSpan fw-bold">Status:</span> {item.statusId}<br />
+                                        {
+                                            item.warning ?
+                                                <span>
+                                                    <FontAwesomeIcon icon={faExclamationTriangle} /><span>Warning!</span>
+                                                </span>
+                                                : ""
+                                        }
+                                    </td>
+                                    <td>
+                                        <button className="btn-site" onClick={officeSettingClickHandler} officedetail={JSON.stringify(item)}>Settings</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>)
+                }) : ""
             }
         </div>
     );

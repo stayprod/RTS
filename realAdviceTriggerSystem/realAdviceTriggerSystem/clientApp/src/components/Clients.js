@@ -17,6 +17,7 @@ export const Clients = (props) => {
     const [settingObj, setSettingObj] = useState({});
     const [showAppended, setShowAppended] = useState(false);
     const [clientOffices, setClientOffices] = useState({});
+    const [clientWarning, setClientWarning] = useState("");
     const navigate = useNavigate();
     const token = useToken();
 
@@ -38,6 +39,7 @@ export const Clients = (props) => {
             state: client
         })
     }
+
     useEffect(() => {
         if (token != null) {
             const config = {
@@ -132,7 +134,7 @@ export const Clients = (props) => {
                                 <br />
                                 <span className="titleSpan fw-bold">CRM CLIENT ID:</span> {item.id}
                                 <br />
-                                <span className="titleSpan fw-bold">ACTIVE:</span> {item.statusId ? 'YES' : 'NO'}
+                                <span className="titleSpan fw-bold">STATUS:</span> {item.localclient.client.activationStatus != null ? item.localclient.client.activationStatus : "Pending"}
                                 <br />
                                 {
                                     item.localclient.client != undefined ? "" :

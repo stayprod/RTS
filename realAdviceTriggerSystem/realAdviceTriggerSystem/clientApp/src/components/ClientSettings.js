@@ -72,21 +72,23 @@ export const ClientSettings = (props) => {
     }
 
     const getClientDetail = async (clientId) => {
-        const response = await fetch(variables.API_URL + 'Client/GetClientDetail?clientId=' + location.state.id);
-        const jsonData = await response.json();
-        if (jsonData != null) {
-            setClientDetailFromDB(jsonData);
+        //const response = await fetch(variables.API_URL + 'Client/GetClientDetail?clientId=' + location.state.id);
+        //const jsonData = await response.json();
+        //if (jsonData != null) {
+        //    setClientDetailFromDB(jsonData);
 
-            const adminResponse = await fetch(variables.API_URL + 'Admin/GetAdminDetail?clientId=' + jsonData.clientid);
-            const adminJsonData = await adminResponse.json();
-            if (adminJsonData != null) {
-                setAdminDetail(adminJsonData);
-            }
-        }
+        //    const adminResponse = await fetch(variables.API_URL + 'Admin/GetAdminDetail?clientId=' + jsonData.clientid);
+        //    const adminJsonData = await adminResponse.json();
+        //    if (adminJsonData != null) {
+        //        setAdminDetail(adminJsonData);
+        //    }
+        //}
     }
 
     const getOfficesList = () => {
         if (location.state != null) {
+            setClientDetailFromDB(location.state)
+            setAdminDetail(location.state);
             //get client offices and pass to setting screen
             //const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImlhdCI6MTY5MzI5MTY4OH0.eyJzZXJ2aWNlQ29uc3VtZXJJZCI6MTMzNywidHlwZUlkIjo0LCJjbGllbnRJZCI6MTAyNjN9.1-9mYean_qX58r6ykhP545Y3r8IGK53PgDOoyIja8YM';
             // Replace with your actual token
@@ -191,7 +193,7 @@ export const ClientSettings = (props) => {
             </div>
             <div className="card">
                 <div className="row">
-                    <div className="col-sm-4">
+                    <div className="col-sm-12 col-md-2 text-md-center text-sm-start mb-sm-3">
 
                         {
                             clientDetail.settings != undefined ?
@@ -199,12 +201,15 @@ export const ClientSettings = (props) => {
                                 <img src={image} alt="Profile_Image" className="profile-image" />
                         }
                     </div>
-                    <div className="col-sm-4"></div>
-                    <div className="col-sm-4 mb-3 mb-md-0">
-                        <div>
-                            <h6 className="sub-heading fw-bold mb-3">Status:</h6>
-                        </div>
-                        <select className="form-select" id="status">
+                    <div className="col-sm-12 col-md-6 mb-sm-3">
+                        <label className="me-1">Whise Commercial Name:</label>
+                        <strong>{clientDetail.name}</strong><br />
+                        <label className="me-1">Whise Client Id:</label>
+                        <strong>{clientDetail.id}</strong>
+                    </div>
+                    <div className="col-sm-12 col-md-4 mb-0">
+                        <label>Status</label>
+                        <select className="form-select" id="status" defaultValue={clientDetailFromDB.activationStatus}>
                             <option value="Pending">Pending</option>
                             <option value="Demo">Demo</option>
                             <option value="Activate">Activate</option>
@@ -221,7 +226,7 @@ export const ClientSettings = (props) => {
                 <div className="row">
                     <div className="col-sm-4 mb-3">
                         <label>Commercial Name</label>
-                        <input type="text" className="form-control" id="commercialName" disabled defaultValue={clientDetailFromDB.commercialName != undefined ? clientDetailFromDB.commercialName : clientDetail.name} />
+                        <input type="text" className="form-control" id="commercialName" defaultValue={clientDetailFromDB.commercialName} />
                     </div>
                     <div className="col-sm-2 mb-3">
                         <label>Street</label>
@@ -314,7 +319,7 @@ export const ClientSettings = (props) => {
                     </div>
                     <div className="col-sm-4 mb-3 mb-md-0">
                         <label>Client ID</label>
-                        <input type="text" className="form-control" />
+                        <div className="form-control field-disabled">{clientDetail.id}</div>
                     </div>
                     <div className="col-sm-4">
                     </div>

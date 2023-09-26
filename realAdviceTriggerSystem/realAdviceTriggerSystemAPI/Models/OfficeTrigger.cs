@@ -7,17 +7,19 @@ public partial class OfficeTrigger
 {
     public int OfficeTriggerid { get; set; }
 
-    public int Officeid { get; set; }
+    public int? Officeid { get; set; }
 
-    public string TriggerName { get; set; } = null!;
+    public int? Layoutid { get; set; }
 
-    public string KeyMoment { get; set; } = null!;
+    public string? TriggerName { get; set; }
 
-    public string TriggerType { get; set; } = null!;
+    public string? KeyMoment { get; set; }
 
-    public string DurationType { get; set; } = null!;
+    public string? TriggerType { get; set; }
 
-    public int DurationValue { get; set; }
+    public string? DurationType { get; set; }
+
+    public int? DurationValue { get; set; }
 
     public string? TargetParticipant1 { get; set; }
 
@@ -26,4 +28,8 @@ public partial class OfficeTrigger
     public string? TargetParticipant2 { get; set; }
 
     public string? CTarget2 { get; set; }
+
+    public string? Language { get; set; }
+
+    public string? Texte { get; set; }
 }

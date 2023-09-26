@@ -40,8 +40,20 @@ namespace realAdviceTriggerSystemAPI.Controllers
             {
                 using (var con = new RealadviceTriggeringSystemContext())
                 {
-                    con.Offices.Add(office);
-                    con.SaveChanges();
+
+                    Office? _office = con.Offices.Where(t => t.WhiseOfficeid == office.WhiseOfficeid).FirstOrDefault();
+
+                    if (_office != null)
+                    {
+                        office.Officeid = _office.Officeid;
+                        con.SaveChanges();
+                    }
+                    else
+                    {
+                        con.Offices.Add(office);
+                        con.SaveChanges();
+                    }
+
                     return new JsonResult(office);
                 }
             }

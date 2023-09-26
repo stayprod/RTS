@@ -3,7 +3,9 @@ import axios from 'axios';
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { Row, Col, Nav, Form, Image, Button, Navbar, Dropdown, Container, ListGroup, InputGroup, NavDropdown, Modal, Tab, Tabs } from 'react-bootstrap';
 import { MultiSelect } from "react-multi-select-component";
-import "draftail/dist/draftail.css"
+import "draftail/dist/draftail.css";
+import { convertToRaw, convertFromRaw } from "draft-js";
+import { convertFromHTML, convertToHTML } from "draft-convert";
 import { DraftailEditor, BLOCK_TYPE, INLINE_STYLE, ENTITY_TYPE, UNDO_ICON } from "draftail";
 import { useToken } from './tokenContext';
 import { variables } from '../Variables';
@@ -37,6 +39,8 @@ export const OfficeSettings = (props) => {
     const [selectedLaytName, setSelectedLaytName] = useState("");
     const [officeId, setOfficeId] = useState(0);
     const [clientId, setClientId] = useState(0);
+    const [emailTexte, setEmailTexte] = useState("");
+    const [selectedTab, setSelectedTab] = useState("french");
 
     let linkBuilder = "";
     let participentType = [];
@@ -239,79 +243,155 @@ export const OfficeSettings = (props) => {
 
     const saveFile = (e) => {
         setFile(e.target.files[0]);
-        setFileName(e.target.files[0].name);
+        const filename = e.target.files[0].name;
+        const extension = filename.split(".")[1];
+        const finalName = currentOffice.name.replace(/ /g, "") + "." + extension;
+        setFileName(finalName);
     }
 
-    const uploadFile = async () => {
-        debugger;
-        const formData = new FormData();
-        formData.append("formFile", file);
-        formData.append("fileName", fileName);
-        try {
+    const saveTrigger = (office) => {
 
-            let url = variables.API_URL + `File/ImageUpload?`;
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            });
-
-            const jsonData = await response.json();
-
-            return jsonData;
-        }
-        catch (ex) {
-            console.log(ex)
-        }
-    }
-
-    const saveOfficeTrigger = () => {
-        let objOfficeTrigger = {
-            OfficeTriggerid: 0,
-            Officeid: currentOffice.id,
-            TriggerName: document.getElementById("tname").value,
-            KeyMoment: "",
-            TriggerType: "",
-            DurationType: "",
-            DurationValue: "",
-            TargetParticipant1: "",
-            CTarget1: "",
-            TargetParticipant2: "",
-            CTarget2: "",
-        }
-    }
-
-    const saveOfficeSettings = (e) => {
-        let imgPath = uploadFile();
-
-        let objOfficeSettings = {
-            Officeid: 0,
-            WhiseOfficeid: currentOffice.id,
-            CommercialName: currentOffice.name,
-            CrmDetail: "",
-            OfficeImg: imgPath,
-            UniqueKey: "",
-        }
-
-        let url = variables.API_URL + `Office/SaveOfficeDetail?`;
-
-        const config = {
+        //configurations to post json data
+        const jsonconfig = {
             headers: {
                 'Content-Type': 'application/json'
             }
         };
 
-        // ASP.NET Core API endpoint with headers
-        axios.post(url, JSON.stringify(objOfficeSettings), config)
-            .then(response => {
-                uploadFile(response.data);
+        //SaveOfficeTriggerDetail api call
+        //Api call to save trigger for an office
+        let language = selectedTab.e;
+        let trigger = {};
+        let objOfficeTrigger = {
+            OfficeTriggerid: 0,
+            Officeid: +office.officeid,
+            Layoutid: +selectedLaytOutId,
+            TriggerName: document.getElementById("tname").innerText,
+            KeyMoment: document.getElementById("keymomentDropdown").value,
+            TriggerType: document.getElementById("triggertypeDropdown").value,
+            DurationType: document.getElementById("durationtypeDropdown").value,
+            DurationValue: +document.getElementById("durationValue").value,
+            TargetParticipant1: document.getElementById("participent1").value,
+            CTarget1: document.getElementById("ctarget1").value,
+            TargetParticipant2: document.getElementById("participent2").value,
+            CTarget2: document.getElementById("ctarget2").value,
+            Language: language,
+            Texte: emailTexte,
+        }
+        let triggerurl = variables.API_URL + `OfficeTrigger/SaveOfficeTriggerDetail?`;
+        return axios.post(triggerurl, JSON.stringify(objOfficeTrigger), jsonconfig)
+            .then((response) => {
+                response.data
             })
             .catch(error => {
-                console.error('Error fetching data:', error);
+                alert('Error fetching data:', error);
             });
+    }
+
+    const uploadImage = () => {
+
+        //configurations to post formdata
+        const formConfig = {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        };
+
+        //ImageUpload api call
+        //Upload office image and get image path
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("fileName", fileName);
+        let fileuploadurl = window.location.origin + `/api/File/UploadLogo?`;
+
+        return axios.post(fileuploadurl, formData, formConfig)
+            .then((response) => {
+                response.data
+            })
+            .catch(error => {
+                alert('Error fetching data:', error);
+            });
+
+    }
+
+    const saveOfficeSettings = (e) => {
+        //uploadImage().then((imgPath) => {
+            //configurations to post json data
+            const jsonconfig = {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            };
+
+            //SaveOfficeDetail api call
+            //save office settings in database
+            let objOfficeSettings = {
+                Officeid: 0,
+                Clientid: currentClient.localclient.client.clientid,
+                WhiseOfficeid: currentOffice.id == undefined ? currentOffice.whiseOfficeid : currentOffice.id,
+                CommercialName: currentOffice.name,
+                CrmDetail: "",
+                OfficeImg: "",
+                UniqueKey: "",
+            }
+            let url = variables.API_URL + `Office/SaveOfficeDetail?`;
+            axios.post(url, JSON.stringify(objOfficeSettings), jsonconfig)
+                .then((response) => {
+                    debugger;
+                    setCurrentOffice(response.data);
+                    saveTrigger(response.data).then((data) => {
+                        alert("Office settings successfully saved.")
+                    })
+                })
+                .catch(error => {
+                    alert('Error fetching data:', error);
+                });
+        //});
+        //use the token to make further calls
+    }
+
+    const exporterConfigForTexte = {
+        blockToHTML: (block) => {
+            if (block.type === BLOCK_TYPE.BLOCKQUOTE) {
+                return <blockquote />
+            }
+
+            // Discard atomic blocks, as they get converted based on their entity.
+            if (block.type === BLOCK_TYPE.ATOMIC) {
+                return {
+                    start: "",
+                    end: "",
+                }
+            }
+
+            return null
+        },
+
+        entityToHTML: (entity, originalText) => {
+            if (entity.type === ENTITY_TYPE.LINK) {
+                return <a href={entity.data.url}>{originalText}</a>
+            }
+
+            if (entity.type === ENTITY_TYPE.IMAGE) {
+                return <img src={entity.data.src} alt={entity.data.alt} />
+            }
+
+            if (entity.type === ENTITY_TYPE.HORIZONTAL_RULE) {
+                return <hr />
+            }
+
+            return originalText
+        },
+    }
+
+    const convertTexteToHtml = (raw) => {
+        raw ? setEmailTexte(convertToHTML(exporterConfigForTexte)(convertFromRaw(raw))) : "";
+        console.log(emailTexte);
+    }
+
+    const handleTabSelect = (e) => {
+        setSelectedTab({ e });
+
     }
 
     useEffect(() => {
@@ -364,7 +444,7 @@ export const OfficeSettings = (props) => {
                 <div className="row">
                     <div className="col-sm-4 mb-3 mb-md-0">
                         <label>Office Name</label>
-                        <input className="form-control" value={currentOffice.name} disabled />
+                        <input className="form-control" defaultValue={currentOffice.name} disabled />
                     </div>
                     <div className="col-sm-4"></div>
                     <div className="col-sm-4">
@@ -379,7 +459,7 @@ export const OfficeSettings = (props) => {
                 </div>
                 <div className="row">
                     <div className="col-sm-4 mb-3 mb-md-0">
-                        <label>Commercial Name</label>
+                        <label>CRM Name</label>
                         <select className="form-select">
                             <option>Whise</option>
                             <option>Omnicasa</option>
@@ -391,7 +471,7 @@ export const OfficeSettings = (props) => {
                     </div>
                     <div className="col-sm-4 mb-3 mb-md-0">
                         <label>Office ID</label>
-                        <input type="text" className="form-control" value={currentOffice.id} />
+                        <input type="text" className="form-control" defaultValue={currentOffice.id} />
                     </div>
                     <div className="col-sm-4 mb-3 mb-md-0">
                         <label>Unique Key</label>
@@ -448,18 +528,12 @@ export const OfficeSettings = (props) => {
                     showTriggerScreen == true ?
                         <>
                             <div>
-                                <h6 className="sub-heading fw-bold mb-3">{keyMoment}</h6>
-                            </div>
-                            <div className="row">
-                                <div className="col-sm-4 mb-3">
-                                    <label>Trigger Name</label>
-                                    <input type="text" className="form-control" />
-                                </div>
+                                <h6 className="sub-heading fw-bold mb-3" id="tname">{keyMoment}</h6>
                             </div>
                             <div className="row">
                                 <div className="col-sm-12 col-md-4 mb-3">
                                     <label>Key Moment</label>
-                                    <select className="form-select" onChange={setKeyMomentForTrigger}>
+                                    <select className="form-select" id="keymomentDropdown" onChange={setKeyMomentForTrigger}>
                                         <option value="">Select an option</option>
                                         <option value="Evaluation (to sale)">Evaluation (to sale)</option>
                                         <option value="Evaluation (to rent)">Evaluation (to rent)</option>
@@ -476,7 +550,7 @@ export const OfficeSettings = (props) => {
                                 </div>
                                 <div className="col-sm-12 col-md-4 mb-3">
                                     <label>Trigger Type</label>
-                                    <select className="form-select">
+                                    <select className="form-select" id="triggertypeDropdown">
                                         <option value="">Select an option</option>
                                         <option>Email</option>
                                         <option>SMS</option>
@@ -486,7 +560,7 @@ export const OfficeSettings = (props) => {
                             <div className="row">
                                 <div className="col-sm-12 col-md-4 mb-3">
                                     <label>Type of Duration</label>
-                                    <select className="form-select" onChange={onChangeOfDurationType}>
+                                    <select className="form-select" id="durationtypeDropdown" onChange={onChangeOfDurationType}>
                                         <option value="">Select an option</option>
                                         <option value="Days">Days</option>
                                         <option value="Hours">Hours</option>
@@ -501,7 +575,7 @@ export const OfficeSettings = (props) => {
                             <div className="row">
                                 <div className="col-sm-12 col-md-4 mb-3">
                                     <label>Target</label>
-                                    <input type="text" className="form-control" />
+                                    <input type="text" className="form-control" id="participent1" />
                                 </div>
                                 <div className="col-sm-12 col-md-4 mb-3">
                                     <label>C-Target</label>
@@ -517,7 +591,7 @@ export const OfficeSettings = (props) => {
                             <div className="row">
                                 <div className="col-sm-12 col-md-4 mb-3">
                                     <label>Target</label>
-                                    <input type="text" className="form-control" />
+                                    <input type="text" className="form-control" id="participent2" />
                                 </div>
                                 <div className="col-sm-12 col-md-4 mb-3">
                                     <label>C-Target</label>
@@ -606,9 +680,9 @@ export const OfficeSettings = (props) => {
                             <div className="row">
                                 <div className="col-sm-12 col-md-12 mb-3" id="surveyTypeCheckboxes">
                                     <label className="me-3 mb-0 fw-bold">Survey Email:</label>
-                                    <div class="form-check form-check-inline me-2">
-                                        <input class="form-check-input" type="checkbox" name="inlineRadioOptions" id="inlineParticipent" />
-                                        <label class="form-check-label mb-0" for="inlineParticipent" >Participent</label>
+                                    <div className="form-check form-check-inline me-2">
+                                        <input className="form-check-input" type="checkbox" name="inlineRadioOptions" id="inlineParticipent" />
+                                        <label className="form-check-label mb-0" htmlFor="inlineParticipent" >Participent</label>
                                     </div>
                                 </div>
                             </div>
@@ -648,48 +722,52 @@ export const OfficeSettings = (props) => {
                                 </div>
                             </div>
                             <Tabs
-                                defaultActiveKey="french"
-                                id="text-tabs"
+                                defaultActiveKey={selectedTab}
+                                id="texte-tabs"
                                 className="mb-3"
+                                onSelect={handleTabSelect}
                             >
                                 <Tab eventKey="french" title="French">
                                     <div className="row">
                                         <div className="col-sm-12 col-md-12 mb-3">
                                             <label>Texte</label>
-                                                <DraftailEditor
-                                                    rawContentState={null}
-                                                    blockTypes={[
-                                                        { type: BLOCK_TYPE.HEADER_ONE },
-                                                        { type: BLOCK_TYPE.HEADER_TWO },
-                                                        { type: BLOCK_TYPE.HEADER_THREE },
-                                                        { type: BLOCK_TYPE.HEADER_FOUR },
-                                                        { type: BLOCK_TYPE.HEADER_FIVE },
-                                                        { type: BLOCK_TYPE.HEADER_SIX },
-                                                        { type: BLOCK_TYPE.BLOCKQUOTE },
-                                                        { type: BLOCK_TYPE.UNORDERED_LIST_ITEM },
-                                                        { type: BLOCK_TYPE.ORDERED_LIST_ITEM }
+                                            <DraftailEditor
+                                                onSave={(raw) => {
+                                                    convertTexteToHtml(raw)
+                                                }}
+                                                rawContentState={null}
+                                                blockTypes={[
+                                                    { type: BLOCK_TYPE.HEADER_ONE },
+                                                    { type: BLOCK_TYPE.HEADER_TWO },
+                                                    { type: BLOCK_TYPE.HEADER_THREE },
+                                                    { type: BLOCK_TYPE.HEADER_FOUR },
+                                                    { type: BLOCK_TYPE.HEADER_FIVE },
+                                                    { type: BLOCK_TYPE.HEADER_SIX },
+                                                    { type: BLOCK_TYPE.BLOCKQUOTE },
+                                                    { type: BLOCK_TYPE.UNORDERED_LIST_ITEM },
+                                                    { type: BLOCK_TYPE.ORDERED_LIST_ITEM }
+                                                ]}
+                                                inlineStyles={
+                                                    [
+                                                        { type: INLINE_STYLE.BOLD },
+                                                        { type: INLINE_STYLE.ITALIC },
+                                                        { type: INLINE_STYLE.CODE },
+                                                        { type: INLINE_STYLE.UNDERLINE },
+                                                        { type: INLINE_STYLE.STRIKETHROUGH },
+                                                        { type: INLINE_STYLE.SUBSCRIPT },
+                                                        { type: INLINE_STYLE.SUPERSCRIPT },
+                                                        { type: INLINE_STYLE.MARK },
+                                                        { type: INLINE_STYLE.SMALL },
+                                                        { type: INLINE_STYLE.INSERT },
+                                                        { type: INLINE_STYLE.DELETE },
+                                                        { type: INLINE_STYLE.QUOTATION }
                                                     ]}
-                                                    inlineStyles={
-                                                        [
-                                                            { type: INLINE_STYLE.BOLD },
-                                                            { type: INLINE_STYLE.ITALIC },
-                                                            { type: INLINE_STYLE.CODE },
-                                                            { type: INLINE_STYLE.UNDERLINE },
-                                                            { type: INLINE_STYLE.STRIKETHROUGH },
-                                                            { type: INLINE_STYLE.SUBSCRIPT },
-                                                            { type: INLINE_STYLE.SUPERSCRIPT },
-                                                            { type: INLINE_STYLE.MARK },
-                                                            { type: INLINE_STYLE.SMALL },
-                                                            { type: INLINE_STYLE.INSERT },
-                                                            { type: INLINE_STYLE.DELETE },
-                                                            { type: INLINE_STYLE.QUOTATION }
-                                                        ]}
-                                                    entityTypes={[
-                                                        { type: ENTITY_TYPE.LINK },
-                                                        { type: ENTITY_TYPE.IMAGE }
-                                                    ]}
-                                                />
-                                            <button class="btn-site mt-3">View</button>
+                                                entityTypes={[
+                                                    { type: ENTITY_TYPE.LINK },
+                                                    { type: ENTITY_TYPE.IMAGE }
+                                                ]}
+                                            />
+                                            <button className="btn-site mt-3">View</button>
                                         </div>
                                     </div>
                                 </Tab>
@@ -698,6 +776,9 @@ export const OfficeSettings = (props) => {
                                         <div className="col-sm-12 col-md-12 mb-3">
                                             <label>Texte</label>
                                             <DraftailEditor
+                                                onSave={(raw) => {
+                                                    convertTexteToHtml(raw)
+                                                }}
                                                 rawContentState={null}
                                                 blockTypes={[
                                                     { type: BLOCK_TYPE.HEADER_ONE },
@@ -730,7 +811,7 @@ export const OfficeSettings = (props) => {
                                                     { type: ENTITY_TYPE.IMAGE }
                                                 ]}
                                             />
-                                            <button class="btn-site mt-3">View</button>
+                                            <button className="btn-site mt-3">View</button>
                                         </div>
                                     </div>
                                 </Tab>
@@ -739,6 +820,9 @@ export const OfficeSettings = (props) => {
                                         <div className="col-sm-12 col-md-12 mb-3">
                                             <label>Texte</label>
                                             <DraftailEditor
+                                                onSave={(raw) => {
+                                                    convertTexteToHtml(raw)
+                                                }}
                                                 rawContentState={null}
                                                 blockTypes={[
                                                     { type: BLOCK_TYPE.HEADER_ONE },
@@ -771,7 +855,7 @@ export const OfficeSettings = (props) => {
                                                     { type: ENTITY_TYPE.IMAGE }
                                                 ]}
                                             />
-                                            <button class="btn-site mt-3">View</button>
+                                            <button className="btn-site mt-3">View</button>
                                         </div>
                                     </div>
                                 </Tab>
@@ -779,40 +863,40 @@ export const OfficeSettings = (props) => {
                             <div className="row">
                                 <div className="col-sm-12 col-md-12 mb-3">
                                     <label className="me-3">Link</label>
-                                    <input type="text" className="form-control" id="surveyLink" value="https://survey.realadvice.be/TRIOR/?" />
+                                    <input type="text" className="form-control" id="surveyLink" defaultValue="https://survey.realadvice.be/TRIOR/?" />
                                 </div>
                             </div>
                             <div className="row">
                                 <div className="col-sm-12 mb-3">
                                     <div className="form-check form-check-inline me-2">
-                                        <input className="form-check-input" type="checkbox" name="inlineRadioOptions" id="checkboxAgent" value="Harold+Salm" onChange={generateSurveyLink} />
-                                        <label className="form-check-label mb-0" for="checkboxAgent" >Agent</label>
+                                        <input className="form-check-input" type="checkbox" name="inlineRadioOptions" id="checkboxAgent" defaultValue="Harold+Salm" onChange={generateSurveyLink} />
+                                        <label className="form-check-label mb-0" htmlFor="checkboxAgent" >Agent</label>
                                     </div>
                                     <div className="form-check form-check-inline me-2">
-                                        <input className="form-check-input" type="checkbox" name="inlineRadioOptions" id="checkboxOffice" value="office" onChange={generateSurveyLink} />
-                                        <label className="form-check-label mb-0" for="checkboxOffice" >Office</label>
+                                        <input className="form-check-input" type="checkbox" name="inlineRadioOptions" id="checkboxOffice" defaultValue="office" onChange={generateSurveyLink} />
+                                        <label className="form-check-label mb-0" htmlFor="checkboxOffice" >Office</label>
                                     </div>
                                     <div className="form-check form-check-inline me-2">
-                                        <input className="form-check-input" type="checkbox" name="inlineRadioOptions" id="checkboxDob" value="07-15-1996" onChange={generateSurveyLink} />
-                                        <label className="form-check-label mb-0" for="checkboxDob" >DOB</label>
+                                        <input className="form-check-input" type="checkbox" name="inlineRadioOptions" id="checkboxDob" defaultValue="07-15-1996" onChange={generateSurveyLink} />
+                                        <label className="form-check-label mb-0" htmlFor="checkboxDob" >DOB</label>
                                     </div>
                                     <div className="form-check form-check-inline me-2">
-                                        <input className="form-check-input" type="checkbox" name="inlineRadioOptions" id="checkboxLanguage" value="du" onChange={generateSurveyLink} />
-                                        <label className="form-check-label mb-0" for="checkboxLanguage" >Language</label>
+                                        <input className="form-check-input" type="checkbox" name="inlineRadioOptions" id="checkboxLanguage" defaultValue="du" onChange={generateSurveyLink} />
+                                        <label className="form-check-label mb-0" htmlFor="checkboxLanguage" >Language</label>
                                     </div>
                                 </div>
                             </div>
                             <div className="row">
                                 <div className="col-sm-12 col-md-12 mb-3">
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="checkbox" name="activateReminderOptions" id="activateReminder" value="option1" />
-                                        <label class="form-check-label" for="activateReminder">Activate Reminder</label>
+                                    <div className="form-check form-check-inline">
+                                        <input className="form-check-input" type="checkbox" name="activateReminderOptions" id="activateReminder" defaultValue="option1" />
+                                        <label className="form-check-label" htmlFor="activateReminder">Activate Reminder</label>
                                     </div>
                                 </div>
                             </div>
 
                             <div className="text-center">
-                                <button class="btn-site" onClick={createNewSurveyEmail}>Create New Version of Email</button>
+                                <button className="btn-site" onClick={createNewSurveyEmail}>Create New Version of Email</button>
                             </div>
                         </>
                         :
