@@ -32,6 +32,43 @@ namespace realAdviceTriggerSystemAPI.Controllers
             }
         }
 
+
+        [HttpGet]
+        [Route("GetAllTriggersByOffice")]
+        public JsonResult GetAllTriggersByOffice(int officeId)
+        {
+            try
+            {
+                using (var con = new RealadviceTriggeringSystemContext())
+                {
+                    List<OfficeTrigger>? _officeTriggers = con.OfficeTriggers.Where(c => c.Officeid == officeId).ToList();
+                    return new JsonResult(_officeTriggers);
+                }
+            }
+            catch (Exception exp)
+            {
+                return new JsonResult(exp);
+            }
+        }
+
+        [HttpGet]
+        [Route("GetAllTriggers")]
+        public JsonResult GetAllTriggers()
+        {
+            try
+            {
+                using (var con = new RealadviceTriggeringSystemContext())
+                {
+                    List<OfficeTrigger>? _officeTriggers = con.OfficeTriggers.ToList();
+                    return new JsonResult(_officeTriggers);
+                }
+            }
+            catch (Exception exp)
+            {
+                return new JsonResult(exp);
+            }
+        }
+
         [HttpPost]
         [Route("SaveOfficeTriggerDetail")]
         public JsonResult SaveOfficeTriggerDetail(OfficeTrigger officeTrigger)
@@ -46,10 +83,13 @@ namespace realAdviceTriggerSystemAPI.Controllers
                     if (_trigger != null)
                     {
                         officeTrigger.OfficeTriggerid = _trigger.OfficeTriggerid;
+                        officeTrigger.UpdatedOn = DateTime.Now;
                         con.SaveChanges();
                     }
                     else
                     {
+                        officeTrigger.CreatedOn = DateTime.Now;
+                        officeTrigger.UpdatedOn = DateTime.Now;
                         con.OfficeTriggers.Add(officeTrigger);
                         con.SaveChanges();
                     }

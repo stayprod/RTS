@@ -96,3 +96,11 @@
     background-color: #e9ecef;
     opacity: 1;
 }
+
+.remove-setting-icon{
+    position: absolute;
+    right: -4px;
+    bottom: 28px;
+    width: auto;
+    padding: 0;
+}

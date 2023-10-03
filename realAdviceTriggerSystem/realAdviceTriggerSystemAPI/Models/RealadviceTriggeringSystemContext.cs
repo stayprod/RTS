@@ -25,6 +25,8 @@ public partial class RealadviceTriggeringSystemContext : DbContext
 
     public virtual DbSet<OfficeTrigger> OfficeTriggers { get; set; }
 
+    public virtual DbSet<PimcoreSetting> PimcoreSettings { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseMySQL("server=localhost; port=3306; database=realadvice-triggering-system; user=pimcore_user; password=eezahtech*1;Persist Security Info=False;Connect Timeout=300;ConvertZeroDateTime=True");
@@ -198,6 +200,9 @@ public partial class RealadviceTriggeringSystemContext : DbContext
             entity.Property(e => e.CTarget2)
                 .HasMaxLength(50)
                 .HasColumnName("c_target_2");
+            entity.Property(e => e.CreatedOn)
+                .HasColumnType("datetime")
+                .HasColumnName("created_on");
             entity.Property(e => e.DurationType)
                 .HasMaxLength(200)
                 .HasColumnName("duration_type");
@@ -231,6 +236,38 @@ public partial class RealadviceTriggeringSystemContext : DbContext
             entity.Property(e => e.TriggerType)
                 .HasMaxLength(200)
                 .HasColumnName("trigger_type");
+            entity.Property(e => e.UpdatedOn)
+                .HasColumnType("datetime")
+                .HasColumnName("updated_on");
+        });
+
+        modelBuilder.Entity<PimcoreSetting>(entity =>
+        {
+            entity.HasKey(e => e.PimcoreSettingid).HasName("PRIMARY");
+
+            entity.ToTable("pimcore_setting");
+
+            entity.Property(e => e.PimcoreSettingid)
+                .HasColumnType("int(11)")
+                .HasColumnName("pimcore_settingid");
+            entity.Property(e => e.CreatedOn)
+                .HasColumnType("datetime")
+                .HasColumnName("created_on");
+            entity.Property(e => e.FirstName)
+                .HasMaxLength(200)
+                .HasColumnName("first_name");
+            entity.Property(e => e.LastName)
+                .HasMaxLength(200)
+                .HasColumnName("last_name");
+            entity.Property(e => e.LoginId)
+                .HasMaxLength(200)
+                .HasColumnName("login_id");
+            entity.Property(e => e.Officeid)
+                .HasColumnType("int(11)")
+                .HasColumnName("officeid");
+            entity.Property(e => e.WhiseOfficeid)
+                .HasColumnType("int(11)")
+                .HasColumnName("whise_officeid");
         });
 
         OnModelCreatingPartial(modelBuilder);

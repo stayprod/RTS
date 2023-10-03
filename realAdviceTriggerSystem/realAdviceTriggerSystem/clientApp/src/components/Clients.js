@@ -17,7 +17,7 @@ export const Clients = (props) => {
     const [settingObj, setSettingObj] = useState({});
     const [showAppended, setShowAppended] = useState(false);
     const [clientOffices, setClientOffices] = useState({});
-    const [clientWarning, setClientWarning] = useState("");
+    const [clientWarning, setClientWarning] = useState(0);
     const navigate = useNavigate();
     const token = useToken();
 
@@ -136,13 +136,12 @@ export const Clients = (props) => {
                                 <br />
                                 <span className="titleSpan fw-bold">STATUS:</span> {item.localclient.client.activationStatus != null ? item.localclient.client.activationStatus : "Pending"}
                                 <br />
-                                {
-                                    item.localclient.client != undefined ? "" :
-                                        <>
-                                            <FontAwesomeIcon icon={faExclamationTriangle} /><span>Warning!</span>
-                                            <br />
-                                        </>
-                                }
+                                <div>
+                                    <FontAwesomeIcon icon={faExclamationTriangle} />
+                                    <span className="titleSpan fw-bold">Warnings: </span>
+                                    <span id={"client_" + item.id}></span>
+                                    <br />
+                                </div>
                                 <button className='btn-site button top-right' clientdetail={JSON.stringify(item)} onClick={showClientSettingsHandler}>
                                     Settings
                                 </button>

@@ -5,7 +5,9 @@ VisualStudioVersion = 17.6.33801.468
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "realAdviceTriggerSystem", "realAdviceTriggerSystem\realAdviceTriggerSystem.csproj", "{89492015-13F8-461D-8171-907377860C54}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "realAdviceTriggerSystemAPI", "realAdviceTriggerSystemAPI\realAdviceTriggerSystemAPI.csproj", "{86C60115-4CBB-48DC-B726-A0D158EB40C0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "realAdviceTriggerSystemAPI", "realAdviceTriggerSystemAPI\realAdviceTriggerSystemAPI.csproj", "{86C60115-4CBB-48DC-B726-A0D158EB40C0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "realAdviceTriggerSystemService", "realAdviceTriggerService\realAdviceTriggerSystemService.csproj", "{F1232AEC-01ED-487F-8E5C-5AB6D03BA301}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{86C60115-4CBB-48DC-B726-A0D158EB40C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86C60115-4CBB-48DC-B726-A0D158EB40C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{86C60115-4CBB-48DC-B726-A0D158EB40C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1232AEC-01ED-487F-8E5C-5AB6D03BA301}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1232AEC-01ED-487F-8E5C-5AB6D03BA301}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1232AEC-01ED-487F-8E5C-5AB6D03BA301}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1232AEC-01ED-487F-8E5C-5AB6D03BA301}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

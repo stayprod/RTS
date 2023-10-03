@@ -10,25 +10,34 @@ import { faExclamationTriangle, faFilter } from '@fortawesome/free-solid-svg-ico
 
 export const Offices = (props) => {
     const { clientId, client } = props;
-    const [officesList, setOfficesList] = useState([]);
+    const [whiseOfficesList, setWhiseOfficesList] = useState([]);
     const navigate = useNavigate();
 
     const officeSettingClickHandler = (e) => {
         let office = JSON.parse(e.target.getAttribute("officedetail"));
 
+        const localOffices = client.localclient.office;
+
+        //filtering out locally saved office 
+        const l_office = localOffices.filter(item => {
+            return item.whiseOfficeid == office.id
+        })
+
         const stateBuilder = {
-            CurrentOffice: office,
-            AllOffices: officesList,
-            CurrentClient: client
+            WhiseOffice: office,
+            AllWhiseOffices: whiseOfficesList,
+            CurrentClient: client,
+            LocalOffice: l_office[0]
         }
 
-        const url = "/OfficeSettings/" + office.id;
+        const url = "/officesettings/" + office.id;
 
         navigate(url, {
             state: stateBuilder
         })
     }
     const token = useToken();
+    let warningCount = 0;
 
     useEffect(() => {
         //const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImlhdCI6MTY5MzI5MTY4OH0.eyJzZXJ2aWNlQ29uc3VtZXJJZCI6MTMzNywidHlwZUlkIjo0LCJjbGllbnRJZCI6MTAyNjN9.1-9mYean_qX58r6ykhP545Y3r8IGK53PgDOoyIja8YM';
@@ -55,6 +64,7 @@ export const Offices = (props) => {
                         }
                     }
                     else {
+                        warningCount++;
                         item.warning = true;
                         let isAlreadyPushed = finalArrayToSet.includes(item, 0);
                         if (isAlreadyPushed == false) {
@@ -62,7 +72,14 @@ export const Offices = (props) => {
                         }
                     }
                 })
-                setOfficesList(finalArrayToSet);
+                setWhiseOfficesList(finalArrayToSet);
+                if (warningCount == 0) {
+                    document.getElementById("client_" + clientId).parentElement.classList.add("d-none");
+                }
+                else {
+                    document.getElementById("client_" + clientId).parentElement.classList.remove("d-none");
+                    document.getElementById("client_" + clientId).innerHTML = warningCount;
+                }
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
@@ -72,12 +89,9 @@ export const Offices = (props) => {
     return (
         <div className="pt-4 px-5">
             {
-                officesList.length > 0 ? officesList.map((item, i) => {
-                    //let existedOffInDb = client.localclient.office.filter(_off => {
-                    //    return _off.whiseOfficeid == item.id
-                    //})
+                whiseOfficesList.length > 0 ? whiseOfficesList.map((item, i) => {
                     return (
-                        <table className={i == officesList.length - 1 ? "table mb-0" : "table"} id='expandable-table'>
+                        <table className={i == whiseOfficesList.length - 1 ? "table mb-0" : "table"} id='expandable-table'>
                             <tbody id='table-body'>
                                 <tr>
                                     <td>

@@ -16,13 +16,13 @@ namespace realAdviceTriggerSystemAPI.Controllers
 
         [HttpGet]
         [Route("GetOfficeDetail")]
-        public JsonResult GetOfficeDetail(int officeId)
+        public JsonResult GetOfficeDetail(int whiseOfficeId)
         {
             try
             {
                 using (var con = new RealadviceTriggeringSystemContext())
                 {
-                    Office? _office = con.Offices.Where(c => c.WhiseOfficeid == officeId).FirstOrDefault();
+                    Office? _office = con.Offices.Where(c => c.WhiseOfficeid == whiseOfficeId).FirstOrDefault();
                     return new JsonResult(_office);
                 }
             }

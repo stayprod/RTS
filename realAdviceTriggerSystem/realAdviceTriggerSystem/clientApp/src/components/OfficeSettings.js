@@ -10,65 +10,149 @@ import { DraftailEditor, BLOCK_TYPE, INLINE_STYLE, ENTITY_TYPE, UNDO_ICON } from
 import { useToken } from './tokenContext';
 import { variables } from '../Variables';
 
-import { EmailLayoutModal } from './EmailLayout';
-
-const options = [
-    { label: "to sale", value: "to sale" },
-    { label: "to rent", value: "to rent" },
-    { label: "annuity sale", value: "annuity sale" },
-];
+import { Trigger } from './Trigger';
 
 export const OfficeSettings = (props) => {
     const token = useToken();
     const [offices, setOffices] = useState({});
-    const [data, setData] = useState([]);
-    const [currentOffice, setCurrentOffice] = useState({});
+    const [whiseOffice, setWhiseOffice] = useState({});
+    const [localOffice, setLocalOffice] = useState({});
     const [currentClient, setCurrentClient] = useState({});
-    const [officeLayout, setOfficeLayouts] = useState({});
+    const [triggers, setTriggers] = useState({});
     const [showTriggerScreen, setShowTriggerScreen] = useState(false);
-    const [selectedOption, setSelectedOption] = useState('');
-    const [selected, setSelected] = useState([]);
-    const [symbol, setSymbol] = useState("+");
-    const [keyMoment, setKeyMoment] = useState("Trigger:");
     const [file, setFile] = useState();
     const [fileName, setFileName] = useState();
-    const [showLayoutModal, setShowLayoutModal] = useState(false);
-    const [layoutModalTitle, setLayoutModalTitle] = useState("");
-    const [layoutModalType, setLayoutModalType] = useState("");
-    const [selectedLaytOutId, setSelectedLaytOutId] = useState(0);
-    const [selectedLaytName, setSelectedLaytName] = useState("");
-    const [officeId, setOfficeId] = useState(0);
-    const [clientId, setClientId] = useState(0);
-    const [emailTexte, setEmailTexte] = useState("");
-    const [selectedTab, setSelectedTab] = useState("french");
+    const [pimcoreSettingsHtml, setPimcoreSettingsHtml] = useState("");
+    const [pimcoreSettingsRows, setPimcoreSettingsRows] = useState(0);
+    const [pimcoreSettings, setPimcoreSettings] = useState({});
 
     let linkBuilder = "";
-    let participentType = [];
 
     const location = useLocation();
     const navigate = useNavigate();
     const optionElements = [];
 
     const getListOfOfficesFromStateBuilder = () => {
-        setOffices(location.state.AllOffices);
-        setCurrentOffice(location.state.CurrentOffice);
+        //list of whise offices for a specific client
+        setOffices(location.state.AllWhiseOffices);
+
+        //selected office detail from whise
+        setWhiseOffice(location.state.WhiseOffice);
+
+        //client object including whise client detail and local database client detail
         setCurrentClient(location.state.CurrentClient);
+
+        setLocalOffice(location.state.LocalOffice);
+        getTriggersByOffice(location.state.LocalOffice);
+        getPimcoreSettingsByOffice(location.state.WhiseOffice);
     }
 
-    const getListOfLayoutsByOffice = async () => {
-        const response = await fetch(variables.API_URL + 'Layout/GetLayoutsByOffice?officeId=' + location.state.CurrentOffice.id);
+    const getTriggersByOffice = async (_office) => {
+        if (_office == undefined) {
+            return
+        }
+        const response = await fetch(variables.API_URL + 'OfficeTrigger/GetAllTriggersByOffice?officeId=' + _office.officeid);
         const jsonData = await response.json();
         if (jsonData != null) {
-            setOfficeLayouts(jsonData)
+            setTriggers(jsonData);
         }
+    }
+
+    const getPimcoreSettingsByOffice = async (_office) => {
+        if (_office == undefined) {
+            return
+        }
+        const response = await fetch(variables.API_URL + 'PimcoreSettings/GetPimcoreDetail?whiseOfficeId=' + _office.id);
+        const jsonData = await response.json();
+        if (jsonData != null && jsonData.length > 0) {
+            setPimcoreSettings(jsonData);
+            jsonData.forEach((item, i) => {
+                let newRowhtml = `<div class="row position-relative" id="row${i}"><div class="col-sm-4 mb-3 mb-md-3">
+                        <label>First Name</label>
+                        <input type="text" class="form-control" id="pimcoreFName${i}" value="${item.firstName}" />
+                    </div>
+                    <div class="col-sm-4 mb-3 mb-md-3">
+                        <label>Last Name</label>
+                        <input type="text" class="form-control" id="pimcoreLName${i}" value="${item.lastName}" />
+                    </div>
+                    <div class="col-sm-4 mb-3 mb-md-3">
+                        <label>Login Id</label>
+                        <input type="text" class="form-control" id="pimcoreLoginID${i}" value="${item.loginId}" />
+                    </div>
+                    <span class="remove-setting-icon" onclick="removePimcoreSettingsRow" parentid="row${i}">
+                        <svg title="delete row" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 384 512">
+                            <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
+                        </svg>
+                    </span>
+                    </div>`;
+                setPimcoreSettingsHtml(prevState => prevState + newRowhtml);
+            })
+            setPimcoreSettingsRows(jsonData.length);
+        }
+        else {
+            let newRowhtml = `<div class="row position-relative" id="row0"><div class="col-sm-4 mb-3 mb-md-3">
+                        <label>First Name</label>
+                        <input type="text" class="form-control" id="pimcoreFName0" value="" />
+                    </div>
+                    <div class="col-sm-4 mb-3 mb-md-3">
+                        <label>Last Name</label>
+                        <input type="text" class="form-control" id="pimcoreLName0" value="" />
+                    </div>
+                    <div class="col-sm-4 mb-3 mb-md-3">
+                        <label>Login Id</label>
+                        <input type="text" class="form-control" id="pimcoreLoginID0" value="" />
+                    </div>
+                    <span class="remove-setting-icon" onclick="removePimcoreSettingsRow" parentid="row0">
+                        <svg title="delete row" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 384 512">
+                            <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
+                        </svg>
+                    </span>
+                    </div>`;
+            setPimcoreSettingsHtml(prevState => prevState + newRowhtml);
+            setPimcoreSettingsRows(1);
+        }
+    }
+
+    const addNewPimcoreSettingsRow = (e) => {
+        if (pimcoreSettingsRows == 4) {
+            alert("Maximum four agents are allowed");
+            return
+        }
+        setPimcoreSettingsRows(prevState => prevState + 1);
+        let newRowhtml = `<div class="row position-relative" id="row${pimcoreSettingsRows}"><div class="col-sm-4 mb-3 mb-md-3">
+                        <label>First Name</label>
+                        <input type="text" class="form-control" id="pimcoreFName${pimcoreSettingsRows}" />
+                    </div>
+                    <div class="col-sm-4 mb-3 mb-md-3">
+                        <label>Last Name</label>
+                        <input type="text" class="form-control" id="pimcoreLName${pimcoreSettingsRows}" />
+                    </div>
+                    <div class="col-sm-4 mb-3 mb-md-3">
+                        <label>Login Id</label>
+                        <input type="text" class="form-control" id="pimcoreLoginID${pimcoreSettingsRows}" />
+                    </div>
+                    <span class="remove-setting-icon" onclick="removePimcoreSettingsRow" parentid="row${pimcoreSettingsRows}">
+                        <svg title="delete row" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 384 512">
+                            <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
+                        </svg>
+                    </span>
+                    </div>`;
+        setPimcoreSettingsHtml(prevState => prevState + newRowhtml);
+    }
+
+    const removePimcoreSettingsRow = (e) => {
+        const rowsCount = pimcoreSettingsRows - 1;
+        const parentId = e.target.getAttribute("parentid");
+        document.getElementById(parentId).remove();
+        setPimcoreSettingsRows(rowsCount);
     }
 
     const officeSettingClickHandler = (e) => {
         let office = JSON.parse(e.target.getAttribute("officedetail"));
 
         const stateBuilder = {
-            CurrentOffice: office,
-            AllOffices: offices,
+            WhiseOffice: office,
+            AllWhiseOffices: offices,
             CurrentClient: currentClient
         }
 
@@ -86,206 +170,12 @@ export const OfficeSettings = (props) => {
 
     }
 
-    const showTriggerForm = (e) => {
-
-        if (symbol == "+") {
-            setSymbol("-");
-        }
-        else {
-            setSymbol("+");
-        }
-        setShowTriggerScreen(prevState => !prevState);
-    }
-
-    const setKeyMomentForTrigger = (e) => {
-        let value = e.target.value;
-        setKeyMoment("Trigger - " + value);
-    }
-
-    const onChangeOfDurationType = (e) => {
-        let value = e.target.value;
-        if (value != "") {
-            document.getElementById("durationValue").removeAttribute("disabled");
-        }
-        else {
-            document.getElementById("durationValue").value = "";
-            document.getElementById("durationValue").setAttribute("disabled", true);
-        }
-    }
-
-    const createNewSurveyEmail = (e) => {
-
-    }
-
-    const setListOfTargetType = (e) => {
-        let value = e.target.value;
-        let html = ""
-        if (participentType.indexOf(value) == -1 && value != "") {
-            participentType.push(value);
-        }
-        document.getElementById("surveyTypeCheckboxes").innerHTML = "";
-
-        html += `<label class="me-3 mb-0 fw-bold">Survey Email:</label>`;
-        html += `<div class="form-check form-check-inline me-2">
-                    <input class="form-check-input" type="checkbox" name="inlineRadioOptions" id="inlineParticipent" />
-                    <label class="form-check-label mb-0" for="inlineParticipent" >Participent</label>
-                </div>`
-
-        participentType.forEach((item) => {
-            html += `<div class="form-check form-check-inline me-2">
-                        <input class="form-check-input" type="checkbox" name="inlineRadioOptions" id="inline${item}" />
-                        <label class="form-check-label mb-0" for="inline${item}" >${item}</label>
-                    </div>`
-        })
-
-        document.getElementById("surveyTypeCheckboxes").innerHTML += html;
-    }
-
-    const generateSurveyLink = (e) => {
-        let checked = e.target.checked;
-        let value = e.target.value;
-        let link = document.getElementById("surveyLink").value;
-        let id = e.target.id;
-
-        if (checked == false) {
-            let newLink = ""
-            if (id == "checkboxAgent" && link.indexOf("&agent") > -1) {
-                newLink = link.replace("&agent=" + value, "");
-            }
-            else if (id == "checkboxAgent") {
-                newLink = link.replace("agent=" + value, "");
-            }
-            if (id == "checkboxOffice" && link.indexOf("&office") > -1) {
-                newLink = link.replace("&office=" + value, "");
-            }
-            else if (id == "checkboxOffice") {
-                newLink = link.replace("office=" + value, "");
-            }
-            if (id == "checkboxDob" && link.indexOf("&DOB") > -1) {
-                newLink = link.replace("&DOB=" + value, "");
-            }
-            else if (id == "checkboxDob") {
-                newLink = link.replace("DOB=" + value, "");
-            }
-
-            document.getElementById("surveyLink").value = newLink;
-        }
-        else {
-            if (id == "checkboxAgent") {
-                if (linkBuilder == "") {
-                    linkBuilder += "agent=" + value;
-                }
-                else {
-                    linkBuilder = "";
-                    linkBuilder += "&agent=" + value;
-                }
-            }
-            if (id == "checkboxOffice") {
-                if (linkBuilder == "") {
-                    linkBuilder += "office=" + value;
-                }
-                else {
-                    linkBuilder = "";
-                    linkBuilder += "&office=" + value;
-                }
-            }
-            if (id == "checkboxDob") {
-                if (linkBuilder == "") {
-                    linkBuilder += "DOB=" + value;
-                }
-                else {
-                    linkBuilder = "";
-                    linkBuilder += "&DOB=" + value;
-                }
-            }
-
-            link += linkBuilder;
-            document.getElementById("surveyLink").value = link;
-        }
-    }
-
-    const setSelectedEmailLayout = (e) => {
-        let value = e.target.value;
-        if (value != "") {
-            setSelectedLaytOutId(value);
-            var index = e.target.selectedIndex;
-            setSelectedLaytName(e.target[index].text);
-        }
-        else {
-            setSelectedLaytName("");
-        }
-    }
-
-    const hideLayoutModal = (e) => {
-        setShowLayoutModal(false);
-    }
-
-    const openLayoutModal = (e) => {
-        if (e.target.innerText == "New") {
-            setShowLayoutModal(true);
-            setLayoutModalTitle("New Layout");
-            setLayoutModalType("new");
-            setOfficeId(currentOffice.id);
-            setClientId(currentClient.id);
-        }
-        else {
-            if (document.getElementById("layoutDropdown").value == "") {
-                alert("No layout selected for preview");
-                return
-            }
-            setShowLayoutModal(true);
-            setLayoutModalTitle(selectedLaytName + " Layout Preview");
-            setLayoutModalType("preview");
-            setOfficeId(currentOffice.id);
-            setClientId(currentClient.id);
-        }
-    }
-
     const saveFile = (e) => {
         setFile(e.target.files[0]);
         const filename = e.target.files[0].name;
         const extension = filename.split(".")[1];
-        const finalName = currentOffice.name.replace(/ /g, "") + "." + extension;
+        const finalName = whiseOffice.name.replace(/ /g, "") + "." + extension;
         setFileName(finalName);
-    }
-
-    const saveTrigger = (office) => {
-
-        //configurations to post json data
-        const jsonconfig = {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        };
-
-        //SaveOfficeTriggerDetail api call
-        //Api call to save trigger for an office
-        let language = selectedTab.e;
-        let trigger = {};
-        let objOfficeTrigger = {
-            OfficeTriggerid: 0,
-            Officeid: +office.officeid,
-            Layoutid: +selectedLaytOutId,
-            TriggerName: document.getElementById("tname").innerText,
-            KeyMoment: document.getElementById("keymomentDropdown").value,
-            TriggerType: document.getElementById("triggertypeDropdown").value,
-            DurationType: document.getElementById("durationtypeDropdown").value,
-            DurationValue: +document.getElementById("durationValue").value,
-            TargetParticipant1: document.getElementById("participent1").value,
-            CTarget1: document.getElementById("ctarget1").value,
-            TargetParticipant2: document.getElementById("participent2").value,
-            CTarget2: document.getElementById("ctarget2").value,
-            Language: language,
-            Texte: emailTexte,
-        }
-        let triggerurl = variables.API_URL + `OfficeTrigger/SaveOfficeTriggerDetail?`;
-        return axios.post(triggerurl, JSON.stringify(objOfficeTrigger), jsonconfig)
-            .then((response) => {
-                response.data
-            })
-            .catch(error => {
-                alert('Error fetching data:', error);
-            });
     }
 
     const uploadImage = () => {
@@ -314,109 +204,107 @@ export const OfficeSettings = (props) => {
 
     }
 
-    const saveOfficeSettings = (e) => {
-        //uploadImage().then((imgPath) => {
-            //configurations to post json data
-            const jsonconfig = {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            };
+    const showTriggerForm = (_office) => {
+        const stateBuilder = {
+            LocalOfficeDetail: _office,
+            WhiseOffice: whiseOffice,
+            ClientDetail: currentClient,
+            AllWhiseOffices: offices
+        }
 
-            //SaveOfficeDetail api call
-            //save office settings in database
-            let objOfficeSettings = {
-                Officeid: 0,
-                Clientid: currentClient.localclient.client.clientid,
-                WhiseOfficeid: currentOffice.id == undefined ? currentOffice.whiseOfficeid : currentOffice.id,
-                CommercialName: currentOffice.name,
-                CrmDetail: "",
-                OfficeImg: "",
-                UniqueKey: "",
+        const url = "/trigger/" + _office.officeid;
+        navigate(url, {
+            state: stateBuilder
+        })
+    }
+
+    const savePimcoreSettings = (_elementId) => {
+        const jsonconfig = {
+            headers: {
+                'Content-Type': 'application/json'
             }
-            let url = variables.API_URL + `Office/SaveOfficeDetail?`;
-            axios.post(url, JSON.stringify(objOfficeSettings), jsonconfig)
-                .then((response) => {
-                    debugger;
-                    setCurrentOffice(response.data);
-                    saveTrigger(response.data).then((data) => {
-                        alert("Office settings successfully saved.")
-                    })
-                })
-                .catch(error => {
-                    alert('Error fetching data:', error);
-                });
-        //});
+        };
+
+        let pimcoreAgentsList = [];
+
+        for (var i = 0; i < pimcoreSettingsRows; i++) {
+            let settingId = pimcoreSettings[i] != undefined ? pimcoreSettings[i].pimcoreSettingid : 0;
+            let objPimcoreSettings = {
+                PimcoreSettingid: settingId,
+                Officeid: +localOffice.officeid,
+                WhiseOfficeid: +whiseOffice.id,
+                FirstName: document.getElementById("pimcoreFName" + i).value,
+                LastName: document.getElementById("pimcoreLName" + i).value,
+                LoginId: document.getElementById("pimcoreLoginID" + i).value
+            }
+            pimcoreAgentsList.push(objPimcoreSettings);
+        }
+
+
+        //SavePimcoreSetting api call
+        //save pimcore settings in database
+        let url = variables.API_URL + `PimcoreSettings/SavePimcoreSetting?`;
+        axios.post(url, pimcoreAgentsList, jsonconfig)
+            .then((response) => {
+                setPimcoreSettings(response.data);
+                if (_elementId == "saveOfficeSettings") {
+                    alert("Office settings successfully saved.");
+                }
+            })
+            .catch(error => {
+                alert('Error fetching data:', error);
+            });
         //use the token to make further calls
     }
 
-    const exporterConfigForTexte = {
-        blockToHTML: (block) => {
-            if (block.type === BLOCK_TYPE.BLOCKQUOTE) {
-                return <blockquote />
+    const saveOfficeSettings = (e) => {
+        //configurations to post json data
+        const jsonconfig = {
+            headers: {
+                'Content-Type': 'application/json'
             }
+        };
 
-            // Discard atomic blocks, as they get converted based on their entity.
-            if (block.type === BLOCK_TYPE.ATOMIC) {
-                return {
-                    start: "",
-                    end: "",
+        //SaveOfficeDetail api call
+        //save office settings in database
+        let objOfficeSettings = {
+            Officeid: 0,
+            Clientid: currentClient.localclient.client.clientid,
+            WhiseOfficeid: localOffice != undefined ? localOffice.whiseOfficeid : whiseOffice.id,
+            CommercialName: whiseOffice.name,
+            CrmDetail: "",
+            OfficeImg: "",
+            UniqueKey: "",
+        }
+
+        let url = variables.API_URL + `Office/SaveOfficeDetail?`;
+        axios.post(url, JSON.stringify(objOfficeSettings), jsonconfig)
+            .then((response) => {
+                setLocalOffice(response.data);
+                savePimcoreSettings(e.target.id);
+                if (e.target.id == "addTrigger") {
+                    showTriggerForm(response.data);
                 }
-            }
-
-            return null
-        },
-
-        entityToHTML: (entity, originalText) => {
-            if (entity.type === ENTITY_TYPE.LINK) {
-                return <a href={entity.data.url}>{originalText}</a>
-            }
-
-            if (entity.type === ENTITY_TYPE.IMAGE) {
-                return <img src={entity.data.src} alt={entity.data.alt} />
-            }
-
-            if (entity.type === ENTITY_TYPE.HORIZONTAL_RULE) {
-                return <hr />
-            }
-
-            return originalText
-        },
+            })
+            .catch(error => {
+                alert('Error fetching data:', error);
+            });
+        //use the token to make further calls
     }
 
-    const convertTexteToHtml = (raw) => {
-        raw ? setEmailTexte(convertToHTML(exporterConfigForTexte)(convertFromRaw(raw))) : "";
-        console.log(emailTexte);
+    const EditTrigger = (e) => {
+
     }
 
-    const handleTabSelect = (e) => {
-        setSelectedTab({ e });
+    const DeleteTrigger = (e) => {
 
     }
 
     useEffect(() => {
-
         if (location.state != null) {
             getListOfOfficesFromStateBuilder();
-            getListOfLayoutsByOffice();
         }
-        if (token == undefined) {
-            return
-        }
-        const config = {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-        };
-        axios.post('https://api.whise.eu/v1/calendars/actions/list', {}, config) // ASP.NET Core API endpoint with headers
-            .then(response => {
-                setData(response.data.calendarActions);
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
-    }, [token])
+    }, [])
 
     return (
         <section className="client-setting">
@@ -428,7 +316,7 @@ export const OfficeSettings = (props) => {
             <div className="pb-4 pt-2">
                 {
                     offices.length > 0 ? offices.map(item => {
-                        let activeClass = item.id == currentOffice.id ? "office-active" : "";
+                        let activeClass = item.id == whiseOffice.id ? "office-active" : "";
 
                         return (
                             <span className={"name-tiles " + activeClass} onClick={officeSettingClickHandler} officedetail={JSON.stringify(item)}>{
@@ -444,7 +332,7 @@ export const OfficeSettings = (props) => {
                 <div className="row">
                     <div className="col-sm-4 mb-3 mb-md-0">
                         <label>Office Name</label>
-                        <input className="form-control" defaultValue={currentOffice.name} disabled />
+                        <input className="form-control" defaultValue={whiseOffice.name} disabled />
                     </div>
                     <div className="col-sm-4"></div>
                     <div className="col-sm-4">
@@ -471,7 +359,7 @@ export const OfficeSettings = (props) => {
                     </div>
                     <div className="col-sm-4 mb-3 mb-md-0">
                         <label>Office ID</label>
-                        <input type="text" className="form-control" defaultValue={currentOffice.id} />
+                        <input type="text" className="form-control" defaultValue={whiseOffice.id} />
                     </div>
                     <div className="col-sm-4 mb-3 mb-md-0">
                         <label>Unique Key</label>
@@ -480,432 +368,74 @@ export const OfficeSettings = (props) => {
                 </div>
             </div>
             <div className="card">
-                <div>
-                    <h6 className="sub-heading fw-bold mb-3">PIMCORE Settings:</h6>
+                <div className="d-flex justify-content-between">
+                    <h6 className="sub-heading fw-bold mb-3">PIMCORE Settings: </h6>
+                    <button className="btn-site" id="addPimcoreSettings" onClick={addNewPimcoreSettingsRow}>Add Agent</button>
                 </div>
                 <div className="row">
-                    <div className="col-sm-4 mb-3 mb-md-3">
-                        <label>Agent</label>
-                        <input type="text" className="form-control" />
-                    </div>
-                    <div className="col-sm-4 mb-3 mb-md-3">
-                        <label>Name</label>
-                        <input type="text" className="form-control" />
-                    </div>
-                    <div className="col-sm-4 mb-3 mb-md-3">
-                        <label>Key</label>
-                        <input type="text" className="form-control" />
-                    </div>
-                    <div className="col-sm-4 mb-3 mb-md-3">
-                        <label className="d-md-none d-sm-block">Agent</label>
-                        <input type="text" className="form-control" />
-                    </div>
-                    <div className="col-sm-4 mb-3 mb-md-3">
-                        <label className="d-md-none d-sm-block">Name</label>
-                        <input type="text" className="form-control" />
-                    </div>
-                    <div className="col-sm-4 mb-3 mb-md-3">
-                        <label className="d-md-none d-sm-block">Key</label>
-                        <input type="text" className="form-control" />
-                    </div>
-                    <div className="col-sm-4 mb-3">
-                        <label className="d-md-none d-sm-block">Agent</label>
-                        <input type="text" className="form-control" />
-                    </div>
-                    <div className="col-sm-4 mb-3">
-                        <label className="d-md-none d-sm-block">Name</label>
-                        <input type="text" className="form-control" />
-                    </div>
-                    <div className="col-sm-4 mb-3">
-                        <label className="d-md-none d-sm-block">Key</label>
-                        <input type="text" className="form-control" />
-                    </div>
+                    <div className="col-sm-12" dangerouslySetInnerHTML={{ __html: pimcoreSettingsHtml }} />
+
                     <div className="col-sm-12 mb-3">
-                        <button className="btn-site" onClick={showTriggerForm}>Add a Trigger {symbol} </button>
+                        <button className="btn-site" id="addTrigger" onClick={saveOfficeSettings}>Add New Trigger</button>
+                    </div>
+                    <div className="col-sm-12">
+                        <table className="w-100">
+                            <thead>
+                                <tr className="bg-primary text-white">
+                                    <th>Key Moment</th>
+                                    <th>Trigger Name</th>
+                                    <th>Trigger Type</th>
+                                    <th>Trigger Duration</th>
+                                    <th>Duration Value</th>
+                                    <th>Target Participent</th>
+                                    <th>Target 1</th>
+                                    <th>Target Participent</th>
+                                    <th>Target 2</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {
+                                    triggers.length > 0 ? triggers.map((item) => {
+                                        return (
+                                            <tr>
+                                                <td className="border-start border-end border-bottom p-2 justify-content-center">{item.keyMoment}</td>
+                                                <td className="border-end border-bottom p-2 justify-content-center">{item.triggerName}</td>
+                                                <td className="border-end border-bottom p-2 justify-content-center">{item.triggerType}</td>
+                                                <td className="border-end border-bottom p-2 justify-content-center">{item.durationType}</td>
+                                                <td className="border-end border-bottom p-2 justify-content-center text-center">{item.durationValue}</td>
+                                                <td className="border-end border-bottom p-2 justify-content-center">{item.targetParticipent1}</td>
+                                                <td className="border-end border-bottom p-2 justify-content-center">{item.cTarget1}</td>
+                                                <td className="border-end border-bottom p-2 justify-content-center">{item.targetParticipent2}</td>
+                                                <td className="border-end border-bottom p-2 justify-content-center">{item.cTarget2}</td>
+                                                <td className="border-end border-bottom p-2 justify-content-center">
+                                                    <button className="btn-site btn-edit-trigger mb-1" onClick={EditTrigger}>Edit</button>
+                                                    <button className="btn-site btn-delete-trigger" onClick={DeleteTrigger}>Delete</button>
+                                                </td>
+                                            </tr>
+                                        )
+                                    })
+                                        :
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>No Trigger Found</td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                }
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                {
-                    showTriggerScreen == true ?
-                        <>
-                            <div>
-                                <h6 className="sub-heading fw-bold mb-3" id="tname">{keyMoment}</h6>
-                            </div>
-                            <div className="row">
-                                <div className="col-sm-12 col-md-4 mb-3">
-                                    <label>Key Moment</label>
-                                    <select className="form-select" id="keymomentDropdown" onChange={setKeyMomentForTrigger}>
-                                        <option value="">Select an option</option>
-                                        <option value="Evaluation (to sale)">Evaluation (to sale)</option>
-                                        <option value="Evaluation (to rent)">Evaluation (to rent)</option>
-                                        <option value="After mandate (to sale)">After mandate (to sale)</option>
-                                        <option value="After mandate (to rent)">After mandate (to rent)</option>
-                                        <option value="Visits (to sale)">Visits (to sale)</option>
-                                        <option value="Visits (to rent)">Visits (to rent)</option>
-                                        <option value="Sale agreement">Sale agreement</option>
-                                        <option value="Rental agreement">Rental agreement</option>
-                                        <option value="Notarial deed">Notarial deed</option>
-                                        <option value="Entry inventory">Entry inventory</option>
-                                        <option value="Exit inventory">Exit inventory</option>
-                                    </select>
-                                </div>
-                                <div className="col-sm-12 col-md-4 mb-3">
-                                    <label>Trigger Type</label>
-                                    <select className="form-select" id="triggertypeDropdown">
-                                        <option value="">Select an option</option>
-                                        <option>Email</option>
-                                        <option>SMS</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div className="row">
-                                <div className="col-sm-12 col-md-4 mb-3">
-                                    <label>Type of Duration</label>
-                                    <select className="form-select" id="durationtypeDropdown" onChange={onChangeOfDurationType}>
-                                        <option value="">Select an option</option>
-                                        <option value="Days">Days</option>
-                                        <option value="Hours">Hours</option>
-                                        <option value="Minutes">Minutes</option>
-                                    </select>
-                                </div>
-                                <div className="col-sm-12 col-md-2 mb-3">
-                                    <label>Value</label>
-                                    <input type="number" className="form-control" id="durationValue" disabled />
-                                </div>
-                            </div>
-                            <div className="row">
-                                <div className="col-sm-12 col-md-4 mb-3">
-                                    <label>Target</label>
-                                    <input type="text" className="form-control" id="participent1" />
-                                </div>
-                                <div className="col-sm-12 col-md-4 mb-3">
-                                    <label>C-Target</label>
-                                    <select className="form-select" id="ctarget1" onChange={setListOfTargetType}>
-                                        <option value="">Select an option</option>
-                                        <option value="Owner">Owner</option>
-                                        <option value="Lessor">Lessor</option>
-                                        <option value="Buyer">Buyer</option>
-                                        <option value="Tenant">Tenant</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div className="row">
-                                <div className="col-sm-12 col-md-4 mb-3">
-                                    <label>Target</label>
-                                    <input type="text" className="form-control" id="participent2" />
-                                </div>
-                                <div className="col-sm-12 col-md-4 mb-3">
-                                    <label>C-Target</label>
-                                    <select className="form-select" id="ctarget2" onChange={setListOfTargetType}>
-                                        <option value="">Select an option</option>
-                                        <option value="Owner">Owner</option>
-                                        <option value="Lessor">Lessor</option>
-                                        <option value="Buyer">Buyer</option>
-                                        <option value="Tenant">Tenant</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div className="row">
-                                <div className="col-sm-12 col-md-4 mb-3">
-                                    <label>Target</label>
-                                    <input type="text" className="form-control" />
-                                </div>
-                                <div className="col-sm-12 col-md-4 mb-3">
-                                    <label>C-Target</label>
-                                    <select className="form-select" id="ctarget3" onChange={setListOfTargetType}>
-                                        <option value="">Select an option</option>
-                                        <option value="Owner">Owner</option>
-                                        <option value="Lessor">Lessor</option>
-                                        <option value="Buyer">Buyer</option>
-                                        <option value="Tenant">Tenant</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div className="row">
-                                <div className="col-sm-12 col-md-4 mb-3">
-                                    <label>Target</label>
-                                    <input type="text" className="form-control" />
-                                </div>
-                                <div className="col-sm-12 col-md-4 mb-3">
-                                    <label>C-Target</label>
-                                    <select className="form-select" id="ctarget4" onChange={setListOfTargetType}>
-                                        <option value="">Select an option</option>
-                                        <option value="Owner">Owner</option>
-                                        <option value="Lessor">Lessor</option>
-                                        <option value="Buyer">Buyer</option>
-                                        <option value="Tenant">Tenant</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div>
-                                <h6 className="sub-heading fw-bold mb-3">Condition:</h6>
-                            </div>
-                            <div className="row">
-                                <div className="col-sm-12 col-md-4 mb-3">
-                                    <label>WHISE</label>
-                                    <select className="form-select">
-                                        <option value="">Select an option</option>
-                                        {data?.map((option) => (
-                                            <option key={option.id} value={option.id}>
-                                                {option.name}({option.id})
-                                            </option>
-                                        ))}
-                                    </select>
-                                    {selectedOption && <p>Selected: {selectedOption}</p>}
-                                </div>
-                                <div className="col-sm-12 col-md-4 mb-3">
-                                    <label>Property Transaction Type</label>
-                                    {/*<select className="form-select">*/}
-                                    {/*    <option>Email</option>*/}
-                                    {/*    <option>SMS</option>*/}
-                                    {/*</select>*/}
-                                    <MultiSelect
-                                        className="multiselect"
-                                        options={options}
-                                        value={selected}
-                                        onChange={setSelected}
-                                        labelledBy="Select"
-                                    />
-                                </div>
-                                <div className="col-sm-12 col-md-4 mb-3">
-                                    <label>Property Transaction Type</label>
-                                    <select className="form-select">
-                                        <option>Email</option>
-                                        <option>SMS</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div>
-                                <h6 className="sub-heading fw-bold mb-3">Select Email Configuration:</h6>
-                            </div>
-                            <div className="row">
-                                <div className="col-sm-12 col-md-12 mb-3" id="surveyTypeCheckboxes">
-                                    <label className="me-3 mb-0 fw-bold">Survey Email:</label>
-                                    <div className="form-check form-check-inline me-2">
-                                        <input className="form-check-input" type="checkbox" name="inlineRadioOptions" id="inlineParticipent" />
-                                        <label className="form-check-label mb-0" htmlFor="inlineParticipent" >Participent</label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="row">
-                                <div className="col-sm-12 col-md-4 mb-3">
-                                    <label className="me-3">Layout</label>
-                                    <div className="d-flex">
-                                        <select className="form-select" id="layoutDropdown" onChange={setSelectedEmailLayout}>
-                                            <option value="">--Select Layout--</option>
-                                            {
-                                                officeLayout.length > 0 ? officeLayout.map((item) => {
-                                                    return (
-                                                        <option value={item.layoutid}>{item.layoutName}</option>
-                                                    )
-                                                })
-                                                    :
-                                                    ""
-                                            }
-                                        </select>
-                                        <button className="btn-site ms-1" onClick={openLayoutModal}>
-                                            New
-                                        </button>
-                                        <button className="btn-site ms-1" onClick={openLayoutModal}>
-                                            View
-                                        </button>
-                                        <EmailLayoutModal
-                                            showModal={showLayoutModal}
-                                            modalTitle={layoutModalTitle}
-                                            modalType={layoutModalType}
-                                            officeId={officeId}
-                                            clientId={clientId}
-                                            hideLayoutModal={hideLayoutModal}
-                                            layoutId={selectedLaytOutId}
-                                            reloadLayoutsList={getListOfLayoutsByOffice}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                            <Tabs
-                                defaultActiveKey={selectedTab}
-                                id="texte-tabs"
-                                className="mb-3"
-                                onSelect={handleTabSelect}
-                            >
-                                <Tab eventKey="french" title="French">
-                                    <div className="row">
-                                        <div className="col-sm-12 col-md-12 mb-3">
-                                            <label>Texte</label>
-                                            <DraftailEditor
-                                                onSave={(raw) => {
-                                                    convertTexteToHtml(raw)
-                                                }}
-                                                rawContentState={null}
-                                                blockTypes={[
-                                                    { type: BLOCK_TYPE.HEADER_ONE },
-                                                    { type: BLOCK_TYPE.HEADER_TWO },
-                                                    { type: BLOCK_TYPE.HEADER_THREE },
-                                                    { type: BLOCK_TYPE.HEADER_FOUR },
-                                                    { type: BLOCK_TYPE.HEADER_FIVE },
-                                                    { type: BLOCK_TYPE.HEADER_SIX },
-                                                    { type: BLOCK_TYPE.BLOCKQUOTE },
-                                                    { type: BLOCK_TYPE.UNORDERED_LIST_ITEM },
-                                                    { type: BLOCK_TYPE.ORDERED_LIST_ITEM }
-                                                ]}
-                                                inlineStyles={
-                                                    [
-                                                        { type: INLINE_STYLE.BOLD },
-                                                        { type: INLINE_STYLE.ITALIC },
-                                                        { type: INLINE_STYLE.CODE },
-                                                        { type: INLINE_STYLE.UNDERLINE },
-                                                        { type: INLINE_STYLE.STRIKETHROUGH },
-                                                        { type: INLINE_STYLE.SUBSCRIPT },
-                                                        { type: INLINE_STYLE.SUPERSCRIPT },
-                                                        { type: INLINE_STYLE.MARK },
-                                                        { type: INLINE_STYLE.SMALL },
-                                                        { type: INLINE_STYLE.INSERT },
-                                                        { type: INLINE_STYLE.DELETE },
-                                                        { type: INLINE_STYLE.QUOTATION }
-                                                    ]}
-                                                entityTypes={[
-                                                    { type: ENTITY_TYPE.LINK },
-                                                    { type: ENTITY_TYPE.IMAGE }
-                                                ]}
-                                            />
-                                            <button className="btn-site mt-3">View</button>
-                                        </div>
-                                    </div>
-                                </Tab>
-                                <Tab eventKey="dutch" title="Dutch">
-                                    <div className="row">
-                                        <div className="col-sm-12 col-md-12 mb-3">
-                                            <label>Texte</label>
-                                            <DraftailEditor
-                                                onSave={(raw) => {
-                                                    convertTexteToHtml(raw)
-                                                }}
-                                                rawContentState={null}
-                                                blockTypes={[
-                                                    { type: BLOCK_TYPE.HEADER_ONE },
-                                                    { type: BLOCK_TYPE.HEADER_TWO },
-                                                    { type: BLOCK_TYPE.HEADER_THREE },
-                                                    { type: BLOCK_TYPE.HEADER_FOUR },
-                                                    { type: BLOCK_TYPE.HEADER_FIVE },
-                                                    { type: BLOCK_TYPE.HEADER_SIX },
-                                                    { type: BLOCK_TYPE.BLOCKQUOTE },
-                                                    { type: BLOCK_TYPE.UNORDERED_LIST_ITEM },
-                                                    { type: BLOCK_TYPE.ORDERED_LIST_ITEM }
-                                                ]}
-                                                inlineStyles={
-                                                    [
-                                                        { type: INLINE_STYLE.BOLD },
-                                                        { type: INLINE_STYLE.ITALIC },
-                                                        { type: INLINE_STYLE.CODE },
-                                                        { type: INLINE_STYLE.UNDERLINE },
-                                                        { type: INLINE_STYLE.STRIKETHROUGH },
-                                                        { type: INLINE_STYLE.SUBSCRIPT },
-                                                        { type: INLINE_STYLE.SUPERSCRIPT },
-                                                        { type: INLINE_STYLE.MARK },
-                                                        { type: INLINE_STYLE.SMALL },
-                                                        { type: INLINE_STYLE.INSERT },
-                                                        { type: INLINE_STYLE.DELETE },
-                                                        { type: INLINE_STYLE.QUOTATION }
-                                                    ]}
-                                                entityTypes={[
-                                                    { type: ENTITY_TYPE.LINK },
-                                                    { type: ENTITY_TYPE.IMAGE }
-                                                ]}
-                                            />
-                                            <button className="btn-site mt-3">View</button>
-                                        </div>
-                                    </div>
-                                </Tab>
-                                <Tab eventKey="english" title="English">
-                                    <div className="row">
-                                        <div className="col-sm-12 col-md-12 mb-3">
-                                            <label>Texte</label>
-                                            <DraftailEditor
-                                                onSave={(raw) => {
-                                                    convertTexteToHtml(raw)
-                                                }}
-                                                rawContentState={null}
-                                                blockTypes={[
-                                                    { type: BLOCK_TYPE.HEADER_ONE },
-                                                    { type: BLOCK_TYPE.HEADER_TWO },
-                                                    { type: BLOCK_TYPE.HEADER_THREE },
-                                                    { type: BLOCK_TYPE.HEADER_FOUR },
-                                                    { type: BLOCK_TYPE.HEADER_FIVE },
-                                                    { type: BLOCK_TYPE.HEADER_SIX },
-                                                    { type: BLOCK_TYPE.BLOCKQUOTE },
-                                                    { type: BLOCK_TYPE.UNORDERED_LIST_ITEM },
-                                                    { type: BLOCK_TYPE.ORDERED_LIST_ITEM }
-                                                ]}
-                                                inlineStyles={
-                                                    [
-                                                        { type: INLINE_STYLE.BOLD },
-                                                        { type: INLINE_STYLE.ITALIC },
-                                                        { type: INLINE_STYLE.CODE },
-                                                        { type: INLINE_STYLE.UNDERLINE },
-                                                        { type: INLINE_STYLE.STRIKETHROUGH },
-                                                        { type: INLINE_STYLE.SUBSCRIPT },
-                                                        { type: INLINE_STYLE.SUPERSCRIPT },
-                                                        { type: INLINE_STYLE.MARK },
-                                                        { type: INLINE_STYLE.SMALL },
-                                                        { type: INLINE_STYLE.INSERT },
-                                                        { type: INLINE_STYLE.DELETE },
-                                                        { type: INLINE_STYLE.QUOTATION }
-                                                    ]}
-                                                entityTypes={[
-                                                    { type: ENTITY_TYPE.LINK },
-                                                    { type: ENTITY_TYPE.IMAGE }
-                                                ]}
-                                            />
-                                            <button className="btn-site mt-3">View</button>
-                                        </div>
-                                    </div>
-                                </Tab>
-                            </Tabs>
-                            <div className="row">
-                                <div className="col-sm-12 col-md-12 mb-3">
-                                    <label className="me-3">Link</label>
-                                    <input type="text" className="form-control" id="surveyLink" defaultValue="https://survey.realadvice.be/TRIOR/?" />
-                                </div>
-                            </div>
-                            <div className="row">
-                                <div className="col-sm-12 mb-3">
-                                    <div className="form-check form-check-inline me-2">
-                                        <input className="form-check-input" type="checkbox" name="inlineRadioOptions" id="checkboxAgent" defaultValue="Harold+Salm" onChange={generateSurveyLink} />
-                                        <label className="form-check-label mb-0" htmlFor="checkboxAgent" >Agent</label>
-                                    </div>
-                                    <div className="form-check form-check-inline me-2">
-                                        <input className="form-check-input" type="checkbox" name="inlineRadioOptions" id="checkboxOffice" defaultValue="office" onChange={generateSurveyLink} />
-                                        <label className="form-check-label mb-0" htmlFor="checkboxOffice" >Office</label>
-                                    </div>
-                                    <div className="form-check form-check-inline me-2">
-                                        <input className="form-check-input" type="checkbox" name="inlineRadioOptions" id="checkboxDob" defaultValue="07-15-1996" onChange={generateSurveyLink} />
-                                        <label className="form-check-label mb-0" htmlFor="checkboxDob" >DOB</label>
-                                    </div>
-                                    <div className="form-check form-check-inline me-2">
-                                        <input className="form-check-input" type="checkbox" name="inlineRadioOptions" id="checkboxLanguage" defaultValue="du" onChange={generateSurveyLink} />
-                                        <label className="form-check-label mb-0" htmlFor="checkboxLanguage" >Language</label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="row">
-                                <div className="col-sm-12 col-md-12 mb-3">
-                                    <div className="form-check form-check-inline">
-                                        <input className="form-check-input" type="checkbox" name="activateReminderOptions" id="activateReminder" defaultValue="option1" />
-                                        <label className="form-check-label" htmlFor="activateReminder">Activate Reminder</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="text-center">
-                                <button className="btn-site" onClick={createNewSurveyEmail}>Create New Version of Email</button>
-                            </div>
-                        </>
-                        :
-                        ""
-                }
             </div>
 
             <div className="mb-4">
-                <button className="btn-site" onClick={saveOfficeSettings}>Save</button>
+                <button className="btn-site" id="saveOfficeSettings" onClick={saveOfficeSettings}>Save</button>
             </div>
         </section>
     );
