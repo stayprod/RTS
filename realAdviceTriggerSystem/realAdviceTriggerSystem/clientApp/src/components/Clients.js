@@ -134,7 +134,7 @@ export const Clients = (props) => {
                                 <br />
                                 <span className="titleSpan fw-bold">CRM CLIENT ID:</span> {item.id}
                                 <br />
-                                <span className="titleSpan fw-bold">STATUS:</span> {item.localclient.client.activationStatus != null ? item.localclient.client.activationStatus : "Pending"}
+                                <span className="titleSpan fw-bold">STATUS:</span> {item.localclient != null && item.localclient.client.activationStatus != null ? item.localclient.client.activationStatus : "Pending"}
                                 <br />
                                 <div>
                                     <FontAwesomeIcon icon={faExclamationTriangle} />

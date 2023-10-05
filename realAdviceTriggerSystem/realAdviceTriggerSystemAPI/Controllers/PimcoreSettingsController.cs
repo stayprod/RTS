@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using realAdviceTriggerSystemAPI.Models;
+using System.Drawing;
+using System.Runtime.Intrinsics.Arm;
 
 namespace realAdviceTriggerSystemAPI.Controllers
 {
@@ -69,6 +71,30 @@ namespace realAdviceTriggerSystemAPI.Controllers
                     }
 
                     return new JsonResult(_finalPimSetting);
+                }
+            }
+            catch (Exception exp)
+            {
+                return new JsonResult(exp);
+            }
+        }
+
+        [HttpDelete]
+        [Route("DeletePimcoreSetting")]
+        public JsonResult DeletePimcoreSetting(List<PimcoreSetting> pimcore)
+        {
+            try
+            {
+                using (var con = new RealadviceTriggeringSystemContext())
+                {
+
+                    foreach (var item in pimcore)
+                    {
+                        PimcoreSetting setting = con.PimcoreSettings.Where(d => d.PimcoreSettingid == item.PimcoreSettingid).First();
+                        con.PimcoreSettings.Remove(setting);
+                        con.SaveChanges();
+                    }
+                    return new JsonResult("");
                 }
             }
             catch (Exception exp)

@@ -13,28 +13,26 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using System.IO;
+using realAdviceTriggerSystemService.Models;
 
 namespace TriggerService
 {
-
+     
     public class Worker : BackgroundService
     {
 
-        List<Client> clients = new List<Client>();
-        Client cli = new Client();
+        List<Clients> clients = new List<Clients>();
+        Clients cli = new Clients();
         EmailSend SendEmailobj = new EmailSend();
         private readonly ILogger<Worker> _logger;
         private readonly HttpClient _httpClient;
-
-
-
+        private readonly MandrillEmailService _emailService;
 
         public Worker(ILogger<Worker> logger)
         {
             _logger = logger;
             _httpClient = new HttpClient();
         }
-
         private async Task<string> GetTokenAsync()
         {
             try
@@ -112,75 +110,108 @@ namespace TriggerService
 
         }
 
+
+        private async Task<EstateResponse> GetEstateListAsync(string token)
+        {
+            try
+            {
+                // Prepare the request headers
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                // Build the request URL
+                var apiUrl = "https://api.whise.eu/v1/estates/list";
+
+                // Prepare the request content (JSON data)
+                var today = DateTime.UtcNow.Date;
+                var requestData = new { id="5284008" };
+                var json = JsonConvert.SerializeObject(requestData);
+                var requestContent = new StringContent(json, Encoding.UTF8, "application/json");
+
+                // Send the POST request to retrieve Estate
+                var response = await _httpClient.PostAsync(apiUrl, requestContent);
+
+                // Ensure a successful response
+                response.EnsureSuccessStatusCode();
+
+                // Read the response content
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                // Deserialize the response JSON into a list of Estate objects
+
+                EstateResponse EstateResponse = JsonConvert.DeserializeObject<EstateResponse>(responseContent);
+
+
+                return EstateResponse;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+        }
+
+        public async Task<object> GetTriggerAsync()
+        {
+            try
+            {
+                IConfigurationRoot configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json")
+                .Build();
+                ClientSetting clientSettings = configuration.GetSection("ClientCredential").Get<ClientSetting>();
+                // Prepare the request content
+                var requestContent = new StringContent(
+                            "application/json"
+                        );
+
+                // Send the POST request to obtain the token
+                var response = await _httpClient.GetAsync("https://localhost:7139/api/OfficeTrigger/GetAllTriggers");
+
+                // Ensure a successful response
+                //response.EnsureSuccessStatusCode();
+
+                // Read the response content
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                // Extract the token from the response JSON
+                //var token = JObject.Parse(responseContent)["token"].ToString();
+                return responseContent;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+        
+        private async Task<OfficeTriggers> GetTriggers()
+        {
+            return new OfficeTriggers();
+        }
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             try
             {
+                var token = await GetTokenAsync();
                 while (!stoppingToken.IsCancellationRequested)
                 {
-                    var token = await GetTokenAsync();
+                    //_emailService = new MandrillEmailService();
+                    //var triggers = await GetTriggerAsync();
+                    //await _emailService.SendEmailAsync("umarfarooq3540@email.com", "Subject", "Message body");
 
-                    // Get today's appointments
+
+                    // Get today's appointmentss
+                    Console.WriteLine(token);
                     var appointments = await GetTodaysAppointmentsAsync(token);
-                    using (var context = new EmailWorkerServiceContext())
+                    using (var context = new realadvicetriggeringsystemContext())
                     {
-                        var settings = context.Settings.ToList();
-                        // Process the appointments as needed
-                        foreach (var appointment in appointments.Calendars)
-                        {
-                            foreach (var setting in settings)
-                            {
-                                DateTime currentTime = DateTime.Now;
-                                //DateTime otherTime = new DateTime(client.LastEmail);
-                                int minutesDifference;
-                                if (setting.EmailTime.DayOfYear == 1)
-                                {
-                                    TimeSpan timeDifferenceFromFirstmail = currentTime.Subtract(setting.EmailTime);
-                                    minutesDifference = (int)timeDifferenceFromFirstmail.TotalMinutes;
-                                }
-                                else
-                                {
-                                    TimeSpan timeDifference = currentTime.Subtract(setting.EmailTime);
-                                    minutesDifference = (int)timeDifference.TotalMinutes;
-                                }
-                                int emailRemindTime = setting.TimeAfterFirstSent * 24 * 60;
-
-
-                                if (minutesDifference >= setting.TimeAfterEvent && setting.SentEmail == true && setting.EventTypeId == appointment.Action.Id && setting.EmailTime.DayOfYear == 1)
-                                {
-                                    if (appointment.Contacts != null)
-                                    {
-                                        bool isEmailSend = SendEmailobj.emailSend(appointment.Contacts[0].PrivateEmail, "TestService", setting.TemplEmail, true);
-
-                                        if (isEmailSend)
-                                        {
-                                            Console.WriteLine(appointment.Contacts[0].PrivateEmail);
-                                            setting.EmailTime = currentTime;
-                                            context.SaveChanges();
-                                        }
-                                    }
-
-                                }
-                                else if (minutesDifference >= emailRemindTime && setting.SentEmailRemind == true && setting.EventTypeId == appointment.Action.Id)
-                                {
-                                    if (appointment.Contacts != null)
-                                    {
-                                        bool isEmailSend = SendEmailobj.emailSend(appointment.Contacts[0].PrivateEmail, "TestService", setting.RemindTempl, true);
-
-                                        if (isEmailSend)
-                                        {
-                                            Console.WriteLine(appointment.Contacts[0].PrivateEmail);
-                                            setting.EmailTime = currentTime;
-                                            context.SaveChanges();
-                                        }
-                                    }
-
-                                }
-
-                            }
-                        }
-
+                        var _clients = context.Clients.ToList();
                     }
+                    var EstateList = await GetEstateListAsync(token);
+                    Console.WriteLine(appointments);
 
                 }
                 await Task.Delay(TimeSpan.FromSeconds(60), stoppingToken); // Poll API every 30 seconds 

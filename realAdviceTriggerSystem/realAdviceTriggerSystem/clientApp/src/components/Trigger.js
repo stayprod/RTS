@@ -12,22 +12,25 @@ import { variables } from '../Variables';
 
 import { EmailLayoutModal } from './EmailLayout';
 
-const options = [
-    { label: "to sale", value: "to sale" },
-    { label: "to rent", value: "to rent" },
-    { label: "annuity sale", value: "annuity sale" },
-];
+const targetOptions = [
+    { label: "Vendor", value: "1" },
+    { label: "Lessor", value: "2" },
+    { label: "Buyer", value: "3" },
+    { label: "Tenant", value: "4" },
+]
 
 export const Trigger = (props) => {
     const token = useToken();
+    const [triggerNameBuilder, setTriggerNameBuilder] = useState({ "default": "Trigger:" });
+    const [finalTriggerName, setFinalTriggerName] = useState("Trigger:");
     const [whiseOfficeDetail, setWhiseOfficeDetail] = useState({});
     const [localOfficeDetail, setLocalOfficeDetail] = useState({});
     const [clientDetail, setClientDetail] = useState({});
     const [whiseOfficesList, setWhiseOfficesList] = useState({});
-    const [keyMoment, setKeyMoment] = useState("Trigger:");
     const [data, setData] = useState([]);
     const [selectedOption, setSelectedOption] = useState('');
     const [selected, setSelected] = useState([]);
+    const [selectedTarget, setSelectedTarget] = useState([]);
     const [selectedLaytOutId, setSelectedLaytOutId] = useState(0);
     const [selectedLaytName, setSelectedLaytName] = useState("");
     const [officeLayout, setOfficeLayouts] = useState({});
@@ -36,8 +39,10 @@ export const Trigger = (props) => {
     const [layoutModalType, setLayoutModalType] = useState("");
     const [officeId, setOfficeId] = useState(0);
     const [clientId, setClientId] = useState(0);
-    const [selectedTab, setSelectedTab] = useState("french");
+    const [selectedTab, setSelectedTab] = useState("english");
     const [emailTexte, setEmailTexte] = useState("");
+    const [durationValue, setDurationValue] = useState("");
+    const [triggerDetail, setTriggerDetail] = useState({});
     let participentType = [];
 
     const location = useLocation();
@@ -50,6 +55,9 @@ export const Trigger = (props) => {
         setClientDetail(location.state.ClientDetail)
         setWhiseOfficesList(location.state.AllWhiseOffices)
         getListOfLayoutsByOffice(location.state.LocalOfficeDetail);
+        if (location.state.TriggerDetail != undefined) {
+            loadTriggerDetailInEdit(location.state.TriggerDetail)
+        }
     }
 
     const getListOfLayoutsByOffice = async (_localoffice) => {
@@ -63,28 +71,143 @@ export const Trigger = (props) => {
         }
     }
 
-    const setKeyMomentForTrigger = (e) => {
-        let value = e.target.value;
-        setKeyMoment("Trigger - " + value);
+    const loadTriggerDetailInEdit = (trigger) => {
+
+        setTriggerDetail(trigger);
+        document.getElementById("keymomentDropdown").value = trigger.keyMoment;
+        let momentIndex = document.getElementById("keymomentDropdown").selectedIndex;
+        let momentText = document.getElementById("keymomentDropdown")[momentIndex].text;
+        triggerNameBuilder["keymomentDropdown"] = momentText;
+
+        document.getElementById("triggertypeDropdown").value = trigger.triggerType;
+        let triggertypeIndex = document.getElementById("triggertypeDropdown").selectedIndex;
+        let triggertypeText = document.getElementById("triggertypeDropdown")[triggertypeIndex].text;
+        triggerNameBuilder["triggertypeDropdown"] = triggertypeText;
+
+        document.getElementById("durationtypeDropdown").value = trigger.durationType;
+        let durationtypeIndex = document.getElementById("durationtypeDropdown").selectedIndex;
+        let durationtypeText = document.getElementById("durationtypeDropdown")[durationtypeIndex].text;
+        triggerNameBuilder["durationtypeDropdown"] = durationtypeText;
+
+        if (trigger.durationValue != "") {
+            document.getElementById("durationValue").removeAttribute("disabled");
+            document.getElementById("durationValue").value = trigger.durationValue;
+            triggerNameBuilder["durationValue"] = "(" + trigger.durationValue + ")";
+        }
+        document.getElementById("participent1").value = trigger.targetParticipant1;
+
+        //read targets from database and create targets label string
+        const targets = JSON.parse(trigger.cTarget1);
+        let targetString = "";
+        targets.forEach(item => {
+            targetString += item.label + " ";
+        })
+        triggerNameBuilder["ctarget1"] = targetString;
+
+        //populate trigger name from database and fill state to handle controls state
+        setFinalTriggerName(trigger.triggerName);
+
+        setSelectedTarget(targets);
+        setSelectedTab(trigger.language);
+        document.getElementById("layoutDropdown").value = trigger.layoutid;
+    }
+
+    const setNameForTrigger = (e) => {
+
+        if (e.target.value != "") {
+            let index = e.target.selectedIndex;
+            let value = e.target[index].text;
+            triggerNameBuilder[e.target.id] = value;
+
+            let nameString = ""
+            Object.keys(triggerNameBuilder).map(item => {
+                nameString += triggerNameBuilder[item] + " ";
+            })
+            setFinalTriggerName(nameString);
+        }
+        else {
+            triggerNameBuilder[e.target.id] = "";
+            let nameString = ""
+            Object.keys(triggerNameBuilder).map(item => {
+                nameString += triggerNameBuilder[item] + " ";
+            })
+            setFinalTriggerName(nameString);
+        }
     }
 
     const onChangeOfDurationType = (e) => {
         let value = e.target.value;
         if (value != "") {
             document.getElementById("durationValue").removeAttribute("disabled");
+
+            let index = e.target.selectedIndex;
+            let value = e.target[index].text;
+            triggerNameBuilder[e.target.id] = value;
+
+            let nameString = ""
+            Object.keys(triggerNameBuilder).map(item => {
+                nameString += triggerNameBuilder[item] + " ";
+            })
+
+            setFinalTriggerName(nameString);
         }
         else {
             document.getElementById("durationValue").value = "";
             document.getElementById("durationValue").setAttribute("disabled", true);
+
+            triggerNameBuilder["durationValue"] = "";
+            triggerNameBuilder[e.target.id] = "";
+
+            let nameString = ""
+            Object.keys(triggerNameBuilder).map(item => {
+                nameString += triggerNameBuilder[item] + " ";
+            })
+
+            setFinalTriggerName(nameString);
         }
     }
 
-    const setListOfTargetType = (e) => {
-        let value = e.target.value;
-        let html = ""
-        if (participentType.indexOf(value) == -1 && value != "") {
-            participentType.push(value);
+    const appendMultiselectValuesInTriggerName = (targets) => {
+
+        if (targets.length > 0) {
+            let targetString = "";
+            targets.forEach(item => {
+                targetString += item.label + " ";
+            })
+            triggerNameBuilder["ctarget1"] = targetString;
+            let nameString = ""
+            Object.keys(triggerNameBuilder).map(item => {
+                nameString += triggerNameBuilder[item] + " ";
+            })
+
+            setFinalTriggerName(nameString);
         }
+        else {
+            triggerNameBuilder["ctarget1"] = "";
+            let nameString = ""
+            Object.keys(triggerNameBuilder).map(item => {
+                nameString += triggerNameBuilder[item] + " ";
+            })
+
+            setFinalTriggerName(nameString);
+        }
+
+    }
+
+    const setListOfTargetType = (e) => {
+
+        setSelectedTarget(e);
+        appendMultiselectValuesInTriggerName(e); //append selected c-targets in trigger name
+
+        const _targers = e;
+
+        _targers.forEach(traget => {
+            if (participentType.indexOf(traget.value) == -1) {
+                participentType.push(traget.label);
+            }
+        })
+
+        let html = ""
         document.getElementById("surveyTypeCheckboxes").innerHTML = "";
 
         html += `<label class="me-3 mb-0 fw-bold">Survey Email:</label>`;
@@ -262,23 +385,23 @@ export const Trigger = (props) => {
 
         //SaveOfficeTriggerDetail api call
         //Api call to save trigger for an office
-        let language = selectedTab.e;
+        let language = selectedTab;
         let trigger = {};
         let objOfficeTrigger = {
-            OfficeTriggerid: 0,
+            OfficeTriggerid: triggerDetail.officeTriggerid != undefined ? triggerDetail.officeTriggerid : 0,
             Officeid: +localOfficeDetail.officeid,
             Layoutid: +selectedLaytOutId,
-            TriggerName: document.getElementById("tname").innerText,
+            TriggerName: finalTriggerName,
             KeyMoment: document.getElementById("keymomentDropdown").value,
             TriggerType: document.getElementById("triggertypeDropdown").value,
             DurationType: document.getElementById("durationtypeDropdown").value,
             DurationValue: +document.getElementById("durationValue").value,
             TargetParticipant1: document.getElementById("participent1").value,
-            CTarget1: document.getElementById("ctarget1").value,
-            TargetParticipant2: document.getElementById("participent2").value,
-            CTarget2: document.getElementById("ctarget2").value,
+            CTarget1: JSON.stringify(selectedTarget), //document.getElementById("ctarget1").value,
+            TargetParticipant2: "",
+            CTarget2: "",
             Language: language,
-            Texte: emailTexte,
+            Texte: triggerDetail.texte != undefined && triggerDetail.texte != "" ? triggerDetail.texte : emailTexte,
         }
         let triggerurl = variables.API_URL + `OfficeTrigger/SaveOfficeTriggerDetail?`;
         return axios.post(triggerurl, JSON.stringify(objOfficeTrigger), jsonconfig)
@@ -325,43 +448,49 @@ export const Trigger = (props) => {
                 console.error('Error fetching data:', error);
             });
     }, [token])
-
+     
     return (
         <>
             <section className="client-setting">
                 <div className="row py-3">
-                    <div className="col-sm-6">
+                    <div className="col-sm-12">
                         <h4>Add Trigger</h4>
+                    </div>
+                    <div className="col-sm-12">
+                        <label className="me-2 fw-bold">Client:</label><span>{clientDetail.name}</span><br/>
+                        <label className="me-2 fw-bold">Office:</label><span>{whiseOfficeDetail.name}</span>
                     </div>
                 </div>
                 <div className="card">
                     <div>
-                        <h6 className="sub-heading fw-bold mb-3" id="tname">{keyMoment}</h6>
+                        <h6 className="sub-heading fw-bold mb-3" id="tname">
+                            {finalTriggerName}
+                        </h6>
                     </div>
                     <div className="row">
                         <div className="col-sm-12 col-md-4 mb-3">
                             <label>Key Moment</label>
-                            <select className="form-select" id="keymomentDropdown" onChange={setKeyMomentForTrigger}>
-                                <option value="">Select an option</option>
-                                <option value="Evaluation (to sale)">Evaluation (to sale)</option>
-                                <option value="Evaluation (to rent)">Evaluation (to rent)</option>
-                                <option value="After mandate (to sale)">After mandate (to sale)</option>
-                                <option value="After mandate (to rent)">After mandate (to rent)</option>
-                                <option value="Visits (to sale)">Visits (to sale)</option>
-                                <option value="Visits (to rent)">Visits (to rent)</option>
-                                <option value="Sale agreement">Sale agreement</option>
-                                <option value="Rental agreement">Rental agreement</option>
-                                <option value="Notarial deed">Notarial deed</option>
-                                <option value="Entry inventory">Entry inventory</option>
-                                <option value="Exit inventory">Exit inventory</option>
+                            <select className="form-select" id="keymomentDropdown" onChange={setNameForTrigger}>
+                                <option value="" key="">Select an option</option>
+                                <option value="1" key="1">Evaluation (to sale)</option>
+                                <option value="2" key="2">Evaluation (to rent)</option>
+                                <option value="3" key="3">After mandate (to sale)</option>
+                                <option value="4" key="4">After mandate (to rent)</option>
+                                <option value="5" key="5">Visits (to sale)</option>
+                                <option value="6" key="6">Visits (to rent)</option>
+                                <option value="7" key="7">Sale agreement</option>
+                                <option value="8" key="8">Rental agreement</option>
+                                <option value="9" key="9">Notarial deed</option>
+                                <option value="10" key="10">Entry inventory</option>
+                                <option value="11" key="11">Exit inventory</option>
                             </select>
                         </div>
                         <div className="col-sm-12 col-md-4 mb-3">
                             <label>Trigger Type</label>
-                            <select className="form-select" id="triggertypeDropdown">
+                            <select className="form-select" id="triggertypeDropdown" onChange={setNameForTrigger}>
                                 <option value="">Select an option</option>
-                                <option>Email</option>
-                                <option>SMS</option>
+                                <option value="1">Email</option>
+                                <option value="2">SMS</option>
                             </select>
                         </div>
                     </div>
@@ -370,88 +499,57 @@ export const Trigger = (props) => {
                             <label>Type of Duration</label>
                             <select className="form-select" id="durationtypeDropdown" onChange={onChangeOfDurationType}>
                                 <option value="">Select an option</option>
-                                <option value="Days">Days</option>
-                                <option value="Hours">Hours</option>
-                                <option value="Minutes">Minutes</option>
+                                <option value="1">Days</option>
+                                <option value="2">Hours</option>
+                                <option value="3">Minutes</option>
                             </select>
                         </div>
                         <div className="col-sm-12 col-md-2 mb-3">
                             <label>Value</label>
-                            <input type="number" className="form-control" id="durationValue" disabled />
+                            <input
+                                type="number"
+                                min="0"
+                                onKeyDown={(e) => {
+                                    if (e.key === '-')
+                                        e.preventDefault()
+
+
+                                }}
+                                onChange={(e) => {
+                                    let value = e.target.value;
+                                    triggerNameBuilder[e.target.id] = "(" + value + ")";
+
+                                    let nameString = ""
+                                    Object.keys(triggerNameBuilder).map(item => {
+                                        nameString += triggerNameBuilder[item] + " ";
+                                    })
+
+                                    setFinalTriggerName(nameString);
+                                }}
+                                className="form-control"
+                                id="durationValue"
+                                disabled
+                            />
                         </div>
                     </div>
                     <div className="row">
                         <div className="col-sm-12 col-md-4 mb-3">
                             <label>Target</label>
-                            {/*<input type="text" className="form-control" id="participent1" />*/}
                             <select className="form-select" id="participent1">
                                 <option value="">Select an option</option>
-                                <option value="Participant">Participant</option>
-                                <option value="NoParticipant">No Participant</option>
+                                <option value="1">Participant</option>
+                                <option value="2">No Participant</option>
                             </select>
                         </div>
                         <div className="col-sm-12 col-md-4 mb-3">
                             <label>C-Target</label>
-                            <select className="form-select" id="ctarget1" onChange={setListOfTargetType}>
-                                <option value="">Select an option</option>
-                                <option value="Owner">Owner</option>
-                                <option value="Lessor">Lessor</option>
-                                <option value="Buyer">Buyer</option>
-                                <option value="Tenant">Tenant</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div className="row">
-                        <div className="col-sm-12 col-md-4 mb-3">
-                            <label>Target</label>
-                            {/*<input type="text" className="form-control" id="participent2" />*/}
-                            <select className="form-select" id="participent2">
-                                <option value="">Select an option</option>
-                                <option value="Participant">Participant</option>
-                                <option value="NoParticipant">No Participant</option>
-                            </select>
-                        </div>
-                        <div className="col-sm-12 col-md-4 mb-3">
-                            <label>C-Target</label>
-                            <select className="form-select" id="ctarget2" onChange={setListOfTargetType}>
-                                <option value="">Select an option</option>
-                                <option value="Owner">Owner</option>
-                                <option value="Lessor">Lessor</option>
-                                <option value="Buyer">Buyer</option>
-                                <option value="Tenant">Tenant</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div className="row">
-                        <div className="col-sm-12 col-md-4 mb-3">
-                            <label>Target</label>
-                            <input type="text" className="form-control" />
-                        </div>
-                        <div className="col-sm-12 col-md-4 mb-3">
-                            <label>C-Target</label>
-                            <select className="form-select" id="ctarget3" onChange={setListOfTargetType}>
-                                <option value="">Select an option</option>
-                                <option value="Owner">Owner</option>
-                                <option value="Lessor">Lessor</option>
-                                <option value="Buyer">Buyer</option>
-                                <option value="Tenant">Tenant</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div className="row">
-                        <div className="col-sm-12 col-md-4 mb-3">
-                            <label>Target</label>
-                            <input type="text" className="form-control" />
-                        </div>
-                        <div className="col-sm-12 col-md-4 mb-3">
-                            <label>C-Target</label>
-                            <select className="form-select" id="ctarget4" onChange={setListOfTargetType}>
-                                <option value="">Select an option</option>
-                                <option value="Owner">Owner</option>
-                                <option value="Lessor">Lessor</option>
-                                <option value="Buyer">Buyer</option>
-                                <option value="Tenant">Tenant</option>
-                            </select>
+                            <MultiSelect
+                                className="multiselect"
+                                options={targetOptions}
+                                value={selectedTarget}
+                                onChange={setListOfTargetType}
+                                labelledBy="target"
+                            />
                         </div>
                     </div>
                     <div>
@@ -468,27 +566,48 @@ export const Trigger = (props) => {
                                     </option>
                                 ))}
                             </select>
-                            {selectedOption && <p>Selected: {selectedOption}</p>}
                         </div>
                         <div className="col-sm-12 col-md-4 mb-3">
                             <label>Property Transaction Type</label>
-                            <MultiSelect
-                                className="multiselect"
-                                options={options}
-                                value={selected}
-                                onChange={setSelected}
-                                labelledBy="Select"
-                            />
+                            <select className="form-select">
+                                <option value="">Select an option</option>
+                                <option value="1">To sale</option>
+                                <option value="2">To rent</option>
+                                <option value="3">Annuity sale</option>
+                            </select>
                         </div>
                         <div className="col-sm-12 col-md-4 mb-3">
-                            <label>Property Transaction Type</label>
-                            <MultiSelect
-                                className="multiselect"
-                                options={options}
-                                value={selected}
-                                onChange={setSelected}
-                                labelledBy="Select"
-                            />
+                            <label>Property Transaction Status</label>
+
+                            <select className="form-select">
+                                <option value="">Select an option</option>
+                                <option value="1">To sale</option>
+                                <option value="2">To rent</option>
+                                <option value="3">Sold</option>
+                                <option value="4">Rented</option>
+                                <option value="5">Under option (sale)</option>
+                                <option value="6">Under option rent</option>
+                                <option value="7">Retiré de la vente</option>
+                                <option value="8">Retiré de la Location</option>
+                                <option value="9">Suspendu vendu</option>
+                                <option value="10">Suspendu loué</option>
+                                <option value="11">Option prop. Vendu</option>
+                                <option value="12">Option prop. Loué</option>
+                                <option value="13">Vendu avec cond. suspensive</option>
+                                <option value="14">A vendre en viager</option>
+                                <option value="15">Sous option en viager</option>
+                                <option value="16">Vendu en viager</option>
+                                <option value="17">Prospection</option>
+                                <option value="18">Préparation vente</option>
+                                <option value="19">Réservé</option>
+                                <option value="20">Compromis</option>
+                                <option value="21">Prospection location</option>
+                                <option value="22">Estimation vente</option>
+                                <option value="23">Estimation location</option>
+                                <option value="24">Estimation rente viagère</option>
+                                <option value="25">Préparation location</option>
+                                <option value="26">Préparation vente en viager</option>
+                            </select>
                         </div>
                     </div>
                     <div>
@@ -544,6 +663,50 @@ export const Trigger = (props) => {
                         className="mb-3"
                         onSelect={handleTabSelect}
                     >
+                        <Tab eventKey="english" title="English">
+                            <div className="row">
+                                <div className="col-sm-12 col-md-12 mb-3">
+                                    <label>Texte</label>
+                                    <DraftailEditor
+                                        onSave={(raw) => {
+                                            convertTexteToHtml(raw)
+                                        }}
+                                        rawContentState={null}
+                                        blockTypes={[
+                                            { type: BLOCK_TYPE.HEADER_ONE },
+                                            { type: BLOCK_TYPE.HEADER_TWO },
+                                            { type: BLOCK_TYPE.HEADER_THREE },
+                                            { type: BLOCK_TYPE.HEADER_FOUR },
+                                            { type: BLOCK_TYPE.HEADER_FIVE },
+                                            { type: BLOCK_TYPE.HEADER_SIX },
+                                            { type: BLOCK_TYPE.BLOCKQUOTE },
+                                            { type: BLOCK_TYPE.UNORDERED_LIST_ITEM },
+                                            { type: BLOCK_TYPE.ORDERED_LIST_ITEM }
+                                        ]}
+                                        inlineStyles={
+                                            [
+                                                { type: INLINE_STYLE.BOLD },
+                                                { type: INLINE_STYLE.ITALIC },
+                                                { type: INLINE_STYLE.CODE },
+                                                { type: INLINE_STYLE.UNDERLINE },
+                                                { type: INLINE_STYLE.STRIKETHROUGH },
+                                                { type: INLINE_STYLE.SUBSCRIPT },
+                                                { type: INLINE_STYLE.SUPERSCRIPT },
+                                                { type: INLINE_STYLE.MARK },
+                                                { type: INLINE_STYLE.SMALL },
+                                                { type: INLINE_STYLE.INSERT },
+                                                { type: INLINE_STYLE.DELETE },
+                                                { type: INLINE_STYLE.QUOTATION }
+                                            ]}
+                                        entityTypes={[
+                                            { type: ENTITY_TYPE.LINK },
+                                            { type: ENTITY_TYPE.IMAGE }
+                                        ]}
+                                    />
+                                    <button className="btn-site mt-3">View</button>
+                                </div>
+                            </div>
+                        </Tab>
                         <Tab eventKey="french" title="French">
                             <div className="row">
                                 <div className="col-sm-12 col-md-12 mb-3">
@@ -589,50 +752,6 @@ export const Trigger = (props) => {
                             </div>
                         </Tab>
                         <Tab eventKey="dutch" title="Dutch">
-                            <div className="row">
-                                <div className="col-sm-12 col-md-12 mb-3">
-                                    <label>Texte</label>
-                                    <DraftailEditor
-                                        onSave={(raw) => {
-                                            convertTexteToHtml(raw)
-                                        }}
-                                        rawContentState={null}
-                                        blockTypes={[
-                                            { type: BLOCK_TYPE.HEADER_ONE },
-                                            { type: BLOCK_TYPE.HEADER_TWO },
-                                            { type: BLOCK_TYPE.HEADER_THREE },
-                                            { type: BLOCK_TYPE.HEADER_FOUR },
-                                            { type: BLOCK_TYPE.HEADER_FIVE },
-                                            { type: BLOCK_TYPE.HEADER_SIX },
-                                            { type: BLOCK_TYPE.BLOCKQUOTE },
-                                            { type: BLOCK_TYPE.UNORDERED_LIST_ITEM },
-                                            { type: BLOCK_TYPE.ORDERED_LIST_ITEM }
-                                        ]}
-                                        inlineStyles={
-                                            [
-                                                { type: INLINE_STYLE.BOLD },
-                                                { type: INLINE_STYLE.ITALIC },
-                                                { type: INLINE_STYLE.CODE },
-                                                { type: INLINE_STYLE.UNDERLINE },
-                                                { type: INLINE_STYLE.STRIKETHROUGH },
-                                                { type: INLINE_STYLE.SUBSCRIPT },
-                                                { type: INLINE_STYLE.SUPERSCRIPT },
-                                                { type: INLINE_STYLE.MARK },
-                                                { type: INLINE_STYLE.SMALL },
-                                                { type: INLINE_STYLE.INSERT },
-                                                { type: INLINE_STYLE.DELETE },
-                                                { type: INLINE_STYLE.QUOTATION }
-                                            ]}
-                                        entityTypes={[
-                                            { type: ENTITY_TYPE.LINK },
-                                            { type: ENTITY_TYPE.IMAGE }
-                                        ]}
-                                    />
-                                    <button className="btn-site mt-3">View</button>
-                                </div>
-                            </div>
-                        </Tab>
-                        <Tab eventKey="english" title="English">
                             <div className="row">
                                 <div className="col-sm-12 col-md-12 mb-3">
                                     <label>Texte</label>

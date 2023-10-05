@@ -16,10 +16,10 @@ export const Offices = (props) => {
     const officeSettingClickHandler = (e) => {
         let office = JSON.parse(e.target.getAttribute("officedetail"));
 
-        const localOffices = client.localclient.office;
+        const localOffices = client.localclient?.office;
 
         //filtering out locally saved office 
-        const l_office = localOffices.filter(item => {
+        const l_office = localOffices?.filter(item => {
             return item.whiseOfficeid == office.id
         })
 
@@ -53,10 +53,10 @@ export const Offices = (props) => {
             .then(response => {
                 let finalArrayToSet = [];
                 response.data.offices.forEach(item => {
-                    let existedOffInDb = client.localclient.office.filter(_off => {
+                    let existedOffInDb = client.localclient?.office.filter(_off => {
                         return _off.whiseOfficeid == item.id
                     })
-                    if (existedOffInDb.length > 0) {
+                    if (existedOffInDb && existedOffInDb.length > 0) {
                         item.warning = false;
                         let isAlreadyPushed = finalArrayToSet.includes(item, 0);
                         if (isAlreadyPushed == false) {

@@ -87,8 +87,8 @@ export const ClientSettings = (props) => {
 
     const getOfficesList = () => {
         if (location.state != null) {
-            setClientDetailFromDB(location.state)
-            setAdminDetail(location.state);
+            setClientDetailFromDB(location.state.localclient.client)
+            setAdminDetail(location.state.localclient.admin[0]);
             //get client offices and pass to setting screen
             //const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImlhdCI6MTY5MzI5MTY4OH0.eyJzZXJ2aWNlQ29uc3VtZXJJZCI6MTMzNywidHlwZUlkIjo0LCJjbGllbnRJZCI6MTAyNjN9.1-9mYean_qX58r6ykhP545Y3r8IGK53PgDOoyIja8YM';
             // Replace with your actual token
@@ -122,7 +122,9 @@ export const ClientSettings = (props) => {
         _client.email = document.getElementById("email").value;
         _client.phoneNumber = document.getElementById("phoneNumber").value;
         _client.website = document.getElementById("website").value;
+        _client.crmDetail = document.getElementById("crmName").value;
         _client.comments = document.getElementById("comments").value;
+
 
         let url = variables.API_URL + `Client/SaveClientDetail?`;
 
@@ -251,6 +253,7 @@ export const ClientSettings = (props) => {
                     <div className="col-sm-4 mb-3">
                         <label>Country List</label>
                         <select className="form-select" id="country" defaultValue={clientDetailFromDB.country != undefined ? clientDetailFromDB.country : "german"}>
+                            <option value="">Select an option</option>
                             <option value="german">German</option>
                             <option value="unitedstates">United States</option>
                             <option value="russia">Russia</option>
@@ -308,13 +311,14 @@ export const ClientSettings = (props) => {
                 <div className="row">
                     <div className="col-sm-4 mb-3">
                         <label>CRM Name</label>
-                        <select className="form-select">
-                            <option>Whise</option>
-                            <option>Omnicasa</option>
-                            <option>Sweepbright</option>
-                            <option>Zabun</option>
-                            <option>Apimo</option>
-                            <option>Activimmo</option>
+                        <select className="form-select" id="crmName" defaultValue={clientDetailFromDB.comments}>
+                            <option value="">Select an option</option>
+                            <option value="Whise">Whise</option>
+                            <option value="Omnicasa">Omnicasa</option>
+                            <option value="Sweepbright">Sweepbright</option>
+                            <option value="Zabun">Zabun</option>
+                            <option value="Apimo">Apimo</option>
+                            <option value="Activimmo">Activimmo</option>
                         </select>
                     </div>
                     <div className="col-sm-4 mb-3 mb-md-0">

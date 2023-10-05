@@ -18,7 +18,7 @@ namespace TriggerService
             bool status = false;
             try
             {
-                IConfigurationRoot configuration = new ConfigurationBuilder()
+                IConfigurationRoot configuration = new ConfigurationBuilder() 
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json")
                 .Build();

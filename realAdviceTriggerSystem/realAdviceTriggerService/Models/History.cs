@@ -10,6 +10,6 @@ namespace TriggerService.Models
     {
         public int HistoryId { get; set; }
         public int ClientId { get; set; }
-        public DateTime Date { get; set; }
+        public DateTime Date { get; set; } 
     }
 }

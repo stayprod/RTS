@@ -195,10 +195,10 @@ public partial class RealadviceTriggeringSystemContext : DbContext
                 .HasColumnType("int(11)")
                 .HasColumnName("office_triggerid");
             entity.Property(e => e.CTarget1)
-                .HasMaxLength(50)
+                .HasColumnType("text")
                 .HasColumnName("c_target_1");
             entity.Property(e => e.CTarget2)
-                .HasMaxLength(50)
+                .HasColumnType("text")
                 .HasColumnName("c_target_2");
             entity.Property(e => e.CreatedOn)
                 .HasColumnType("datetime")

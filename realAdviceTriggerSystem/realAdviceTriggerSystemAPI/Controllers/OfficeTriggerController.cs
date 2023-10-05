@@ -78,12 +78,22 @@ namespace realAdviceTriggerSystemAPI.Controllers
                 using (var con = new RealadviceTriggeringSystemContext())
                 {
 
-                    OfficeTrigger? _trigger = con.OfficeTriggers.Where(t => t.TriggerName == officeTrigger.TriggerName && t.Officeid == officeTrigger.Officeid).FirstOrDefault();
+                    OfficeTrigger? _trigger = con.OfficeTriggers.Where(t => t.OfficeTriggerid == officeTrigger.OfficeTriggerid).FirstOrDefault();
 
                     if (_trigger != null)
                     {
-                        officeTrigger.OfficeTriggerid = _trigger.OfficeTriggerid;
-                        officeTrigger.UpdatedOn = DateTime.Now;
+                        _trigger.Officeid = officeTrigger.Officeid;
+                        _trigger.Layoutid = officeTrigger.Layoutid;
+                        _trigger.TriggerName = officeTrigger.TriggerName;
+                        _trigger.KeyMoment = officeTrigger.KeyMoment;
+                        _trigger.UpdatedOn = DateTime.Now;
+                        _trigger.TriggerType = officeTrigger.TriggerType;
+                        _trigger.DurationType = officeTrigger.DurationType;
+                        _trigger.DurationValue = officeTrigger.DurationValue;
+                        _trigger.TargetParticipant1 = officeTrigger.TargetParticipant1;
+                        _trigger.CTarget1 = officeTrigger.CTarget1;
+                        _trigger.Language = officeTrigger.Language;
+                        _trigger.Texte = officeTrigger.Texte;
                         con.SaveChanges();
                     }
                     else
@@ -95,6 +105,30 @@ namespace realAdviceTriggerSystemAPI.Controllers
                     }
 
                     return new JsonResult(officeTrigger);
+                }
+            }
+            catch (Exception exp)
+            {
+                return new JsonResult(exp);
+            }
+        }
+
+        [HttpDelete]
+        [Route("DeleteTrigger")]
+        public JsonResult DeleteTrigger(int triggerId)
+        {
+            try
+            {
+                using (var con = new RealadviceTriggeringSystemContext())
+                {
+
+                    OfficeTrigger _triggerToRemove = con.OfficeTriggers.Where(d => d.OfficeTriggerid == triggerId).First();
+                    if(_triggerToRemove != null)
+                    {
+                        con.OfficeTriggers.Remove(_triggerToRemove);
+                        con.SaveChanges();
+                    }
+                    return new JsonResult("");
                 }
             }
             catch (Exception exp)

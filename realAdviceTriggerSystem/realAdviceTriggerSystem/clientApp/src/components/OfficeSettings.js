@@ -7,10 +7,12 @@ import "draftail/dist/draftail.css";
 import { convertToRaw, convertFromRaw } from "draft-js";
 import { convertFromHTML, convertToHTML } from "draft-convert";
 import { DraftailEditor, BLOCK_TYPE, INLINE_STYLE, ENTITY_TYPE, UNDO_ICON } from "draftail";
+import moment from 'moment';
 import { useToken } from './tokenContext';
-import { variables } from '../Variables';
+import { variables, EnumobjTriggerType, EnumobjDurationType, EnumobjKeyMoments, EnumobjParticipentType } from '../Variables';
 
 import { Trigger } from './Trigger';
+import { PimcoreSettings } from './PimcoreSettings';
 
 export const OfficeSettings = (props) => {
     const token = useToken();
@@ -22,10 +24,9 @@ export const OfficeSettings = (props) => {
     const [showTriggerScreen, setShowTriggerScreen] = useState(false);
     const [file, setFile] = useState();
     const [fileName, setFileName] = useState();
-    const [pimcoreSettingsHtml, setPimcoreSettingsHtml] = useState("");
     const [pimcoreSettingsRows, setPimcoreSettingsRows] = useState(0);
-    const [pimcoreSettings, setPimcoreSettings] = useState({});
-
+    const [pimcoreSettings, setPimcoreSettings] = useState([]);
+    const [settingsToBeRemoved, setSettingsToBeRemoved] = useState([]);
     let linkBuilder = "";
 
     const location = useLocation();
@@ -66,49 +67,17 @@ export const OfficeSettings = (props) => {
         const jsonData = await response.json();
         if (jsonData != null && jsonData.length > 0) {
             setPimcoreSettings(jsonData);
-            jsonData.forEach((item, i) => {
-                let newRowhtml = `<div class="row position-relative" id="row${i}"><div class="col-sm-4 mb-3 mb-md-3">
-                        <label>First Name</label>
-                        <input type="text" class="form-control" id="pimcoreFName${i}" value="${item.firstName}" />
-                    </div>
-                    <div class="col-sm-4 mb-3 mb-md-3">
-                        <label>Last Name</label>
-                        <input type="text" class="form-control" id="pimcoreLName${i}" value="${item.lastName}" />
-                    </div>
-                    <div class="col-sm-4 mb-3 mb-md-3">
-                        <label>Login Id</label>
-                        <input type="text" class="form-control" id="pimcoreLoginID${i}" value="${item.loginId}" />
-                    </div>
-                    <span class="remove-setting-icon" onclick="removePimcoreSettingsRow" parentid="row${i}">
-                        <svg title="delete row" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 384 512">
-                            <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
-                        </svg>
-                    </span>
-                    </div>`;
-                setPimcoreSettingsHtml(prevState => prevState + newRowhtml);
-            })
             setPimcoreSettingsRows(jsonData.length);
         }
         else {
-            let newRowhtml = `<div class="row position-relative" id="row0"><div class="col-sm-4 mb-3 mb-md-3">
-                        <label>First Name</label>
-                        <input type="text" class="form-control" id="pimcoreFName0" value="" />
-                    </div>
-                    <div class="col-sm-4 mb-3 mb-md-3">
-                        <label>Last Name</label>
-                        <input type="text" class="form-control" id="pimcoreLName0" value="" />
-                    </div>
-                    <div class="col-sm-4 mb-3 mb-md-3">
-                        <label>Login Id</label>
-                        <input type="text" class="form-control" id="pimcoreLoginID0" value="" />
-                    </div>
-                    <span class="remove-setting-icon" onclick="removePimcoreSettingsRow" parentid="row0">
-                        <svg title="delete row" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 384 512">
-                            <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
-                        </svg>
-                    </span>
-                    </div>`;
-            setPimcoreSettingsHtml(prevState => prevState + newRowhtml);
+            setPimcoreSettings(current => [...current, {
+                pimcoreSettingid: 0,
+                whiseOfficeid: 0,
+                firstName: "",
+                lastName: "",
+                loginId: "",
+                officeid: "",
+            }]);
             setPimcoreSettingsRows(1);
         }
     }
@@ -119,32 +88,44 @@ export const OfficeSettings = (props) => {
             return
         }
         setPimcoreSettingsRows(prevState => prevState + 1);
-        let newRowhtml = `<div class="row position-relative" id="row${pimcoreSettingsRows}"><div class="col-sm-4 mb-3 mb-md-3">
-                        <label>First Name</label>
-                        <input type="text" class="form-control" id="pimcoreFName${pimcoreSettingsRows}" />
-                    </div>
-                    <div class="col-sm-4 mb-3 mb-md-3">
-                        <label>Last Name</label>
-                        <input type="text" class="form-control" id="pimcoreLName${pimcoreSettingsRows}" />
-                    </div>
-                    <div class="col-sm-4 mb-3 mb-md-3">
-                        <label>Login Id</label>
-                        <input type="text" class="form-control" id="pimcoreLoginID${pimcoreSettingsRows}" />
-                    </div>
-                    <span class="remove-setting-icon" onclick="removePimcoreSettingsRow" parentid="row${pimcoreSettingsRows}">
-                        <svg title="delete row" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 384 512">
-                            <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
-                        </svg>
-                    </span>
-                    </div>`;
-        setPimcoreSettingsHtml(prevState => prevState + newRowhtml);
+
+        setPimcoreSettings(current => [...current, {
+            pimcoreSettingid: 0,
+            whiseOfficeid: 0,
+            firstName: "",
+            lastName: "",
+            loginId: "",
+            officeid: "",
+        }]);
     }
 
     const removePimcoreSettingsRow = (e) => {
-        const rowsCount = pimcoreSettingsRows - 1;
-        const parentId = e.target.getAttribute("parentid");
-        document.getElementById(parentId).remove();
-        setPimcoreSettingsRows(rowsCount);
+        if (pimcoreSettingsRows == 1) {
+            return;
+        }
+        let element;
+        if (e.target.nodeName == "path") {
+            element = e.target.parentNode.parentNode;
+        }
+        if (e.target.nodeName == "svg") {
+            element = e.target.parentNode;
+        }
+
+        const objSettings = JSON.parse(element.getAttribute("settingdetail"));
+        const elementIndex = +element.getAttribute("parentid").split("-")[1];
+
+        let settingsArray = [...pimcoreSettings]; // make a separate copy of the array
+
+        let removedSettings = [...settingsToBeRemoved];
+
+        if (objSettings.pimcoreSettingid != 0 && settingsToBeRemoved.indexOf(settingsArray[elementIndex]) == -1) {
+            removedSettings.push(settingsArray[elementIndex]);
+            setSettingsToBeRemoved(removedSettings);
+        }
+        settingsArray.splice(elementIndex, 1);
+        setPimcoreSettings(settingsArray);
+
+        setPimcoreSettingsRows(prevState => prevState - 1);
     }
 
     const officeSettingClickHandler = (e) => {
@@ -204,12 +185,15 @@ export const OfficeSettings = (props) => {
 
     }
 
-    const showTriggerForm = (_office) => {
+    const showTriggerForm = (_office, trigger) => {
         const stateBuilder = {
             LocalOfficeDetail: _office,
             WhiseOffice: whiseOffice,
             ClientDetail: currentClient,
             AllWhiseOffices: offices
+        } 
+        if (trigger != undefined) {
+            stateBuilder.TriggerDetail = trigger;
         }
 
         const url = "/trigger/" + _office.officeid;
@@ -257,6 +241,20 @@ export const OfficeSettings = (props) => {
         //use the token to make further calls
     }
 
+    const removePimcoreSettings = () => {
+
+        //DeletePimcoreSetting api call
+        //remove pimcore settings from database
+        let url = variables.API_URL + `PimcoreSettings/DeletePimcoreSetting?`;
+        axios.delete(url, { data: settingsToBeRemoved })
+            .then((response) => {
+                setSettingsToBeRemoved([]);
+            })
+            .catch(error => {
+                alert('Error fetching data:', error);
+            });
+    }
+
     const saveOfficeSettings = (e) => {
         //configurations to post json data
         const jsonconfig = {
@@ -269,7 +267,7 @@ export const OfficeSettings = (props) => {
         //save office settings in database
         let objOfficeSettings = {
             Officeid: 0,
-            Clientid: currentClient.localclient.client.clientid,
+            Clientid: currentClient.localclient?.client.clientid,
             WhiseOfficeid: localOffice != undefined ? localOffice.whiseOfficeid : whiseOffice.id,
             CommercialName: whiseOffice.name,
             CrmDetail: "",
@@ -281,6 +279,9 @@ export const OfficeSettings = (props) => {
         axios.post(url, JSON.stringify(objOfficeSettings), jsonconfig)
             .then((response) => {
                 setLocalOffice(response.data);
+                if (settingsToBeRemoved.length > 0) {
+                    removePimcoreSettings();
+                }
                 savePimcoreSettings(e.target.id);
                 if (e.target.id == "addTrigger") {
                     showTriggerForm(response.data);
@@ -293,11 +294,33 @@ export const OfficeSettings = (props) => {
     }
 
     const EditTrigger = (e) => {
-
+        let trigger = JSON.parse(e.target.getAttribute("trigger"));
+        showTriggerForm(localOffice, trigger);
     }
 
     const DeleteTrigger = (e) => {
+        const trigger = JSON.parse(e.target.getAttribute("trigger"));
 
+        //DeleteTrigger api call
+        //remove office trigger from database
+        let url = variables.API_URL + `OfficeTrigger/DeleteTrigger?triggerId=${trigger.officeTriggerid}`;
+        axios.delete(url)
+            .then((response) => {
+                let triggersList = [...triggers];
+
+                let id = trigger.officeTriggerid;
+
+                let index = triggersList.findIndex(x => x.officeTriggerid === id);
+
+                triggersList.splice(index, 1);
+
+                setTriggers(current => triggersList);
+
+                alert("Trigger deleted successfully.");
+            })
+            .catch(error => {
+                alert('Error fetching data:', error);
+            });
     }
 
     useEffect(() => {
@@ -373,7 +396,9 @@ export const OfficeSettings = (props) => {
                     <button className="btn-site" id="addPimcoreSettings" onClick={addNewPimcoreSettingsRow}>Add Agent</button>
                 </div>
                 <div className="row">
-                    <div className="col-sm-12" dangerouslySetInnerHTML={{ __html: pimcoreSettingsHtml }} />
+                    <div className="col-sm-12">
+                        <PimcoreSettings pcSettingsList={pimcoreSettings} removePimcoreSettings={removePimcoreSettingsRow} />
+                    </div>
 
                     <div className="col-sm-12 mb-3">
                         <button className="btn-site" id="addTrigger" onClick={saveOfficeSettings}>Add New Trigger</button>
@@ -386,31 +411,36 @@ export const OfficeSettings = (props) => {
                                     <th>Trigger Name</th>
                                     <th>Trigger Type</th>
                                     <th>Trigger Duration</th>
-                                    <th>Duration Value</th>
                                     <th>Target Participent</th>
                                     <th>Target 1</th>
-                                    <th>Target Participent</th>
-                                    <th>Target 2</th>
+                                    <th>Created On</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {
                                     triggers.length > 0 ? triggers.map((item) => {
+                                        const length = JSON.parse(item.cTarget1).length;
+                                        //new Date();
+                                        const createdOn = moment(item.createdOn).format('MMMM Do YYYY, h:mm:ss a'); 
                                         return (
                                             <tr>
-                                                <td className="border-start border-end border-bottom p-2 justify-content-center">{item.keyMoment}</td>
+                                                <td className="border-start border-end border-bottom p-2 justify-content-center">{EnumobjKeyMoments[item.keyMoment]}</td>
                                                 <td className="border-end border-bottom p-2 justify-content-center">{item.triggerName}</td>
-                                                <td className="border-end border-bottom p-2 justify-content-center">{item.triggerType}</td>
-                                                <td className="border-end border-bottom p-2 justify-content-center">{item.durationType}</td>
-                                                <td className="border-end border-bottom p-2 justify-content-center text-center">{item.durationValue}</td>
-                                                <td className="border-end border-bottom p-2 justify-content-center">{item.targetParticipent1}</td>
-                                                <td className="border-end border-bottom p-2 justify-content-center">{item.cTarget1}</td>
-                                                <td className="border-end border-bottom p-2 justify-content-center">{item.targetParticipent2}</td>
-                                                <td className="border-end border-bottom p-2 justify-content-center">{item.cTarget2}</td>
+                                                <td className="border-end border-bottom p-2 justify-content-center">{EnumobjTriggerType[item.triggerType]}</td>
+                                                <td className="border-end border-bottom p-2 justify-content-center text-center">{"(" + item.durationValue + ") " + EnumobjDurationType[item.durationType]}</td>
+                                                <td className="border-end border-bottom p-2 justify-content-center">{EnumobjParticipentType[item.targetParticipant1]}</td>
+                                                <td className="border-end border-bottom p-2 justify-content-center">{
+                                                    length > 0 ? JSON.parse(item.cTarget1).map((target, i) => {
+                                                        let symbol = i < length - 1 ? ", " : "";
+                                                        return target.label + symbol;
+                                                    })
+                                                    : ""
+                                                }</td>
+                                                <td className="border-end border-bottom p-2 justify-content-center">{createdOn}</td>
                                                 <td className="border-end border-bottom p-2 justify-content-center">
-                                                    <button className="btn-site btn-edit-trigger mb-1" onClick={EditTrigger}>Edit</button>
-                                                    <button className="btn-site btn-delete-trigger" onClick={DeleteTrigger}>Delete</button>
+                                                    <button className="btn-site btn-edit-trigger mb-1" onClick={EditTrigger} trigger={JSON.stringify(item)}>Edit</button>
+                                                    <button className="btn-site btn-delete-trigger" onClick={DeleteTrigger} trigger={JSON.stringify(item)}>Delete</button>
                                                 </td>
                                             </tr>
                                         )

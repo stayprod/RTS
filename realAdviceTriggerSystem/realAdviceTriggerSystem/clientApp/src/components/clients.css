@@ -90,17 +90,18 @@
 
 .dropdown-menu {
     min-width: 15rem;
-}
+} 
 
 .field-disabled {
     background-color: #e9ecef;
     opacity: 1;
 }
 
-.remove-setting-icon{
+.remove-setting-icon {
     position: absolute;
-    right: -4px;
-    bottom: 28px;
+    right: -6px;
+    bottom: 23px;
     width: auto;
     padding: 0;
+    cursor: pointer;
 }

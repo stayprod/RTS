@@ -6,7 +6,7 @@ namespace TriggerService.Models
 {
    public class ClientSetting
     {
-        public string ClientName { get; set; }
+        public string ClientName { get; set; } 
         public string Password { get; set; }
     }
 }
