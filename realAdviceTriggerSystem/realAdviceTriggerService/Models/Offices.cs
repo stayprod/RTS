@@ -11,7 +11,7 @@ namespace realAdviceTriggerSystemService.Models
         public string CommercialName { get; set; }
         public string CrmDetail { get; set; }
         public string UniqueKey { get; set; } 
-        public string OfficeImg { get; set; }
+        public string OfficeImg { get; set; } 
         public DateTime? CreatedOn { get; set; }
     }
 }

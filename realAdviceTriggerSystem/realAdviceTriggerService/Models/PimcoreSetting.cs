@@ -12,5 +12,5 @@ namespace realAdviceTriggerSystemService.Models
         public string LastName { get; set; }
         public string LoginId { get; set; }
         public DateTime? CreatedOn { get; set; } 
-    }
+    } 
 }

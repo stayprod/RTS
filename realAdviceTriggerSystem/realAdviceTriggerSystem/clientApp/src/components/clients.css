@@ -105,3 +105,9 @@
     padding: 0;
     cursor: pointer;
 }
+
+.back-arrow{
+    left: -50px;
+    cursor: pointer;
+    z-index: 11;
+}

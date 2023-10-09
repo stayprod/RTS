@@ -14,23 +14,26 @@ export const Offices = (props) => {
     const navigate = useNavigate();
 
     const officeSettingClickHandler = (e) => {
-        let office = JSON.parse(e.target.getAttribute("officedetail"));
+        let _whiseOffice = JSON.parse(e.target.getAttribute("officedetail"));
 
         const localOffices = client.localclient?.office;
 
-        //filtering out locally saved office 
-        const l_office = localOffices?.filter(item => {
-            return item.whiseOfficeid == office.id
-        })
-
         const stateBuilder = {
-            WhiseOffice: office,
+            WhiseOffice: _whiseOffice,
             AllWhiseOffices: whiseOfficesList,
-            CurrentClient: client,
-            LocalOffice: l_office[0]
+            CurrentClient: client
         }
 
-        const url = "/officesettings/" + office.id;
+        if (localOffices != undefined) {
+            //filtering out locally saved office 
+            const l_office = localOffices?.filter(item => {
+                return item.whiseOfficeid == _whiseOffice.id
+            })
+            stateBuilder.LocalOffice = l_office[0];
+            stateBuilder.LocalOfficesList = localOffices;
+        }
+
+        const url = "/officesettings/" + _whiseOffice.id;
 
         navigate(url, {
             state: stateBuilder

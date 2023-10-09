@@ -194,6 +194,9 @@ public partial class RealadviceTriggeringSystemContext : DbContext
             entity.Property(e => e.OfficeTriggerid)
                 .HasColumnType("int(11)")
                 .HasColumnName("office_triggerid");
+            entity.Property(e => e.AppointmentType)
+                .HasMaxLength(45)
+                .HasColumnName("appointment_type");
             entity.Property(e => e.CTarget1)
                 .HasColumnType("text")
                 .HasColumnName("c_target_1");
@@ -230,6 +233,12 @@ public partial class RealadviceTriggeringSystemContext : DbContext
             entity.Property(e => e.Texte)
                 .HasColumnType("text")
                 .HasColumnName("texte");
+            entity.Property(e => e.TransactionStatus)
+                .HasMaxLength(45)
+                .HasColumnName("transaction_status");
+            entity.Property(e => e.TransactionType)
+                .HasMaxLength(45)
+                .HasColumnName("transaction_type");
             entity.Property(e => e.TriggerName)
                 .HasMaxLength(200)
                 .HasColumnName("trigger_name");

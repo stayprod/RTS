@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { Row, Col, Nav, Form, Image, Button, Navbar, Dropdown, Container, ListGroup, InputGroup, NavDropdown, Modal, Tab, Tabs } from 'react-bootstrap';
 import { MultiSelect } from "react-multi-select-component";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import "draftail/dist/draftail.css";
 import { convertToRaw, convertFromRaw } from "draft-js";
 import { convertFromHTML, convertToHTML } from "draft-convert";
@@ -56,7 +58,7 @@ export const Trigger = (props) => {
         setWhiseOfficesList(location.state.AllWhiseOffices)
         getListOfLayoutsByOffice(location.state.LocalOfficeDetail);
         if (location.state.TriggerDetail != undefined) {
-            loadTriggerDetailInEdit(location.state.TriggerDetail)
+            loadTriggerDetailInEdit(location.state.TriggerDetail);
         }
     }
 
@@ -109,12 +111,28 @@ export const Trigger = (props) => {
 
         setSelectedTarget(targets);
         setSelectedTab(trigger.language);
-        document.getElementById("layoutDropdown").value = trigger.layoutid;
+
+        const whiseOptions = document.getElementById("whiseAppointmentType");
+        const transactionType = document.getElementById("transactionType");
+        const transactionStatus = document.getElementById("transactionStatus");
+
+        transactionType.value = trigger.transactionType;
+        transactionStatus.value = trigger.transactionStatus;
+
+        setTimeout(function () {
+            document.getElementById("layoutDropdown").value = trigger.layoutid;
+            setSelectedLaytOutId(trigger.layoutid);
+            whiseOptions.value = trigger.appointmentType;
+        }, 1000)
     }
 
     const setNameForTrigger = (e) => {
 
         if (e.target.value != "") {
+
+            if (e.target.style.borderColor == "red") {
+                e.target.style.borderColor = "#ced4da";
+            }
             let index = e.target.selectedIndex;
             let value = e.target[index].text;
             triggerNameBuilder[e.target.id] = value;
@@ -135,10 +153,23 @@ export const Trigger = (props) => {
         }
     }
 
+    const resetConditionDropdowns = (e) => {
+        let value = e.target.value;
+        if (value != "") {
+            if (e.target.style.borderColor == "red") {
+                e.target.style.borderColor = "#ced4da";
+            }
+        }
+    }
+
     const onChangeOfDurationType = (e) => {
         let value = e.target.value;
         if (value != "") {
             document.getElementById("durationValue").removeAttribute("disabled");
+
+            if (e.target.style.borderColor == "red") {
+                e.target.style.borderColor = "#ced4da";
+            }
 
             let index = e.target.selectedIndex;
             let value = e.target[index].text;
@@ -375,6 +406,48 @@ export const Trigger = (props) => {
     }
 
     const saveTrigger = () => {
+        let isFRequiredFieldsEmpty = false;
+        const keymomentDropdown = document.getElementById("keymomentDropdown");
+        const triggerTypeDropdown = document.getElementById("triggertypeDropdown");
+        const durationtypeDropdown = document.getElementById("durationtypeDropdown");
+        const durationValue = document.getElementById("durationValue");
+        const whiseOptions = document.getElementById("whiseAppointmentType");
+        const transactionType = document.getElementById("transactionType");
+        const transactionStatus = document.getElementById("transactionStatus");
+
+        if (keymomentDropdown.value == "") {
+            keymomentDropdown.style.borderColor = "red";
+            isFRequiredFieldsEmpty = true;
+        } // 
+        if (triggerTypeDropdown.value == "") {
+            triggerTypeDropdown.style.borderColor = "red";
+            isFRequiredFieldsEmpty = true;
+        }
+        if (durationtypeDropdown.value == "") {
+            durationtypeDropdown.style.borderColor = "red";
+            isFRequiredFieldsEmpty = true;
+        }
+        if (durationValue.value == "") {
+            durationValue.style.borderColor = "red";
+            isFRequiredFieldsEmpty = true;
+        }
+        if (whiseOptions.value == "") {
+            whiseOptions.style.borderColor = "red";
+            isFRequiredFieldsEmpty = true;
+        }
+        if (transactionType.value == "") {
+            transactionType.style.borderColor = "red";
+            isFRequiredFieldsEmpty = true;
+        }
+        if (transactionStatus.value == "") {
+            transactionStatus.style.borderColor = "red";
+            isFRequiredFieldsEmpty = true;
+        }
+
+        if (isFRequiredFieldsEmpty == true) {
+            alert("please fill the required fields");
+            return
+        }
 
         //configurations to post json data
         const jsonconfig = {
@@ -392,37 +465,43 @@ export const Trigger = (props) => {
             Officeid: +localOfficeDetail.officeid,
             Layoutid: +selectedLaytOutId,
             TriggerName: finalTriggerName,
-            KeyMoment: document.getElementById("keymomentDropdown").value,
-            TriggerType: document.getElementById("triggertypeDropdown").value,
-            DurationType: document.getElementById("durationtypeDropdown").value,
-            DurationValue: +document.getElementById("durationValue").value,
+            KeyMoment: keymomentDropdown.value,
+            TriggerType: triggerTypeDropdown.value,
+            DurationType: durationtypeDropdown.value,
+            DurationValue: +durationValue.value,
             TargetParticipant1: document.getElementById("participent1").value,
             CTarget1: JSON.stringify(selectedTarget), //document.getElementById("ctarget1").value,
             TargetParticipant2: "",
             CTarget2: "",
             Language: language,
             Texte: triggerDetail.texte != undefined && triggerDetail.texte != "" ? triggerDetail.texte : emailTexte,
+            AppointmentType: whiseOptions.value,
+            TransactionType: transactionType.value,
+            TransactionStatus: transactionStatus.value,
         }
         let triggerurl = variables.API_URL + `OfficeTrigger/SaveOfficeTriggerDetail?`;
         return axios.post(triggerurl, JSON.stringify(objOfficeTrigger), jsonconfig)
             .then((response) => {
                 alert("Trigger successfully saved.");
-
-                const stateBuilder = {
-                    AllWhiseOffices: whiseOfficesList,
-                    WhiseOffice: whiseOfficeDetail,
-                    CurrentClient: clientDetail,
-                    LocalOffice: localOfficeDetail
-                }
-
-                const url = "/officesettings/" + whiseOfficeDetail.id;
-                navigate(url, {
-                    state: stateBuilder
-                });
+                moveBackToOfficeScreen();
             })
             .catch(error => {
                 alert('Error fetching data:', error);
             });
+    }
+
+    const moveBackToOfficeScreen = (e) => {
+        const stateBuilder = {
+            AllWhiseOffices: whiseOfficesList,
+            WhiseOffice: whiseOfficeDetail,
+            CurrentClient: clientDetail,
+            LocalOffice: localOfficeDetail
+        }
+
+        const url = "/officesettings/" + whiseOfficeDetail.id;
+        navigate(url, {
+            state: stateBuilder
+        });
     }
 
     useEffect(() => {
@@ -454,7 +533,12 @@ export const Trigger = (props) => {
             <section className="client-setting">
                 <div className="row py-3">
                     <div className="col-sm-12">
-                        <h4>Add Trigger</h4>
+                        <h4 className="position-relative">
+                            <span className="position-absolute back-arrow" onClick={moveBackToOfficeScreen}>
+                                <FontAwesomeIcon icon={faArrowLeft} />
+                            </span>
+                            Add Trigger
+                        </h4>
                     </div>
                     <div className="col-sm-12">
                         <label className="me-2 fw-bold">Client:</label><span>{clientDetail.name}</span><br/>
@@ -517,6 +601,11 @@ export const Trigger = (props) => {
                                 }}
                                 onChange={(e) => {
                                     let value = e.target.value;
+
+                                    if (e.target.style.borderColor == "red") {
+                                        e.target.style.borderColor = "#ced4da";
+                                    }
+
                                     triggerNameBuilder[e.target.id] = "(" + value + ")";
 
                                     let nameString = ""
@@ -558,7 +647,7 @@ export const Trigger = (props) => {
                     <div className="row">
                         <div className="col-sm-12 col-md-4 mb-3">
                             <label>WHISE</label>
-                            <select className="form-select">
+                            <select className="form-select" id="whiseAppointmentType" onChange={resetConditionDropdowns}>
                                 <option value="">Select an option</option>
                                 {data?.map((option) => (
                                     <option key={option.id} value={option.id}>
@@ -569,7 +658,7 @@ export const Trigger = (props) => {
                         </div>
                         <div className="col-sm-12 col-md-4 mb-3">
                             <label>Property Transaction Type</label>
-                            <select className="form-select">
+                            <select className="form-select" id="transactionType" onChange={resetConditionDropdowns}>
                                 <option value="">Select an option</option>
                                 <option value="1">To sale</option>
                                 <option value="2">To rent</option>
@@ -578,8 +667,7 @@ export const Trigger = (props) => {
                         </div>
                         <div className="col-sm-12 col-md-4 mb-3">
                             <label>Property Transaction Status</label>
-
-                            <select className="form-select">
+                            <select className="form-select" id="transactionStatus" onChange={resetConditionDropdowns}>
                                 <option value="">Select an option</option>
                                 <option value="1">To sale</option>
                                 <option value="2">To rent</option>

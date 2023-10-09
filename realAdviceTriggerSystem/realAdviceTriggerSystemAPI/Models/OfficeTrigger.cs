@@ -36,4 +36,10 @@ public partial class OfficeTrigger
     public DateTime? CreatedOn { get; set; }
 
     public DateTime? UpdatedOn { get; set; }
+
+    public string? AppointmentType { get; set; }
+
+    public string? TransactionType { get; set; }
+
+    public string? TransactionStatus { get; set; }
 }

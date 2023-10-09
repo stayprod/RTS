@@ -94,6 +94,9 @@ namespace realAdviceTriggerSystemAPI.Controllers
                         _trigger.CTarget1 = officeTrigger.CTarget1;
                         _trigger.Language = officeTrigger.Language;
                         _trigger.Texte = officeTrigger.Texte;
+                        _trigger.AppointmentType = officeTrigger.AppointmentType;
+                        _trigger.TransactionType = officeTrigger.TransactionType;
+                        _trigger.TransactionStatus = officeTrigger.TransactionStatus;
                         con.SaveChanges();
                     }
                     else

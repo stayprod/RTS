@@ -17,10 +17,12 @@ using realAdviceTriggerSystemService.Models;
 
 namespace TriggerService
 {
-     
+
     public class Worker : BackgroundService
     {
-
+        public enum status
+        {
+        }
         List<Clients> clients = new List<Clients>();
         Clients cli = new Clients();
         EmailSend SendEmailobj = new EmailSend();
@@ -82,7 +84,13 @@ namespace TriggerService
 
                 // Prepare the request content (JSON data)
                 var today = DateTime.UtcNow.Date;
-                var requestData = new { dateFrom = today, dateTo = today.AddDays(1) };
+                var requestData = new
+                {
+                    Field = new
+                    {
+                        Included = new[] { "estates" }
+                    }
+                };
                 var json = JsonConvert.SerializeObject(requestData);
                 var requestContent = new StringContent(json, Encoding.UTF8, "application/json");
 
@@ -124,7 +132,7 @@ namespace TriggerService
 
                 // Prepare the request content (JSON data)
                 var today = DateTime.UtcNow.Date;
-                var requestData = new { id="5284008" };
+                var requestData = new { id = "5284008" };
                 var json = JsonConvert.SerializeObject(requestData);
                 var requestContent = new StringContent(json, Encoding.UTF8, "application/json");
 
@@ -151,6 +159,7 @@ namespace TriggerService
             }
 
         }
+
 
         public async Task<object> GetTriggerAsync()
         {
@@ -185,7 +194,7 @@ namespace TriggerService
                 throw;
             }
         }
-        
+
         private async Task<OfficeTriggers> GetTriggers()
         {
             return new OfficeTriggers();
@@ -195,26 +204,77 @@ namespace TriggerService
         {
             try
             {
-                var token = await GetTokenAsync();
+                var whiseToken = await GetTokenAsync();
                 while (!stoppingToken.IsCancellationRequested)
                 {
                     //_emailService = new MandrillEmailService();
                     //var triggers = await GetTriggerAsync();
                     //await _emailService.SendEmailAsync("umarfarooq3540@email.com", "Subject", "Message body");
-
-
                     // Get today's appointmentss
-                    Console.WriteLine(token);
-                    var appointments = await GetTodaysAppointmentsAsync(token);
-                    using (var context = new realadvicetriggeringsystemContext())
-                    {
-                        var _clients = context.Clients.ToList();
-                    }
-                    var EstateList = await GetEstateListAsync(token);
-                    Console.WriteLine(appointments);
+                    var appointments = await GetTodaysAppointmentsAsync(whiseToken);// for all clients
+                    var EstateList = await GetEstateListAsync(whiseToken);
+                    string filePath = "output.txt";
 
+                    foreach (var appointmentObj in appointments.Calendars)
+                    {
+                        if (appointmentObj.estates != null)
+                        {
+                            foreach (var estateListObj in EstateList.estates)
+                            {
+                                if (appointmentObj.estates[0].estateId == estateListObj.Id)
+                                {
+                                    using (StreamWriter writer = new StreamWriter(filePath, true))
+                                    {
+                                        writer.WriteLine("This text will be appended to the existing file.");
+                                    }
+                                }
+                                var purpose = estateListObj.purpose.Id;
+                                var purposeStatus = estateListObj.purposeStatus.Id;
+
+                            }
+                        }
+
+                    }
+
+                    //bool isEmailSend = SendEmailobj.emailSend("umarfarooq3540@gmail.com", "Sunject", "<h2>My First Email </h2>", true);
+                    //if (isEmailSend)
+                    //{
+                    //        using (StreamWriter writer = new StreamWriter(filePath, true))
+                    //        {
+                    //            writer.WriteLine("This text will be appended to the existing file.");
+                    //        }
+                    //}
+                    using (var con = new realadvicetriggeringsystemContext())
+                    {
+                        //var _clients = context.Clients.ToList();
+                        List<Clients> clients = con.Clients.ToList();
+                        List<AdminDetail> admindetails = con.AdminDetail.ToList();
+                        List<Offices> offices = con.Offices.ToList();
+                        List<OfficeTriggers> triggers = con.OfficeTriggers.ToList();
+
+                        var _clients = from c in clients
+                                       join ad in admindetails on c.Clientid equals ad.Clientid into cl_ad
+                                       join o in offices on c.Clientid equals o.Clientid
+                                       join t in triggers on o.Officeid equals t.Officeid into off_triggers
+                                       select (new
+                                       {
+                                           client = c,
+                                           admin = cl_ad,
+                                           triggers = off_triggers
+                                       });
+                        foreach (var clientObj in _clients)
+                        {
+                            using (StreamWriter writer = new StreamWriter(filePath, true))
+                            {
+                                writer.WriteLine(clientObj);
+                            }
+                        }
+
+                    }
+
+                    _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+                    await Task.Delay(TimeSpan.FromMinutes(2), stoppingToken); // Append every 60 seconds
                 }
-                await Task.Delay(TimeSpan.FromSeconds(60), stoppingToken); // Poll API every 30 seconds 
             }
             catch (Exception ex)
             {

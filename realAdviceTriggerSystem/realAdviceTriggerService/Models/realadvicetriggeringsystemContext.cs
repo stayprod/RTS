@@ -15,7 +15,7 @@ namespace realAdviceTriggerSystemService.Models
         {
         } 
 
-        public virtual DbSet<AdminDetail> AdminDetail { get; set; }
+        public virtual DbSet<AdminDetail> AdminDetail { get; set; } 
         public virtual DbSet<Clients> Clients { get; set; }
         public virtual DbSet<Layouts> Layouts { get; set; }
         public virtual DbSet<OfficeTriggers> OfficeTriggers { get; set; }
@@ -27,7 +27,7 @@ namespace realAdviceTriggerSystemService.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseMySql("server=localhost;port=3306;database=realadvice-triggering-system;user=root;password=987654321;persist security info=False;connect timeout=300;convertzerodatetime=True", x => x.ServerVersion("8.0.33-mysql"));
+                optionsBuilder.UseMySql("server=localhost;port=3306;database=realadvice-triggering-system;user=pimcore_user; password=eezahtech*1;persist security info=False;connect timeout=300;convertzerodatetime=True", x => x.ServerVersion("8.0.33-mysql"));
             }
         }
 

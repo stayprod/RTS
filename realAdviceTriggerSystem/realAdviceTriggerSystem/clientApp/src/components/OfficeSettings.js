@@ -16,10 +16,11 @@ import { PimcoreSettings } from './PimcoreSettings';
 
 export const OfficeSettings = (props) => {
     const token = useToken();
-    const [offices, setOffices] = useState({});
+    const [whiseOffices, setWhiseOffices] = useState({});
     const [whiseOffice, setWhiseOffice] = useState({});
     const [localOffice, setLocalOffice] = useState({});
     const [currentClient, setCurrentClient] = useState({});
+    const [clientLocalOffices, setClientLocalOffices] = useState({});
     const [triggers, setTriggers] = useState({});
     const [showTriggerScreen, setShowTriggerScreen] = useState(false);
     const [file, setFile] = useState();
@@ -35,7 +36,7 @@ export const OfficeSettings = (props) => {
 
     const getListOfOfficesFromStateBuilder = () => {
         //list of whise offices for a specific client
-        setOffices(location.state.AllWhiseOffices);
+        setWhiseOffices(location.state.AllWhiseOffices);
 
         //selected office detail from whise
         setWhiseOffice(location.state.WhiseOffice);
@@ -43,8 +44,15 @@ export const OfficeSettings = (props) => {
         //client object including whise client detail and local database client detail
         setCurrentClient(location.state.CurrentClient);
 
-        setLocalOffice(location.state.LocalOffice);
-        getTriggersByOffice(location.state.LocalOffice);
+        if (location.state.LocalOffice != undefined) {
+            setLocalOffice(location.state.LocalOffice);
+            getTriggersByOffice(location.state.LocalOffice);
+            document.getElementById("crmName").value = location.state.LocalOffice.crmDetail;
+            document.getElementById("crmUniqueKey").value = location.state.LocalOffice.uniqueKey;
+        }
+        if (location.state.LocalOfficesList != undefined) {
+            setClientLocalOffices(location.state.LocalOfficesList);
+        }
         getPimcoreSettingsByOffice(location.state.WhiseOffice);
     }
 
@@ -129,15 +137,26 @@ export const OfficeSettings = (props) => {
     }
 
     const officeSettingClickHandler = (e) => {
-        let office = JSON.parse(e.target.getAttribute("officedetail"));
+        let _whiseOffice = JSON.parse(e.target.getAttribute("officedetail"));
 
         const stateBuilder = {
-            WhiseOffice: office,
-            AllWhiseOffices: offices,
+            WhiseOffice: _whiseOffice,
+            AllWhiseOffices: whiseOffices,
             CurrentClient: currentClient
         }
 
-        const url = "/OfficeSettings/" + office.id;
+        const localOffices = clientLocalOffices;
+
+        if (localOffices != undefined && Object.keys(localOffices).length !== 0) {
+            //filtering out locally saved office 
+            const l_office = localOffices?.filter(item => {
+                return item.whiseOfficeid == _whiseOffice.id
+            })
+            stateBuilder.LocalOffice = l_office[0];
+            stateBuilder.LocalOfficesList = localOffices;
+        }
+
+        const url = "/OfficeSettings/" + _whiseOffice.id;
 
         var currentPath = window.location.pathname;
 
@@ -190,8 +209,8 @@ export const OfficeSettings = (props) => {
             LocalOfficeDetail: _office,
             WhiseOffice: whiseOffice,
             ClientDetail: currentClient,
-            AllWhiseOffices: offices
-        } 
+            AllWhiseOffices: whiseOffices
+        }
         if (trigger != undefined) {
             stateBuilder.TriggerDetail = trigger;
         }
@@ -268,17 +287,18 @@ export const OfficeSettings = (props) => {
         let objOfficeSettings = {
             Officeid: 0,
             Clientid: currentClient.localclient?.client.clientid,
-            WhiseOfficeid: localOffice != undefined ? localOffice.whiseOfficeid : whiseOffice.id,
+            WhiseOfficeid: localOffice.length != undefined ? localOffice.whiseOfficeid : whiseOffice.id,
             CommercialName: whiseOffice.name,
-            CrmDetail: "",
+            CrmDetail: document.getElementById("crmName").value,
             OfficeImg: "",
-            UniqueKey: "",
+            UniqueKey: document.getElementById("crmUniqueKey").value,
         }
 
         let url = variables.API_URL + `Office/SaveOfficeDetail?`;
         axios.post(url, JSON.stringify(objOfficeSettings), jsonconfig)
             .then((response) => {
                 setLocalOffice(response.data);
+                setClientLocalOffices(current => [...current, response.data]);
                 if (settingsToBeRemoved.length > 0) {
                     removePimcoreSettings();
                 }
@@ -338,13 +358,13 @@ export const OfficeSettings = (props) => {
             </div>
             <div className="pb-4 pt-2">
                 {
-                    offices.length > 0 ? offices.map(item => {
+                    whiseOffices.length > 0 ? whiseOffices.map(item => {
                         let activeClass = item.id == whiseOffice.id ? "office-active" : "";
 
                         return (
-                            <span className={"name-tiles " + activeClass} onClick={officeSettingClickHandler} officedetail={JSON.stringify(item)}>{
+                            <button className={"name-tiles " + activeClass} onClick={officeSettingClickHandler} officedetail={JSON.stringify(item)}>{
                                 item.name
-                            }</span>
+                            }</button>
                         )
                     })
                         :
@@ -371,13 +391,14 @@ export const OfficeSettings = (props) => {
                 <div className="row">
                     <div className="col-sm-4 mb-3 mb-md-0">
                         <label>CRM Name</label>
-                        <select className="form-select">
-                            <option>Whise</option>
-                            <option>Omnicasa</option>
-                            <option>Sweepbright</option>
-                            <option>Zabun</option>
-                            <option>Apimo</option>
-                            <option>Activimmo</option>
+                        <select className="form-select" id="crmName">
+                            <option value="">Select an option</option>
+                            <option value="1">Whise</option>
+                            <option value="2">Omnicasa</option>
+                            <option value="3">Sweepbright</option>
+                            <option value="4">Zabun</option>
+                            <option value="5">Apimo</option>
+                            <option value="6">Activimmo</option>
                         </select>
                     </div>
                     <div className="col-sm-4 mb-3 mb-md-0">
@@ -386,7 +407,7 @@ export const OfficeSettings = (props) => {
                     </div>
                     <div className="col-sm-4 mb-3 mb-md-0">
                         <label>Unique Key</label>
-                        <input type="text" className="form-control" />
+                        <input type="text" className="form-control" id="crmUniqueKey" />
                     </div>
                 </div>
             </div>
@@ -422,7 +443,7 @@ export const OfficeSettings = (props) => {
                                     triggers.length > 0 ? triggers.map((item) => {
                                         const length = JSON.parse(item.cTarget1).length;
                                         //new Date();
-                                        const createdOn = moment(item.createdOn).format('MMMM Do YYYY, h:mm:ss a'); 
+                                        const createdOn = moment(item.createdOn).format('MMMM Do YYYY, h:mm:ss a');
                                         return (
                                             <tr>
                                                 <td className="border-start border-end border-bottom p-2 justify-content-center">{EnumobjKeyMoments[item.keyMoment]}</td>
@@ -435,7 +456,7 @@ export const OfficeSettings = (props) => {
                                                         let symbol = i < length - 1 ? ", " : "";
                                                         return target.label + symbol;
                                                     })
-                                                    : ""
+                                                        : ""
                                                 }</td>
                                                 <td className="border-end border-bottom p-2 justify-content-center">{createdOn}</td>
                                                 <td className="border-end border-bottom p-2 justify-content-center">

@@ -45,11 +45,13 @@ namespace realAdviceTriggerSystemAPI.Controllers
 
                     if (_office != null)
                     {
-                        office.Officeid = _office.Officeid;
+                        _office.CrmDetail = office.CrmDetail;
+                        _office.UniqueKey = office.UniqueKey;
                         con.SaveChanges();
                     }
                     else
                     {
+                        office.CreatedOn = DateTime.Now;
                         con.Offices.Add(office);
                         con.SaveChanges();
                     }

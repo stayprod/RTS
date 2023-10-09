@@ -23,3 +23,4 @@ namespace realAdviceTriggerSystemService.Models
         public string Comments { get; set; } 
     }
 }
+ 

@@ -9,7 +9,7 @@ import image from '../assets/images/profile_image.png'
 
 export const ClientSettings = (props) => {
     const [clientDetail, setClientDetail] = useState({});
-    const [offices, setOffices] = useState({});
+    const [whiseOffices, setWhiseOffices] = useState({});
     const [clientDetailFromDB, setClientDetailFromDB] = useState({});
     const [adminDetail, setAdminDetail] = useState({});
 
@@ -49,15 +49,26 @@ export const ClientSettings = (props) => {
     }
 
     const officeSettingClickHandler = (e) => {
-        let office = JSON.parse(e.target.getAttribute("officedetail"));
+        let _whiseOffice = JSON.parse(e.target.getAttribute("officedetail"));
+
+        const localOffices = clientDetail.localclient?.office;
 
         const stateBuilder = {
-            CurrentOffice: office,
-            AllOffices: offices,
+            WhiseOffice: _whiseOffice,
+            AllWhiseOffices: whiseOffices,
             CurrentClient: clientDetail
         }
 
-        const url = "/OfficeSettings/" + office.id;
+        if (localOffices != undefined) {
+            //filtering out locally saved office 
+            const l_office = localOffices?.filter(item => {
+                return item.whiseOfficeid == _whiseOffice.id
+            })
+            stateBuilder.LocalOffice = l_office[0];
+            stateBuilder.LocalOfficesList = localOffices;
+        }
+
+        const url = "/OfficeSettings/" + _whiseOffice.id;
 
         navigate(url, {
             state: stateBuilder
@@ -87,8 +98,10 @@ export const ClientSettings = (props) => {
 
     const getOfficesList = () => {
         if (location.state != null) {
-            setClientDetailFromDB(location.state.localclient.client)
-            setAdminDetail(location.state.localclient.admin[0]);
+            if (location.state.localclient != undefined) {
+                setClientDetailFromDB(location.state.localclient.client)
+                setAdminDetail(location.state.localclient.admin[0]);
+            }
             //get client offices and pass to setting screen
             //const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImlhdCI6MTY5MzI5MTY4OH0.eyJzZXJ2aWNlQ29uc3VtZXJJZCI6MTMzNywidHlwZUlkIjo0LCJjbGllbnRJZCI6MTAyNjN9.1-9mYean_qX58r6ykhP545Y3r8IGK53PgDOoyIja8YM';
             // Replace with your actual token
@@ -101,7 +114,7 @@ export const ClientSettings = (props) => {
             };
             axios.post('https://api.whise.eu/v1/admin/offices/list', { "clientId": clientid }, config) // ASP.NET Core API endpoint with header
                 .then(response => {
-                    setOffices(response.data.offices);
+                    setWhiseOffices(response.data.offices);
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);
@@ -182,11 +195,11 @@ export const ClientSettings = (props) => {
             </div>
             <div className="pb-4 pt-2">
                 {
-                    offices.length > 0 ? offices.map(item => {
+                    whiseOffices.length > 0 ? whiseOffices.map(item => {
                         return (
-                            <span className="name-tiles" onClick={officeSettingClickHandler} officedetail={JSON.stringify(item)}>{
+                            <button className="name-tiles" onClick={officeSettingClickHandler} officedetail={JSON.stringify(item)}>{
                                 item.name
-                            }</span>
+                            }</button>
                         )
                     })
                     :
