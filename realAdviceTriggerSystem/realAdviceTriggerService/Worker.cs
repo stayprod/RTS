@@ -262,11 +262,18 @@ namespace TriggerService
                                            admin = cl_ad,
                                            triggers = off_triggers
                                        });
-                        foreach (var clientObj in _clients)
+
+                        var result = _clients.ToList();
+
+                        foreach (var clientObj in result)
                         {
                             using (StreamWriter writer = new StreamWriter(filePath, true))
                             {
-                                writer.WriteLine(clientObj);
+                                writer.WriteLine(clientObj.client.Clientid);
+
+                                // to get triggers, use the following command
+                                // clientObj.triggers.ToList()[0].DurationValue
+                                // clientObj.triggers.ToList()[1].DurationValue
                             }
                         }
 

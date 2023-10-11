@@ -8,8 +8,8 @@ namespace realAdviceTriggerSystemService.Models
         public int Layoutid { get; set; }
         public int? Officeid { get; set; }
         public int? Clientid { get; set; }
-        public string LayoutName { get; set; } 
-        public string LayoutDetail { get; set; } 
+        public string LayoutName { get; set; }
+        public string LayoutDetail { get; set; }
         public DateTime? CreatedOn { get; set; }
     }
 }

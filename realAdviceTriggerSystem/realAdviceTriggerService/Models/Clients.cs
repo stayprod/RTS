@@ -20,7 +20,6 @@ namespace realAdviceTriggerSystemService.Models
         public string Website { get; set; }
         public string Country { get; set; }
         public string CrmDetail { get; set; }
-        public string Comments { get; set; } 
+        public string Comments { get; set; }
     }
 }
- 
