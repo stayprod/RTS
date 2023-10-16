@@ -19,15 +19,17 @@ public partial class RealadviceTriggeringSystemContext : DbContext
 
     public virtual DbSet<Client> Clients { get; set; }
 
-    public virtual DbSet<ClientSmtpsetting> ClientSmtpsettings { get; set; }
-
     public virtual DbSet<Layout> Layouts { get; set; }
 
     public virtual DbSet<Office> Offices { get; set; }
 
+    public virtual DbSet<OfficeSmtpsetting> OfficeSmtpsettings { get; set; }
+
     public virtual DbSet<OfficeTrigger> OfficeTriggers { get; set; }
 
     public virtual DbSet<PimcoreSetting> PimcoreSettings { get; set; }
+
+    public virtual DbSet<RtsEmailLog> RtsEmailLogs { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
@@ -129,53 +131,6 @@ public partial class RealadviceTriggeringSystemContext : DbContext
                 .HasColumnName("zip_code");
         });
 
-        modelBuilder.Entity<ClientSmtpsetting>(entity =>
-        {
-            entity.HasKey(e => e.Settingid).HasName("PRIMARY");
-
-            entity.ToTable("client_smtpsettings");
-
-            entity.Property(e => e.Settingid)
-                .HasColumnType("int(11)")
-                .HasColumnName("settingid");
-            entity.Property(e => e.Clientid)
-                .HasColumnType("int(11)")
-                .HasColumnName("clientid");
-            entity.Property(e => e.CreatedOn)
-                .HasColumnType("datetime")
-                .HasColumnName("created_on");
-            entity.Property(e => e.EmailProvider)
-                .HasColumnType("text")
-                .HasColumnName("email_provider");
-            entity.Property(e => e.ImapServer)
-                .HasColumnType("text")
-                .HasColumnName("imap_server");
-            entity.Property(e => e.Officeid)
-                .HasColumnType("int(11)")
-                .HasColumnName("officeid");
-            entity.Property(e => e.Password)
-                .HasColumnType("text")
-                .HasColumnName("password");
-            entity.Property(e => e.Port)
-                .HasColumnType("text")
-                .HasColumnName("port");
-            entity.Property(e => e.SslSetting)
-                .HasColumnType("tinyint(4)")
-                .HasColumnName("ssl_setting");
-            entity.Property(e => e.UpdatedOn)
-                .HasColumnType("datetime")
-                .HasColumnName("updated_on");
-            entity.Property(e => e.UserName)
-                .HasColumnType("text")
-                .HasColumnName("user_name");
-            entity.Property(e => e.WhiseClientid)
-                .HasColumnType("int(11)")
-                .HasColumnName("whise_clientid");
-            entity.Property(e => e.WhiseOfficeid)
-                .HasColumnType("int(11)")
-                .HasColumnName("whise_officeid");
-        });
-
         modelBuilder.Entity<Layout>(entity =>
         {
             entity.HasKey(e => e.Layoutid).HasName("PRIMARY");
@@ -237,6 +192,53 @@ public partial class RealadviceTriggeringSystemContext : DbContext
                 .HasColumnName("whise_officeid");
         });
 
+        modelBuilder.Entity<OfficeSmtpsetting>(entity =>
+        {
+            entity.HasKey(e => e.Settingid).HasName("PRIMARY");
+
+            entity.ToTable("office_smtpsettings");
+
+            entity.Property(e => e.Settingid)
+                .HasColumnType("int(11)")
+                .HasColumnName("settingid");
+            entity.Property(e => e.Clientid)
+                .HasColumnType("int(11)")
+                .HasColumnName("clientid");
+            entity.Property(e => e.CreatedOn)
+                .HasColumnType("datetime")
+                .HasColumnName("created_on");
+            entity.Property(e => e.EmailProvider)
+                .HasColumnType("text")
+                .HasColumnName("email_provider");
+            entity.Property(e => e.ImapServer)
+                .HasColumnType("text")
+                .HasColumnName("imap_server");
+            entity.Property(e => e.Officeid)
+                .HasColumnType("int(11)")
+                .HasColumnName("officeid");
+            entity.Property(e => e.Password)
+                .HasColumnType("text")
+                .HasColumnName("password");
+            entity.Property(e => e.Port)
+                .HasColumnType("text")
+                .HasColumnName("port");
+            entity.Property(e => e.SslSetting)
+                .HasColumnType("tinyint(4)")
+                .HasColumnName("ssl_setting");
+            entity.Property(e => e.UpdatedOn)
+                .HasColumnType("datetime")
+                .HasColumnName("updated_on");
+            entity.Property(e => e.UserName)
+                .HasColumnType("text")
+                .HasColumnName("user_name");
+            entity.Property(e => e.WhiseClientid)
+                .HasColumnType("int(11)")
+                .HasColumnName("whise_clientid");
+            entity.Property(e => e.WhiseOfficeid)
+                .HasColumnType("int(11)")
+                .HasColumnName("whise_officeid");
+        });
+
         modelBuilder.Entity<OfficeTrigger>(entity =>
         {
             entity.HasKey(e => e.OfficeTriggerid).HasName("PRIMARY");
@@ -276,6 +278,9 @@ public partial class RealadviceTriggeringSystemContext : DbContext
             entity.Property(e => e.Officeid)
                 .HasColumnType("int(11)")
                 .HasColumnName("officeid");
+            entity.Property(e => e.SurveyLink)
+                .HasColumnType("text")
+                .HasColumnName("survey_link");
             entity.Property(e => e.TargetParticipant1)
                 .HasColumnType("text")
                 .HasColumnName("target_participant_1");
@@ -332,6 +337,26 @@ public partial class RealadviceTriggeringSystemContext : DbContext
             entity.Property(e => e.Officeid)
                 .HasColumnType("int(11)")
                 .HasColumnName("officeid");
+            entity.Property(e => e.WhiseOfficeid)
+                .HasColumnType("int(11)")
+                .HasColumnName("whise_officeid");
+        });
+
+        modelBuilder.Entity<RtsEmailLog>(entity =>
+        {
+            entity.HasKey(e => e.OfficeTriggerid).HasName("PRIMARY");
+
+            entity.ToTable("rts_email_log");
+
+            entity.Property(e => e.OfficeTriggerid)
+                .HasColumnType("int(11)")
+                .HasColumnName("office_triggerid");
+            entity.Property(e => e.Email)
+                .HasMaxLength(45)
+                .HasColumnName("email");
+            entity.Property(e => e.WhiseClientid)
+                .HasColumnType("int(11)")
+                .HasColumnName("whise_clientid");
             entity.Property(e => e.WhiseOfficeid)
                 .HasColumnType("int(11)")
                 .HasColumnName("whise_officeid");

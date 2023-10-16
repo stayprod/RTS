@@ -18,6 +18,7 @@ namespace realAdviceTriggerSystemService.Models
         public virtual DbSet<AdminDetail> AdminDetail { get; set; }
         public virtual DbSet<Clients> Clients { get; set; }
         public virtual DbSet<Layouts> Layouts { get; set; }
+        public virtual DbSet<OfficeSmtpsettings> OfficeSmtpsettings { get; set; }
         public virtual DbSet<OfficeTriggers> OfficeTriggers { get; set; }
         public virtual DbSet<Offices> Offices { get; set; }
         public virtual DbSet<PimcoreSetting> PimcoreSetting { get; set; }
@@ -220,6 +221,64 @@ namespace realAdviceTriggerSystemService.Models
                 entity.Property(e => e.Officeid).HasColumnName("officeid");
             });
 
+            modelBuilder.Entity<OfficeSmtpsettings>(entity =>
+            {
+                entity.HasKey(e => e.Settingid)
+                    .HasName("PRIMARY");
+
+                entity.ToTable("office_smtpsettings");
+
+                entity.Property(e => e.Settingid).HasColumnName("settingid");
+
+                entity.Property(e => e.Clientid).HasColumnName("clientid");
+
+                entity.Property(e => e.CreatedOn)
+                    .HasColumnName("created_on")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.EmailProvider)
+                    .HasColumnName("email_provider")
+                    .HasColumnType("text")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
+
+                entity.Property(e => e.ImapServer)
+                    .HasColumnName("imap_server")
+                    .HasColumnType("text")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
+
+                entity.Property(e => e.Officeid).HasColumnName("officeid");
+
+                entity.Property(e => e.Password)
+                    .HasColumnName("password")
+                    .HasColumnType("text")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
+
+                entity.Property(e => e.Port)
+                    .HasColumnName("port")
+                    .HasColumnType("text")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
+
+                entity.Property(e => e.SslSetting).HasColumnName("ssl_setting");
+
+                entity.Property(e => e.UpdatedOn)
+                    .HasColumnName("updated_on")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.UserName)
+                    .HasColumnName("user_name")
+                    .HasColumnType("text")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
+
+                entity.Property(e => e.WhiseClientid).HasColumnName("whise_clientid");
+
+                entity.Property(e => e.WhiseOfficeid).HasColumnName("whise_officeid");
+            });
+
             modelBuilder.Entity<OfficeTriggers>(entity =>
             {
                 entity.HasKey(e => e.OfficeTriggerid)
@@ -359,6 +418,8 @@ namespace realAdviceTriggerSystemService.Models
                     .HasCharSet("latin1")
                     .HasCollation("latin1_swedish_ci");
 
+                entity.Property(e => e.SmtpSettingid).HasColumnName("smtp_settingid");
+
                 entity.Property(e => e.UniqueKey)
                     .HasColumnName("unique_key")
                     .HasColumnType("varchar(200)")
@@ -403,18 +464,27 @@ namespace realAdviceTriggerSystemService.Models
 
             modelBuilder.Entity<RtsEmailLog>(entity =>
             {
-                entity.HasKey(e => e.OfficeTriggerid)
+                entity.HasKey(e => e.EmailLogid)
                     .HasName("PRIMARY");
 
                 entity.ToTable("rts_email_log");
 
-                entity.Property(e => e.OfficeTriggerid).HasColumnName("office_triggerid");
+                entity.Property(e => e.EmailLogid).HasColumnName("email_logid");
+
+                entity.Property(e => e.CalenderActonId).HasColumnName("calender_acton_id");
+
+                entity.Property(e => e.ContactId).HasColumnName("contact_id");
 
                 entity.Property(e => e.Email)
                     .HasColumnName("email")
                     .HasColumnType("varchar(45)")
                     .HasCharSet("latin1")
                     .HasCollation("latin1_swedish_ci");
+
+                entity.Property(e => e.EstateId).HasColumnName("estate_id");
+
+                entity.Property(e => e.OfficeTriggerid).HasColumnName("office_triggerid");
+
 
                 entity.Property(e => e.WhiseClientid).HasColumnName("whise_clientid");
 

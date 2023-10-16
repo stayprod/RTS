@@ -46,4 +46,6 @@ public partial class OfficeTrigger
     public int? WhiseOfficeid { get; set; }
 
     public int? WhiseClientid { get; set; }
+
+    public string? SurveyLink { get; set; }
 }

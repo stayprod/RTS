@@ -12,7 +12,7 @@ namespace realAdviceTriggerSystemService.Models
         public string KeyMoment { get; set; }
         public string TriggerType { get; set; }
         public string DurationType { get; set; }
-        public int DurationValue { get; set; }
+        public int? DurationValue { get; set; }
         public string TargetParticipant1 { get; set; }
         public string CTarget1 { get; set; }
         public string TargetParticipant2 { get; set; }

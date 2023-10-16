@@ -21,6 +21,7 @@ namespace realAdviceTriggerSystemService.Models
     public class Contact
     {
         public int ContactId { get; set; }
+        public int zip { get; set; }
         public string Name { get; set; }
         public string FirstName { get; set; }
         public ContactTitle ContactTitle { get; set; }

@@ -113,13 +113,13 @@ namespace realAdviceTriggerSystemAPI.Controllers
 
         [HttpPost]
         [Route("SaveSMTPSettings")]
-        public JsonResult SaveSMTPSettings(ClientSmtpsetting smtpObj)
+        public JsonResult SaveSMTPSettings(OfficeSmtpsetting smtpObj)
         {
             try
             {
                 using (var con = new RealadviceTriggeringSystemContext())
                 {
-                    ClientSmtpsetting? _smtpSetting = con.ClientSmtpsettings.Where(c => c.Settingid == smtpObj.Settingid).FirstOrDefault();
+                    OfficeSmtpsetting? _smtpSetting = con.OfficeSmtpsettings.Where(c => c.Settingid == smtpObj.Settingid).FirstOrDefault();
 
                     if (_smtpSetting != null)
                     {
@@ -140,7 +140,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
                     {
                         smtpObj.CreatedOn = DateTime.Now;
                         smtpObj.UpdatedOn = DateTime.Now;
-                        con.ClientSmtpsettings.Add(smtpObj);
+                        con.OfficeSmtpsettings.Add(smtpObj);
                         con.SaveChanges();
                     }
 
@@ -161,7 +161,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
             {
                 using (var con = new RealadviceTriggeringSystemContext())
                 {
-                    ClientSmtpsetting? _client = con.ClientSmtpsettings.Where(c => c.Officeid == officeid).FirstOrDefault();
+                    OfficeSmtpsetting? _client = con.OfficeSmtpsettings.Where(c => c.Officeid == officeid).FirstOrDefault();
                     return new JsonResult(_client);
                 }
             }

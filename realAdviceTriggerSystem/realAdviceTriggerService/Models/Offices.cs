@@ -13,5 +13,6 @@ namespace realAdviceTriggerSystemService.Models
         public string UniqueKey { get; set; }
         public string OfficeImg { get; set; }
         public DateTime? CreatedOn { get; set; }
+        public int? SmtpSettingid { get; set; }
     }
 }

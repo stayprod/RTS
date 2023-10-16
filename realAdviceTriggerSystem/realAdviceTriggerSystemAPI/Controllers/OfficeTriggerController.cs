@@ -99,6 +99,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
                         _trigger.TransactionStatus = officeTrigger.TransactionStatus;
                         _trigger.WhiseOfficeid = officeTrigger.WhiseOfficeid;
                         _trigger.WhiseClientid = officeTrigger.WhiseClientid;
+                        _trigger.SurveyLink = officeTrigger.SurveyLink;
                         con.SaveChanges();
                     }
                     else

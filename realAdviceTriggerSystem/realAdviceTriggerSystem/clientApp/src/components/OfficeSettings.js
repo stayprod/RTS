@@ -639,7 +639,7 @@ export const OfficeSettings = (props) => {
                                     <th>Trigger Type</th>
                                     <th>Trigger Duration</th>
                                     <th>Target Participent</th>
-                                    <th>Target 1</th>
+                                    {/*<th>Target 1</th>*/}
                                     <th>Created On</th>
                                     <th>Action</th>
                                 </tr>
@@ -657,13 +657,13 @@ export const OfficeSettings = (props) => {
                                                 <td className="border-end border-bottom p-2 justify-content-center">{EnumobjTriggerType[item.triggerType]}</td>
                                                 <td className="border-end border-bottom p-2 justify-content-center text-center">{"(" + item.durationValue + ") " + EnumobjDurationType[item.durationType]}</td>
                                                 <td className="border-end border-bottom p-2 justify-content-center">{EnumobjParticipentType[item.targetParticipant1]}</td>
-                                                <td className="border-end border-bottom p-2 justify-content-center">{
-                                                    length > 0 ? JSON.parse(item.cTarget1).map((target, i) => {
-                                                        let symbol = i < length - 1 ? ", " : "";
-                                                        return target.label + symbol;
-                                                    })
-                                                        : ""
-                                                }</td>
+                                                {/*<td className="border-end border-bottom p-2 justify-content-center">{*/}
+                                                {/*    length > 0 ? JSON.parse(item.cTarget1).map((target, i) => {*/}
+                                                {/*        let symbol = i < length - 1 ? ", " : "";*/}
+                                                {/*        return target.label + symbol;*/}
+                                                {/*    })*/}
+                                                {/*        : ""*/}
+                                                {/*}</td>*/}
                                                 <td className="border-end border-bottom p-2 justify-content-center">{createdOn}</td>
                                                 <td className="border-end border-bottom p-2 justify-content-center">
                                                     <button className="btn-site btn-edit-trigger mb-1" onClick={EditTrigger} trigger={JSON.stringify(item)}>Edit</button>

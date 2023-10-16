@@ -45,7 +45,7 @@ export const Trigger = (props) => {
     const [emailTexte, setEmailTexte] = useState("");
     const [durationValue, setDurationValue] = useState("");
     const [triggerDetail, setTriggerDetail] = useState({});
-    let participentType = [];
+    const [suveryLinkForEmail, setSuveryLinkForEmail] = useState(["https://survey.realadvice.be/", "", "/?"]);
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -57,9 +57,26 @@ export const Trigger = (props) => {
         setClientDetail(location.state.ClientDetail)
         setWhiseOfficesList(location.state.AllWhiseOffices)
         getListOfLayoutsByOffice(location.state.LocalOfficeDetail);
+
         if (location.state.TriggerDetail != undefined) {
             loadTriggerDetailInEdit(location.state.TriggerDetail);
         }
+        else {
+            //Bind saved survey Link on page load
+            suveryLinkForEmail[1] = location.state.WhiseOffice.id; 
+            let link = [...suveryLinkForEmail];
+            let html = link.map((item, i) => {
+                if (i == 3) {
+                    item = item.replace("&", "");
+                    return item;
+                }
+                else {
+                    return item;
+                }
+            }).join("");
+            document.getElementById("inputSurveyLink").value = html;
+        }
+
     }
 
     const getListOfLayoutsByOffice = async (_localoffice) => {
@@ -97,19 +114,16 @@ export const Trigger = (props) => {
             triggerNameBuilder["durationValue"] = "(" + trigger.durationValue + ")";
         }
         document.getElementById("participent1").value = trigger.targetParticipant1;
+        let participantIndex = document.getElementById("participent1").selectedIndex;
+        let participantText = document.getElementById("participent1")[participantIndex].text;
+        triggerNameBuilder["participent1"] = participantText;
 
-        //read targets from database and create targets label string
-        const targets = JSON.parse(trigger.cTarget1);
-        let targetString = "";
-        targets.forEach(item => {
-            targetString += item.label + " ";
-        })
-        triggerNameBuilder["ctarget1"] = targetString;
+        populateSurveyLinkInEditMode(trigger.surveyLink)
 
         //populate trigger name from database and fill state to handle controls state
         setFinalTriggerName(trigger.triggerName);
 
-        setSelectedTarget(targets);
+        //setSelectedTarget(targets);
         setSelectedTab(trigger.language);
 
         const whiseOptions = document.getElementById("whiseAppointmentType");
@@ -124,6 +138,77 @@ export const Trigger = (props) => {
             setSelectedLaytOutId(trigger.layoutid);
             whiseOptions.value = trigger.appointmentType;
         }, 1500)
+    }
+
+    const populateSurveyLinkInEditMode = (_link) => {
+
+        //splitting survey link to mark checkboxes checked when opening trigger is in edit mode
+        const splittedSurveyLink = _link.split("/");
+        splittedSurveyLink[1] += "//";
+
+        let firstPart = splittedSurveyLink[0] + splittedSurveyLink[1] + splittedSurveyLink[2] + "/";
+        let secondPart = splittedSurveyLink[3];
+        let thirdPart = "/?";
+        let remainingString = splittedSurveyLink[4].replace("?", "");
+        let initialLinkStateArray = [];
+        Array.prototype.push.apply(initialLinkStateArray, [firstPart, secondPart, thirdPart]);
+
+        let savedParams = remainingString.split("&");
+        savedParams.forEach((item, i) => {
+            initialLinkStateArray.push("&" + item);
+        })
+
+        if (remainingString.indexOf("agent") != -1) {
+            document.getElementById("checkAgent").checked = true;
+        }
+        if (remainingString.indexOf("profile=buyer") != -1) {
+            document.getElementById("checkBuyer").checked = true;
+        }
+        if (remainingString.indexOf("profile=tenant") != -1) {
+            document.getElementById("checkTenant").checked = true;
+        }
+        if (remainingString.indexOf("name") != -1) {
+            document.getElementById("checkName").checked = true;
+        }
+        if (remainingString.indexOf("Firstname") != -1) {
+            document.getElementById("checkFirstname").checked = true;
+        }
+        if (remainingString.indexOf("language") != -1) {
+            document.getElementById("checkLanguage").checked = true;
+        }
+        if (remainingString.indexOf("profile=vendor") != -1) {
+            document.getElementById("checkVendor").checked = true;
+        }
+        if (remainingString.indexOf("zip") != -1) {
+            document.getElementById("checkZip").checked = true;
+        }
+        if (remainingString.indexOf("lessorestimation") != -1) {
+            document.getElementById("checkEstimation").checked = true;
+        }
+        if (remainingString.indexOf("email") != -1) {
+            document.getElementById("checkEmail").checked = true;
+        }
+        if (remainingString.indexOf("country") != -1) {
+            document.getElementById("checkCountry").checked = true;
+        }
+        if (remainingString.indexOf("npssatisfication") != -1) {
+            document.getElementById("checkSatisfaction").checked = true;
+        }
+        if (remainingString.indexOf("officeID") != -1) {
+            document.getElementById("checkOfficeid").checked = true;
+        }
+        if (remainingString.indexOf("loginOfficeID") != -1) {
+            document.getElementById("checkLoginofficeid").checked = true;
+        }
+        if (remainingString.indexOf("contactID") != -1) {
+            document.getElementById("checkContactid").checked = true;
+        }
+        if (remainingString.indexOf("profile=lessor") != -1) {
+            document.getElementById("checkLessor").checked = true;
+        }
+        setSuveryLinkForEmail(initialLinkStateArray);
+
+        document.getElementById("inputSurveyLink").value = _link;
     }
 
     const setNameForTrigger = (e) => {
@@ -198,64 +283,64 @@ export const Trigger = (props) => {
         }
     }
 
-    const appendMultiselectValuesInTriggerName = (targets) => {
+    //const appendMultiselectValuesInTriggerName = (targets) => {
 
-        if (targets.length > 0) {
-            let targetString = "";
-            targets.forEach(item => {
-                targetString += item.label + " ";
-            })
-            triggerNameBuilder["ctarget1"] = targetString;
-            let nameString = ""
-            Object.keys(triggerNameBuilder).map(item => {
-                nameString += triggerNameBuilder[item] + " ";
-            })
+    //    if (targets.length > 0) {
+    //        let targetString = "";
+    //        targets.forEach(item => {
+    //            targetString += item.label + " ";
+    //        })
+    //        triggerNameBuilder["ctarget1"] = targetString;
+    //        let nameString = ""
+    //        Object.keys(triggerNameBuilder).map(item => {
+    //            nameString += triggerNameBuilder[item] + " ";
+    //        })
 
-            setFinalTriggerName(nameString);
-        }
-        else {
-            triggerNameBuilder["ctarget1"] = "";
-            let nameString = ""
-            Object.keys(triggerNameBuilder).map(item => {
-                nameString += triggerNameBuilder[item] + " ";
-            })
+    //        setFinalTriggerName(nameString);
+    //    }
+    //    else {
+    //        triggerNameBuilder["ctarget1"] = "";
+    //        let nameString = ""
+    //        Object.keys(triggerNameBuilder).map(item => {
+    //            nameString += triggerNameBuilder[item] + " ";
+    //        })
 
-            setFinalTriggerName(nameString);
-        }
+    //        setFinalTriggerName(nameString);
+    //    }
 
-    }
+    //}
 
-    const setListOfTargetType = (e) => {
+    //const setListOfTargetType = (e) => {
 
-        setSelectedTarget(e);
-        appendMultiselectValuesInTriggerName(e); //append selected c-targets in trigger name
+    //    setSelectedTarget(e);
+    //    appendMultiselectValuesInTriggerName(e); //append selected c-targets in trigger name
 
-        const _targers = e;
+    //    const _targers = e;
 
-        _targers.forEach(traget => {
-            if (participentType.indexOf(traget.value) == -1) {
-                participentType.push(traget.label);
-            }
-        })
+    //    _targers.forEach(traget => {
+    //        if (participentType.indexOf(traget.value) == -1) {
+    //            participentType.push(traget.label);
+    //        }
+    //    })
 
-        let html = ""
-        document.getElementById("surveyTypeCheckboxes").innerHTML = "";
+    //    let html = ""
+    //    document.getElementById("surveyTypeCheckboxes").innerHTML = "";
 
-        html += `<label class="me-3 mb-0 fw-bold">Survey Email:</label>`;
-        html += `<div class="form-check form-check-inline me-2">
-                    <input class="form-check-input" type="checkbox" name="inlineRadioOptions" id="inlineParticipent" />
-                    <label class="form-check-label mb-0" for="inlineParticipent" >Participent</label>
-                </div>`
+    //    html += `<label class="me-3 mb-0 fw-bold">Survey Email:</label>`;
+    //    html += `<div class="form-check form-check-inline me-2">
+    //                <input class="form-check-input" type="checkbox" name="inlineRadioOptions" id="inlineParticipent" />
+    //                <label class="form-check-label mb-0" for="inlineParticipent" >Participent</label>
+    //            </div>`
 
-        participentType.forEach((item) => {
-            html += `<div class="form-check form-check-inline me-2">
-                        <input class="form-check-input" type="checkbox" name="inlineRadioOptions" id="inline${item}" />
-                        <label class="form-check-label mb-0" for="inline${item}" >${item}</label>
-                    </div>`
-        })
+    //    participentType.forEach((item) => {
+    //        html += `<div class="form-check form-check-inline me-2">
+    //                    <input class="form-check-input" type="checkbox" name="inlineRadioOptions" id="inline${item}" />
+    //                    <label class="form-check-label mb-0" for="inline${item}" >${item}</label>
+    //                </div>`
+    //    })
 
-        document.getElementById("surveyTypeCheckboxes").innerHTML += html;
-    }
+    //    document.getElementById("surveyTypeCheckboxes").innerHTML += html;
+    //}
 
     const setSelectedEmailLayout = (e) => {
         let value = e.target.value;
@@ -338,72 +423,57 @@ export const Trigger = (props) => {
         console.log(emailTexte);
     }
 
+    const replaceTriorFromLink = (e) => {
+        const value = e.target.value;
+        const splitedValue = value.split("/");
+
+        const triorReplacement = splitedValue[3];
+
+        let link = [...suveryLinkForEmail];
+        link[1] = triorReplacement;
+        setSuveryLinkForEmail(current => link);
+    }
+
     const generateSurveyLink = (e) => {
         let checked = e.target.checked;
-        let value = e.target.value;
-        let link = document.getElementById("surveyLink").value;
-        let id = e.target.id;
+        let placeholder = e.target.getAttribute("placeholder");
+        let paramName = e.target.getAttribute("parameter");
+        let link = [...suveryLinkForEmail];
+        let symbol = "&";
 
-        if (checked == false) {
-            let newLink = ""
-            if (id == "checkboxAgent" && link.indexOf("&agent") > -1) {
-                newLink = link.replace("&agent=" + value, "");
+        if (checked == true) {
+            let finalValue = symbol + paramName + "=" + placeholder;
+            const existingParam = link.filter(item => {
+                return item == finalValue;
+            })
+            if (existingParam.length == 0) {
+                link.push(finalValue);
             }
-            else if (id == "checkboxAgent") {
-                newLink = link.replace("agent=" + value, "");
-            }
-            if (id == "checkboxOffice" && link.indexOf("&office") > -1) {
-                newLink = link.replace("&office=" + value, "");
-            }
-            else if (id == "checkboxOffice") {
-                newLink = link.replace("office=" + value, "");
-            }
-            if (id == "checkboxDob" && link.indexOf("&DOB") > -1) {
-                newLink = link.replace("&DOB=" + value, "");
-            }
-            else if (id == "checkboxDob") {
-                newLink = link.replace("DOB=" + value, "");
-            }
-
-            document.getElementById("surveyLink").value = newLink;
         }
         else {
-            if (id == "checkboxAgent") {
-                if (linkBuilder == "") {
-                    linkBuilder += "agent=" + value;
-                }
-                else {
-                    linkBuilder = "";
-                    linkBuilder += "&agent=" + value;
-                }
-            }
-            if (id == "checkboxOffice") {
-                if (linkBuilder == "") {
-                    linkBuilder += "office=" + value;
-                }
-                else {
-                    linkBuilder = "";
-                    linkBuilder += "&office=" + value;
-                }
-            }
-            if (id == "checkboxDob") {
-                if (linkBuilder == "") {
-                    linkBuilder += "DOB=" + value;
-                }
-                else {
-                    linkBuilder = "";
-                    linkBuilder += "&DOB=" + value;
-                }
-            }
-
-            link += linkBuilder;
-            document.getElementById("surveyLink").value = link;
+            let finalValue = symbol + paramName + "=" + placeholder;
+            const indexOfItem = link.indexOf(finalValue);
+            link.splice(indexOfItem, 1);
         }
+
+        let html = link.map((item, i) => {
+            if (i == 3) {
+                item = item.replace("&", "");
+                return item;
+            }
+            else {
+                return item;
+            }
+        }).join("")
+
+        document.getElementById("inputSurveyLink").value = html;
+
+        setSuveryLinkForEmail(current => link);
     }
 
-    const createNewSurveyEmail = (e) => {
+    //const createNewSurveyEmail = (e) => {
 
-    }
+    //}
 
     const saveTrigger = () => {
         let isFRequiredFieldsEmpty = false;
@@ -480,6 +550,7 @@ export const Trigger = (props) => {
             AppointmentType: whiseOptions.value,
             TransactionType: transactionType.value,
             TransactionStatus: transactionStatus.value,
+            SurveyLink: document.getElementById("inputSurveyLink").value
         }
         let triggerurl = variables.API_URL + `OfficeTrigger/SaveOfficeTriggerDetail?`;
         return axios.post(triggerurl, JSON.stringify(objOfficeTrigger), jsonconfig)
@@ -627,22 +698,22 @@ export const Trigger = (props) => {
                     <div className="row">
                         <div className="col-sm-12 col-md-4 mb-3">
                             <label>Target</label>
-                            <select className="form-select" id="participent1">
+                            <select className="form-select" id="participent1" onChange={setNameForTrigger}>
                                 <option value="">Select an option</option>
                                 <option value="1">Participant</option>
                                 <option value="2">No Participant</option>
                             </select>
                         </div>
-                        <div className="col-sm-12 col-md-4 mb-3">
-                            <label>C-Target</label>
-                            <MultiSelect
-                                className="multiselect"
-                                options={targetOptions}
-                                value={selectedTarget}
-                                onChange={setListOfTargetType}
-                                labelledBy="target"
-                            />
-                        </div>
+                        {/*<div className="col-sm-12 col-md-4 mb-3">*/}
+                        {/*    <label>C-Target</label>*/}
+                        {/*    <MultiSelect*/}
+                        {/*        className="multiselect"*/}
+                        {/*        options={targetOptions}*/}
+                        {/*        value={selectedTarget}*/}
+                        {/*        onChange={setListOfTargetType}*/}
+                        {/*        labelledBy="target"*/}
+                        {/*    />*/}
+                        {/*</div>*/}
                     </div>
                     <div>
                         <h6 className="sub-heading fw-bold mb-3">Condition:</h6>
@@ -705,12 +776,8 @@ export const Trigger = (props) => {
                         <h6 className="sub-heading fw-bold mb-3">Select Email Configuration:</h6>
                     </div>
                     <div className="row">
-                        <div className="col-sm-12 col-md-12 mb-3" id="surveyTypeCheckboxes">
+                        <div className="col-sm-12 col-md-12 mb-3">
                             <label className="me-3 mb-0 fw-bold">Survey Email:</label>
-                            <div className="form-check form-check-inline me-2">
-                                <input className="form-check-input" type="checkbox" name="inlineRadioOptions" id="inlineParticipent" />
-                                <label className="form-check-label mb-0" htmlFor="inlineParticipent" >Participent</label>
-                            </div>
                         </div>
                     </div>
                     <div className="row">
@@ -890,26 +957,74 @@ export const Trigger = (props) => {
                     <div className="row">
                         <div className="col-sm-12 col-md-12 mb-3">
                             <label className="me-3">Link</label>
-                            <input type="text" className="form-control" id="surveyLink" defaultValue="https://survey.realadvice.be/TRIOR/?" />
+                            <input type="text" className="form-control" id="inputSurveyLink" onChange={replaceTriorFromLink} />
                         </div>
                     </div>
                     <div className="row">
                         <div className="col-sm-12 mb-3">
-                            <div className="form-check form-check-inline me-2">
-                                <input className="form-check-input" type="checkbox" name="inlineRadioOptions" id="checkboxAgent" defaultValue="Harold+Salm" onChange={generateSurveyLink} />
-                                <label className="form-check-label mb-0" htmlFor="checkboxAgent" >Agent</label>
+                            <div className="form-check form-check-inline me-4">
+                                <input className="form-check-input" type="checkbox" id="checkAgent" parameter="agent" placeholder="{agent}" onChange={generateSurveyLink} />
+                                <label className="form-check-label mb-0" htmlFor="checkAgent" >Agent</label>
                             </div>
-                            <div className="form-check form-check-inline me-2">
-                                <input className="form-check-input" type="checkbox" name="inlineRadioOptions" id="checkboxOffice" defaultValue="office" onChange={generateSurveyLink} />
-                                <label className="form-check-label mb-0" htmlFor="checkboxOffice" >Office</label>
+                            <div className="form-check form-check-inline me-4">
+                                <input className="form-check-input" type="checkbox" id="checkName" parameter="name" placeholder="{name}" onChange={generateSurveyLink} />
+                                <label className="form-check-label mb-0" htmlFor="checkName" >Name</label>
                             </div>
-                            <div className="form-check form-check-inline me-2">
-                                <input className="form-check-input" type="checkbox" name="inlineRadioOptions" id="checkboxDob" defaultValue="07-15-1996" onChange={generateSurveyLink} />
-                                <label className="form-check-label mb-0" htmlFor="checkboxDob" >DOB</label>
+                            <div className="form-check form-check-inline me-4">
+                                <input className="form-check-input" type="checkbox" id="checkFirstname" parameter="Firstname" placeholder="{firstName}" onChange={generateSurveyLink} />
+                                <label className="form-check-label mb-0" htmlFor="checkFirstname" >Firstname</label>
                             </div>
-                            <div className="form-check form-check-inline me-2">
-                                <input className="form-check-input" type="checkbox" name="inlineRadioOptions" id="checkboxLanguage" defaultValue="du" onChange={generateSurveyLink} />
-                                <label className="form-check-label mb-0" htmlFor="checkboxLanguage" >Language</label>
+                            <div className="form-check form-check-inline me-4">
+                                <input className="form-check-input" type="checkbox" id="checkLanguage" parameter="language" placeholder="{language}" onChange={generateSurveyLink} />
+                                <label className="form-check-label mb-0" htmlFor="checkLanguage" >Language</label>
+                            </div>
+                            <div className="form-check form-check-inline me-4">
+                                <input className="form-check-input" type="checkbox" id="checkZip" parameter="zip" placeholder="{zip}" onChange={generateSurveyLink} />
+                                <label className="form-check-label mb-0" htmlFor="checkZip"  >Zip</label>
+                            </div>
+                            <div className="form-check form-check-inline me-4">
+                                <input className="form-check-input" type="checkbox" id="checkEmail" parameter="email" placeholder="{email}" onChange={generateSurveyLink} />
+                                <label className="form-check-label mb-0" htmlFor="checkEmail" >Email</label>
+                            </div>
+                            <div className="form-check form-check-inline me-4">
+                                <input className="form-check-input" type="checkbox" id="checkCountry" parameter="country" placeholder="{country}" onChange={generateSurveyLink} />
+                                <label className="form-check-label mb-0" htmlFor="checkCountry" >Country</label>
+                            </div>
+                            <div className="form-check form-check-inline me-4">
+                                <input className="form-check-input" type="checkbox" id="checkOfficeid" parameter="officeID" placeholder="{officeid}" onChange={generateSurveyLink} />
+                                <label className="form-check-label mb-0" htmlFor="checkOfficeid" >OfficeID</label>
+                            </div>
+                            <div className="form-check form-check-inline me-4">
+                                <input className="form-check-input" type="checkbox" id="checkLoginofficeid" parameter="loginOfficeID" placeholder="{loginofficeid}" onChange={generateSurveyLink} />
+                                <label className="form-check-label mb-0" htmlFor="checkLoginofficeid" >LoginOfficeID</label>
+                            </div>
+                            <div className="form-check form-check-inline me-4">
+                                <input className="form-check-input" type="checkbox" id="checkContactid" parameter="contactID" placeholder="{contactid}" onChange={generateSurveyLink} />
+                                <label className="form-check-label mb-0" htmlFor="checkContactid" >ContactID</label>
+                            </div>
+                            <div className="form-check form-check-inline me-4">
+                                <input className="form-check-input" type="checkbox" id="checkLessor" parameter="profile" placeholder="lessor" onChange={generateSurveyLink} />
+                                <label className="form-check-label mb-0" htmlFor="checkLessor" >Profile=Lessor</label>
+                            </div>
+                            <div className="form-check form-check-inline me-4">
+                                <input className="form-check-input" type="checkbox" id="checkBuyer" parameter="profile" placeholder="buyer" onChange={generateSurveyLink} />
+                                <label className="form-check-label mb-0" htmlFor="checkBuyer" >Profile=Buyer</label>
+                            </div>
+                            <div className="form-check form-check-inline me-4">
+                                <input className="form-check-input" type="checkbox" id="checkTenant" parameter="profile" placeholder="tenant" onChange={generateSurveyLink} />
+                                <label className="form-check-label mb-0" htmlFor="checkTenant" >Profile=Tenant</label>
+                            </div>
+                            <div className="form-check form-check-inline me-4">
+                                <input className="form-check-input" type="checkbox" id="checkVendor" parameter="profile" placeholder="vendor" onChange={generateSurveyLink} />
+                                <label className="form-check-label mb-0" htmlFor="checkVendor" >Profile=Vendor</label>
+                            </div>
+                            <div className="form-check form-check-inline me-4">
+                                <input className="form-check-input" type="checkbox" id="checkEstimation" parameter="lessorestimation" placeholder="{lessorestimation}" onChange={generateSurveyLink} />
+                                <label className="form-check-label mb-0" htmlFor="checkEstimation" >LessorEstimation</label>
+                            </div>
+                            <div className="form-check form-check-inline me-4">
+                                <input className="form-check-input" type="checkbox" id="checkSatisfaction" parameter="npssatisfication" placeholder="{npssatisfication}" onChange={generateSurveyLink} />
+                                <label className="form-check-label mb-0" htmlFor="checkSatisfaction" >NPSSatisfication</label>
                             </div>
                         </div>
                     </div>
@@ -923,7 +1038,7 @@ export const Trigger = (props) => {
                     </div>
 
                     <div className="text-center">
-                        <button className="btn-site me-2" onClick={saveTrigger}>Save Trigger</button><button className="btn-site" onClick={createNewSurveyEmail}>Create New Version of Email</button>
+                        <button className="btn-site me-2" onClick={saveTrigger}>Save Trigger</button>{/*<button className="btn-site" onClick={createNewSurveyEmail}>Create New Version of Email</button>*/}
                     </div>
                 </div>
             </section>

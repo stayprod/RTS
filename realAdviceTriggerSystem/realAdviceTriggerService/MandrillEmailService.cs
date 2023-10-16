@@ -14,7 +14,7 @@ public class MandrillEmailService
 
         var emailContent = new
         {
-            key = mandrillApiKey,
+            key = mandrillApiKey, 
             message = new 
             {
                 from_email = "info@realadvice.be",
@@ -28,7 +28,7 @@ public class MandrillEmailService
                     }
                 },
                 subject = subject,
-                text = message
+                html = message
             }
         };
 

@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+//using realAdviceTriggerSystemAPI.Models;
+using realAdviceTriggerSystemService.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,23 +15,23 @@ namespace TriggerService
     public class EmailSend
     {
 
-        public bool emailSend(string SenderEmail, string Subject, string Message, bool IsBodyHtml = true)
+        public bool emailSend(string SenderEmail, string Subject, string Message, OfficeSmtpsettings settings, bool IsBodyHtml = true)
         {
             bool status = false;
             try
             {
-                IConfigurationRoot configuration = new ConfigurationBuilder() 
+                IConfigurationRoot configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json")
                 .Build();
                 EmailSetting emailSettings = configuration.GetSection("EmailSettings").Get<EmailSetting>();
 
-                string HostAddress = emailSettings.Host;
-                string FormEmailId = emailSettings.Username;
+                string HostAddress = settings.ImapServer;
+                string FormEmailId = settings.EmailProvider;
                 string CC = emailSettings.BCC;
                 string BCC = emailSettings.BCC;
-                string Password = emailSettings.Password;
-                string Port = emailSettings.Port.ToString();
+                string Password = settings.Password;
+                string Port = settings.Port.ToString();
                 MailMessage mailMessage = new MailMessage();
                 mailMessage.From = new MailAddress(FormEmailId);
                 mailMessage.Subject = Subject;
@@ -46,8 +48,7 @@ namespace TriggerService
                     mailMessage.Bcc.Add(new MailAddress(BCCEmail)); //Adding Multiple CC email Id  
                 }
 
-                
-                Client smtp = new SmtpClient();
+                SmtpClient smtp = new SmtpClient();
                 smtp.Host = HostAddress;
                 smtp.EnableSsl = false;
                 NetworkCredential networkCredential = new NetworkCredential();
@@ -64,5 +65,6 @@ namespace TriggerService
                 return status;
             }
         }
+
     }
 }
