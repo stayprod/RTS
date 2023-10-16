@@ -42,4 +42,8 @@ public partial class OfficeTrigger
     public string? TransactionType { get; set; }
 
     public string? TransactionStatus { get; set; }
+
+    public int? WhiseOfficeid { get; set; }
+
+    public int? WhiseClientid { get; set; }
 }

@@ -7,13 +7,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 
 export const PimcoreSettings = (props) => {
-    const { pcSettingsList, removePimcoreSettings } = props;
+    const { pcSettingsList, removePimcoreSettings, resetRequireField } = props;
      
     return (
         pcSettingsList.length != undefined && pcSettingsList.length > 0 ? pcSettingsList.map((item, i) => {
             return (<div className="row position-relative" id={"row-" + i}><div className="col-sm-4 mb-3 mb-md-3">
                 <label>First Name</label>
-                <input type="text" className="form-control" id={"pimcoreFName" + i} defaultValue={item.firstName} />
+                <input type="text" className="form-control" id={"pimcoreFName" + i} defaultValue={item.firstName} onInput={resetRequireField} />
             </div>
                 <div className="col-sm-4 mb-3 mb-md-3">
                     <label>Last Name</label>
@@ -21,7 +21,7 @@ export const PimcoreSettings = (props) => {
                 </div>
                 <div className="col-sm-4 mb-3 mb-md-3">
                     <label>Login Id</label>
-                    <input type="text" className="form-control" id={"pimcoreLoginID" + i} defaultValue={item.loginId} />
+                    <input type="text" className="form-control" id={"pimcoreLoginID" + i} defaultValue={item.loginId} onInput={resetRequireField} />
                 </div>
                 <span className="remove-setting-icon" onClick={removePimcoreSettings} parentid={"row-" + i} title="Remove Setting" settingdetail={JSON.stringify(item)}>
                     <FontAwesomeIcon icon={faTrash} />

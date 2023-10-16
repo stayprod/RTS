@@ -19,6 +19,8 @@ public partial class RealadviceTriggeringSystemContext : DbContext
 
     public virtual DbSet<Client> Clients { get; set; }
 
+    public virtual DbSet<ClientSmtpsetting> ClientSmtpsettings { get; set; }
+
     public virtual DbSet<Layout> Layouts { get; set; }
 
     public virtual DbSet<Office> Offices { get; set; }
@@ -127,6 +129,53 @@ public partial class RealadviceTriggeringSystemContext : DbContext
                 .HasColumnName("zip_code");
         });
 
+        modelBuilder.Entity<ClientSmtpsetting>(entity =>
+        {
+            entity.HasKey(e => e.Settingid).HasName("PRIMARY");
+
+            entity.ToTable("client_smtpsettings");
+
+            entity.Property(e => e.Settingid)
+                .HasColumnType("int(11)")
+                .HasColumnName("settingid");
+            entity.Property(e => e.Clientid)
+                .HasColumnType("int(11)")
+                .HasColumnName("clientid");
+            entity.Property(e => e.CreatedOn)
+                .HasColumnType("datetime")
+                .HasColumnName("created_on");
+            entity.Property(e => e.EmailProvider)
+                .HasColumnType("text")
+                .HasColumnName("email_provider");
+            entity.Property(e => e.ImapServer)
+                .HasColumnType("text")
+                .HasColumnName("imap_server");
+            entity.Property(e => e.Officeid)
+                .HasColumnType("int(11)")
+                .HasColumnName("officeid");
+            entity.Property(e => e.Password)
+                .HasColumnType("text")
+                .HasColumnName("password");
+            entity.Property(e => e.Port)
+                .HasColumnType("text")
+                .HasColumnName("port");
+            entity.Property(e => e.SslSetting)
+                .HasColumnType("tinyint(4)")
+                .HasColumnName("ssl_setting");
+            entity.Property(e => e.UpdatedOn)
+                .HasColumnType("datetime")
+                .HasColumnName("updated_on");
+            entity.Property(e => e.UserName)
+                .HasColumnType("text")
+                .HasColumnName("user_name");
+            entity.Property(e => e.WhiseClientid)
+                .HasColumnType("int(11)")
+                .HasColumnName("whise_clientid");
+            entity.Property(e => e.WhiseOfficeid)
+                .HasColumnType("int(11)")
+                .HasColumnName("whise_officeid");
+        });
+
         modelBuilder.Entity<Layout>(entity =>
         {
             entity.HasKey(e => e.Layoutid).HasName("PRIMARY");
@@ -177,6 +226,9 @@ public partial class RealadviceTriggeringSystemContext : DbContext
             entity.Property(e => e.OfficeImg)
                 .HasMaxLength(500)
                 .HasColumnName("office_img");
+            entity.Property(e => e.SmtpSettingid)
+                .HasColumnType("int(11)")
+                .HasColumnName("smtp_settingid");
             entity.Property(e => e.UniqueKey)
                 .HasMaxLength(200)
                 .HasColumnName("unique_key");
@@ -248,6 +300,12 @@ public partial class RealadviceTriggeringSystemContext : DbContext
             entity.Property(e => e.UpdatedOn)
                 .HasColumnType("datetime")
                 .HasColumnName("updated_on");
+            entity.Property(e => e.WhiseClientid)
+                .HasColumnType("int(11)")
+                .HasColumnName("whise_clientid");
+            entity.Property(e => e.WhiseOfficeid)
+                .HasColumnType("int(11)")
+                .HasColumnName("whise_officeid");
         });
 
         modelBuilder.Entity<PimcoreSetting>(entity =>

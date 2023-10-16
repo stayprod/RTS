@@ -41,12 +41,13 @@ namespace realAdviceTriggerSystemAPI.Controllers
                 using (var con = new RealadviceTriggeringSystemContext())
                 {
 
-                    Office? _office = con.Offices.Where(t => t.WhiseOfficeid == office.WhiseOfficeid).FirstOrDefault();
+                    Office? _office = con.Offices.Where(t => t.Officeid == office.Officeid).FirstOrDefault();
 
                     if (_office != null)
                     {
                         _office.CrmDetail = office.CrmDetail;
                         _office.UniqueKey = office.UniqueKey;
+                        _office.SmtpSettingid = office.SmtpSettingid;
                         con.SaveChanges();
                     }
                     else

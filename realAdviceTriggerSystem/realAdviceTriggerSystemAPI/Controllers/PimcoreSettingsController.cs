@@ -55,6 +55,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
                             var lname = _pimcore.LastName == pimObj.LastName ? _pimcore.LastName : pimObj.LastName;
                             var loginId = _pimcore.LoginId == pimObj.LoginId ? _pimcore.LoginId : pimObj.LoginId;
 
+                            _pimcore.Officeid = pimObj.Officeid;
                             _pimcore.PimcoreSettingid = settingId;
                             _pimcore.FirstName = fname;
                             _pimcore.LastName = lname;

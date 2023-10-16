@@ -1,6 +1,11 @@
 ﻿export const variables = {
     API_URL: "https://localhost:7139/api/"
+    //API_URL: "http://192.168.18.101:54372/api/"
 };
+
+export const validEmail = new RegExp(
+    '^[a-zA-Z0-9._:$!%-]+@[a-zA-Z0-9.-]+.[a-zA-Z]$'
+);
 
 export const EnumobjTriggerType = {
     "1": "Email",

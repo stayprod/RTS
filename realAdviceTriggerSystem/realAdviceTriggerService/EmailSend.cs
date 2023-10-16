@@ -46,7 +46,8 @@ namespace TriggerService
                     mailMessage.Bcc.Add(new MailAddress(BCCEmail)); //Adding Multiple CC email Id  
                 }
 
-                SmtpClient smtp = new SmtpClient();
+                
+                Client smtp = new SmtpClient();
                 smtp.Host = HostAddress;
                 smtp.EnableSsl = false;
                 NetworkCredential networkCredential = new NetworkCredential();

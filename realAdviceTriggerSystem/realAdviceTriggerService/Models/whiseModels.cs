@@ -29,6 +29,7 @@ namespace realAdviceTriggerSystemService.Models
         public string PrivateTel { get; set; }
         public string PrivateMobile { get; set; }
         public string PrivateEmail { get; set; }
+        public string businessEmail { get; set; }
         public bool AgreementEmail { get; set; }
         public bool AgreementSms { get; set; }
         public int FunnelStatusId { get; set; }

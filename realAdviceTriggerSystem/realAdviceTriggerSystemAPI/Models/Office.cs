@@ -20,4 +20,6 @@ public partial class Office
     public string? OfficeImg { get; set; }
 
     public DateTime? CreatedOn { get; set; }
+
+    public int? SmtpSettingid { get; set; }
 }

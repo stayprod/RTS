@@ -123,7 +123,7 @@ export const Trigger = (props) => {
             document.getElementById("layoutDropdown").value = trigger.layoutid;
             setSelectedLaytOutId(trigger.layoutid);
             whiseOptions.value = trigger.appointmentType;
-        }, 1000)
+        }, 1500)
     }
 
     const setNameForTrigger = (e) => {
@@ -463,6 +463,8 @@ export const Trigger = (props) => {
         let objOfficeTrigger = {
             OfficeTriggerid: triggerDetail.officeTriggerid != undefined ? triggerDetail.officeTriggerid : 0,
             Officeid: +localOfficeDetail.officeid,
+            WhiseOfficeid: whiseOfficeDetail.id,
+            WhiseClientid: clientDetail.id,
             Layoutid: +selectedLaytOutId,
             TriggerName: finalTriggerName,
             KeyMoment: keymomentDropdown.value,
@@ -495,7 +497,8 @@ export const Trigger = (props) => {
             AllWhiseOffices: whiseOfficesList,
             WhiseOffice: whiseOfficeDetail,
             CurrentClient: clientDetail,
-            LocalOffice: localOfficeDetail
+            LocalOffice: localOfficeDetail,
+            LocalOfficesList: location.state.LocalOfficesList
         }
 
         const url = "/officesettings/" + whiseOfficeDetail.id;

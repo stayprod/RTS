@@ -9,7 +9,7 @@ import { convertFromHTML, convertToHTML } from "draft-convert";
 import { DraftailEditor, BLOCK_TYPE, INLINE_STYLE, ENTITY_TYPE, UNDO_ICON } from "draftail";
 import moment from 'moment';
 import { useToken } from './tokenContext';
-import { variables, EnumobjTriggerType, EnumobjDurationType, EnumobjKeyMoments, EnumobjParticipentType } from '../Variables';
+import { variables, validEmail, EnumobjTriggerType, EnumobjDurationType, EnumobjKeyMoments, EnumobjParticipentType } from '../Variables';
 
 import { Trigger } from './Trigger';
 import { PimcoreSettings } from './PimcoreSettings';
@@ -28,6 +28,10 @@ export const OfficeSettings = (props) => {
     const [pimcoreSettingsRows, setPimcoreSettingsRows] = useState(0);
     const [pimcoreSettings, setPimcoreSettings] = useState([]);
     const [settingsToBeRemoved, setSettingsToBeRemoved] = useState([]);
+    const [showSMTPModal, setShowSMTPModal] = useState(false);
+    const [smtpFormErrorMessage, setSmtpFormErrorMessage] = useState("");
+    const [smptSetting, setSmptSetting] = useState({});
+
     let linkBuilder = "";
 
     const location = useLocation();
@@ -47,6 +51,7 @@ export const OfficeSettings = (props) => {
         if (location.state.LocalOffice != undefined) {
             setLocalOffice(location.state.LocalOffice);
             getTriggersByOffice(location.state.LocalOffice);
+            getSmtpSettings(location.state.LocalOffice);
             document.getElementById("crmName").value = location.state.LocalOffice.crmDetail;
             document.getElementById("crmUniqueKey").value = location.state.LocalOffice.uniqueKey;
         }
@@ -64,6 +69,18 @@ export const OfficeSettings = (props) => {
         const jsonData = await response.json();
         if (jsonData != null) {
             setTriggers(jsonData);
+        }
+    }
+
+    const getSmtpSettings = async (_office) => {
+        if (_office == undefined) {
+            return
+        }
+        const response = await fetch(variables.API_URL + 'Client/GetSMTPDetail?officeid=' + _office.officeid);
+        const jsonData = await response.json();
+        if (jsonData != null) {
+            setSmptSetting(jsonData);
+            document.getElementById("smtpSettings").removeAttribute("disabled");
         }
     }
 
@@ -205,11 +222,13 @@ export const OfficeSettings = (props) => {
     }
 
     const showTriggerForm = (_office, trigger) => {
+
         const stateBuilder = {
             LocalOfficeDetail: _office,
             WhiseOffice: whiseOffice,
             ClientDetail: currentClient,
-            AllWhiseOffices: whiseOffices
+            AllWhiseOffices: whiseOffices,
+            LocalOfficesList: clientLocalOffices
         }
         if (trigger != undefined) {
             stateBuilder.TriggerDetail = trigger;
@@ -275,30 +294,66 @@ export const OfficeSettings = (props) => {
     }
 
     const saveOfficeSettings = (e) => {
+        let isRequiredFieldsEmpty = false; 
+
+        if (currentClient.localclient == undefined) {
+            alert("please save client settings first");
+            return;
+        }
+
+        if (document.getElementById("crmName").value == "") {
+            document.getElementById("crmName").style.borderColor = "red";
+            isRequiredFieldsEmpty = true;
+        }
+
+        if (document.getElementById("crmUniqueKey").value == "") {
+            document.getElementById("crmUniqueKey").style.borderColor = "red";
+            isRequiredFieldsEmpty = true;
+        }
+
+        if (document.getElementById("pimcoreFName0").value == "") {
+            document.getElementById("pimcoreFName0").style.borderColor = "red";
+            isRequiredFieldsEmpty = true;
+        }
+
+        if (document.getElementById("pimcoreLoginID0").value == "") {
+            document.getElementById("pimcoreLoginID0").style.borderColor = "red";
+            isRequiredFieldsEmpty = true;
+        }
+
+        if (isRequiredFieldsEmpty == true) {
+            alert("Please filled the required fields");
+            return;
+        }
+
         //configurations to post json data
         const jsonconfig = {
             headers: {
                 'Content-Type': 'application/json'
             }
         };
-
         //SaveOfficeDetail api call
         //save office settings in database
         let objOfficeSettings = {
-            Officeid: 0,
+            Officeid: localOffice.officeid != undefined ? localOffice.officeid : 0,
             Clientid: currentClient.localclient?.client.clientid,
             WhiseOfficeid: localOffice.length != undefined ? localOffice.whiseOfficeid : whiseOffice.id,
             CommercialName: whiseOffice.name,
             CrmDetail: document.getElementById("crmName").value,
             OfficeImg: "",
             UniqueKey: document.getElementById("crmUniqueKey").value,
+            SmtpSettingid: document.getElementById("smtpSettings").checked == true ? 1 : 0
         }
 
         let url = variables.API_URL + `Office/SaveOfficeDetail?`;
         axios.post(url, JSON.stringify(objOfficeSettings), jsonconfig)
             .then((response) => {
                 setLocalOffice(response.data);
-                setClientLocalOffices(current => [...current, response.data]);
+
+                location.state.LocalOffice = response.data;
+                location.state.LocalOfficesList.push(response.data);
+
+                //setClientLocalOffices(current => [...current, response.data]);
                 if (settingsToBeRemoved.length > 0) {
                     removePimcoreSettings();
                 }
@@ -337,6 +392,110 @@ export const OfficeSettings = (props) => {
                 setTriggers(current => triggersList);
 
                 alert("Trigger deleted successfully.");
+            })
+            .catch(error => {
+                alert('Error fetching data:', error);
+            });
+    }
+
+    const openSMTPModal = (e) => {
+        setShowSMTPModal(true);
+    }
+    const hideSMTPModal = () => {
+        setShowSMTPModal(false);
+        //document.getElementById("smtpSettings").checked = false;
+    }
+
+    const resetOfficeSettingFields = (e) => {
+        if (e.target.style.borderColor == "red") {
+            e.target.style.borderColor = "#ced4da";
+        }
+    }
+
+    const resetSMTPFormFieldsStyle = (e) => {
+        if (e.target.style.borderColor == "red") {
+            e.target.style.borderColor = "#ced4da";
+            setSmtpFormErrorMessage("");
+        }
+    }
+
+    const saveSmtpSetting = (e) => {
+        if (location.state.LocalOffice == undefined) {
+            alert("please save office settings first");
+            return;
+        }
+        let isFRequiredFieldsEmpty = false;
+        const emailProvider = document.getElementById("emailProviders");
+        //const smtpUserName = document.getElementById("smtpUserName");
+        const smtpPassword = document.getElementById("smtpPassword");
+        const smtpServer = document.getElementById("smtpServer");
+        const smtpPort = document.getElementById("smtpPort");
+        const sslSetting = document.getElementById("sslSetting");
+
+        if (emailProvider.value == "") {
+            emailProvider.style.borderColor = "red";
+            isFRequiredFieldsEmpty = true;
+        } // 
+        //if (smtpUserName.value == "") {
+        //    smtpUserName.style.borderColor = "red";
+        //    isFRequiredFieldsEmpty = true;
+        //}
+        if (smtpPassword.value == "") {
+            smtpPassword.style.borderColor = "red";
+            isFRequiredFieldsEmpty = true;
+        }
+        if (smtpServer.value == "") {
+            smtpServer.style.borderColor = "red";
+            isFRequiredFieldsEmpty = true;
+        }
+        if (smtpPort.value == "") {
+            smtpPort.style.borderColor = "red";
+            isFRequiredFieldsEmpty = true;
+        }
+
+        if (isFRequiredFieldsEmpty == true) {
+            setSmtpFormErrorMessage("Please fill the required fields");
+            return
+        }
+
+        let isValidEmail = false;
+        isValidEmail = validEmail.test(emailProvider.value);
+
+        if (isValidEmail == false) {
+            emailProvider.style.borderColor = "red";
+            setSmtpFormErrorMessage("Please enter a valid email");
+            return
+        }
+
+        //configurations to post json data
+        const jsonconfig = {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        };
+
+        //SaveSMTPSettings api call
+        //Api call to save smtp settings for an client
+        let objSMTPClient = {
+            Settingid: smptSetting.settingid != undefined ? smptSetting.settingid : 0 ,
+            Clientid: currentClient.localclient != undefined ? +currentClient.localclient.client.clientid : 0,
+            Officeid: +localOffice.officeid,
+            WhiseClientid: +currentClient.id,
+            WhiseOfficeid: +whiseOffice.id,
+            EmailProvider: emailProvider.value,
+            UserName: "",
+            Password: smtpPassword.value,
+            ImapServer: smtpServer.value,
+            Port: smtpPort.value,
+            SslSetting: sslSetting.checked == true ? 1 : 0
+        }
+        let url = variables.API_URL + `Client/SaveSMTPSettings?`;
+        return axios.post(url, JSON.stringify(objSMTPClient), jsonconfig)
+            .then((response) => {
+                setSmptSetting(response.data);
+                alert("SMTP settings successfully saved.");
+                setShowSMTPModal(false);
+                document.getElementById("smtpSettings").removeAttribute("disabled");
             })
             .catch(error => {
                 alert('Error fetching data:', error);
@@ -391,7 +550,7 @@ export const OfficeSettings = (props) => {
                 <div className="row">
                     <div className="col-sm-4 mb-3 mb-md-0">
                         <label>CRM Name</label>
-                        <select className="form-select" id="crmName">
+                        <select className="form-select" id="crmName" onChange={resetOfficeSettingFields}>
                             <option value="">Select an option</option>
                             <option value="1">Whise</option>
                             <option value="2">Omnicasa</option>
@@ -407,7 +566,7 @@ export const OfficeSettings = (props) => {
                     </div>
                     <div className="col-sm-4 mb-3 mb-md-0">
                         <label>Unique Key</label>
-                        <input type="text" className="form-control" id="crmUniqueKey" />
+                        <input type="text" className="form-control" id="crmUniqueKey" onInput={resetOfficeSettingFields} />
                     </div>
                 </div>
             </div>
@@ -418,9 +577,56 @@ export const OfficeSettings = (props) => {
                 </div>
                 <div className="row">
                     <div className="col-sm-12">
-                        <PimcoreSettings pcSettingsList={pimcoreSettings} removePimcoreSettings={removePimcoreSettingsRow} />
+                        <PimcoreSettings pcSettingsList={pimcoreSettings} removePimcoreSettings={removePimcoreSettingsRow} resetRequireField={resetOfficeSettingFields} />
                     </div>
-
+                    <div className="col-sm-12 mb-3">
+                        <div className="form-check form-check-inline">
+                            <input className="form-check-input me-2" type="checkbox" name="smtpSettingsCheckbox" id="smtpSettings" defaultChecked={localOffice.smtpSettingid} disabled />
+                            <label className="form-check-label mb-0" htmlFor="smtpSettings">Send email using custom SMTP</label>
+                        </div>
+                        <button className="btn-site ms-4" onClick={openSMTPModal}>SMTP Settings</button>
+                        <Modal className="smtp-modal" id="SMTPModal" show={showSMTPModal} onHide={hideSMTPModal}>
+                            <Modal.Header closeButton>
+                                <Modal.Title>SMTP Settings</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                <div className="row">
+                                    <div className="col-sm-12 mb-3">
+                                        <label>Username*</label>
+                                        <input type="text" className="form-control" id="emailProviders" onInput={resetSMTPFormFieldsStyle} defaultValue={smptSetting.emailProvider} />
+                                    </div>
+                                    <div className="col-sm-12 mb-3 d-none">
+                                        <label>Username*</label>
+                                        <input type="text" className="form-control" id="smtpUserName" onInput={resetSMTPFormFieldsStyle} />
+                                    </div>
+                                    <div className="col-sm-12 mb-3">
+                                        <label>password*</label>
+                                        <input type="password" className="form-control" id="smtpPassword" onInput={resetSMTPFormFieldsStyle} defaultValue={smptSetting.password} />
+                                    </div>
+                                    <div className="col-sm-6 mb-3">
+                                        <label>IMAP Server*</label>
+                                        <input type="text" className="form-control" id="smtpServer" onInput={resetSMTPFormFieldsStyle} defaultValue={smptSetting.imapServer} />
+                                    </div>
+                                    <div className="col-sm-6 mb-3">
+                                        <label>Port*</label>
+                                        <input type="text" className="form-control" id="smtpPort" onInput={resetSMTPFormFieldsStyle} defaultValue={smptSetting.port} />
+                                    </div>
+                                    <div className="col-sm-12">
+                                        <div className="form-check form-check-inline">
+                                            <input className="form-check-input" type="checkbox" name="sslCheckbox" id="sslSetting" defaultValue={smptSetting.sslSetting} />
+                                            <label className="form-check-label mb-0" htmlFor="sslSetting" >SSL</label>
+                                        </div>
+                                    </div>
+                                    <div className="col-sm-12">
+                                        <span className="text-danger">{smtpFormErrorMessage}</span>
+                                    </div>
+                                </div>
+                            </Modal.Body>
+                            <Modal.Footer>
+                                <button className="btn-site" onClick={saveSmtpSetting}>Save</button>
+                            </Modal.Footer>
+                        </Modal>
+                    </div>
                     <div className="col-sm-12 mb-3">
                         <button className="btn-site" id="addTrigger" onClick={saveOfficeSettings}>Add New Trigger</button>
                     </div>

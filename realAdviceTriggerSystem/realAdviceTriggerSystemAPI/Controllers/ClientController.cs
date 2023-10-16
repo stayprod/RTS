@@ -51,7 +51,6 @@ namespace realAdviceTriggerSystemAPI.Controllers
 
                     if (_client != null)
                     {
-                        client.Clientid = _client.Clientid;
                         _client.ActivationStatus = client.ActivationStatus;
                         _client.BoxNumber = client.BoxNumber;
                         _client.City = client.City;
@@ -104,6 +103,66 @@ namespace realAdviceTriggerSystemAPI.Controllers
                                    });
 
                     return new JsonResult(_clients);
+                }
+            }
+            catch (Exception exp)
+            {
+                return new JsonResult(exp);
+            }
+        }
+
+        [HttpPost]
+        [Route("SaveSMTPSettings")]
+        public JsonResult SaveSMTPSettings(ClientSmtpsetting smtpObj)
+        {
+            try
+            {
+                using (var con = new RealadviceTriggeringSystemContext())
+                {
+                    ClientSmtpsetting? _smtpSetting = con.ClientSmtpsettings.Where(c => c.Settingid == smtpObj.Settingid).FirstOrDefault();
+
+                    if (_smtpSetting != null)
+                    {
+                        _smtpSetting.Clientid = smtpObj.Clientid;
+                        _smtpSetting.Officeid = smtpObj.Officeid;
+                        _smtpSetting.WhiseClientid = smtpObj.WhiseClientid;
+                        _smtpSetting.WhiseOfficeid = smtpObj.WhiseOfficeid;
+                        _smtpSetting.EmailProvider = smtpObj.EmailProvider;
+                        _smtpSetting.UserName = smtpObj.UserName;
+                        _smtpSetting.Password = smtpObj.Password;
+                        _smtpSetting.ImapServer = smtpObj.ImapServer;
+                        _smtpSetting.Port = smtpObj.Port;
+                        _smtpSetting.SslSetting = smtpObj.SslSetting;
+                        _smtpSetting.UpdatedOn = DateTime.Now;
+                        con.SaveChanges();
+                    }
+                    else
+                    {
+                        smtpObj.CreatedOn = DateTime.Now;
+                        smtpObj.UpdatedOn = DateTime.Now;
+                        con.ClientSmtpsettings.Add(smtpObj);
+                        con.SaveChanges();
+                    }
+
+                    return new JsonResult(smtpObj);
+                }
+            }
+            catch (Exception exp)
+            {
+                return new JsonResult(exp);
+            }
+        }
+
+        [HttpGet]
+        [Route("GetSMTPDetail")]
+        public JsonResult GetSMTPDetail(int officeid)
+        {
+            try
+            {
+                using (var con = new RealadviceTriggeringSystemContext())
+                {
+                    ClientSmtpsetting? _client = con.ClientSmtpsettings.Where(c => c.Officeid == officeid).FirstOrDefault();
+                    return new JsonResult(_client);
                 }
             }
             catch (Exception exp)
