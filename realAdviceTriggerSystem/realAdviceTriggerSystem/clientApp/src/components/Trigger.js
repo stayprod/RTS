@@ -8,7 +8,12 @@ import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import "draftail/dist/draftail.css";
 import { convertToRaw, convertFromRaw } from "draft-js";
 import { convertFromHTML, convertToHTML } from "draft-convert";
-import { DraftailEditor, BLOCK_TYPE, INLINE_STYLE, ENTITY_TYPE, UNDO_ICON } from "draftail";
+import {
+    DraftailEditor, BLOCK_TYPE, INLINE_STYLE, ENTITY_TYPE, UNDO_ICON,
+    createEditorStateFromRaw,
+    serialiseEditorStateToRaw
+} from "draftail";
+
 import { useToken } from './tokenContext';
 import { variables } from '../Variables';
 
@@ -35,17 +40,24 @@ export const Trigger = (props) => {
     const [selectedTarget, setSelectedTarget] = useState([]);
     const [selectedLaytOutId, setSelectedLaytOutId] = useState(0);
     const [selectedLaytName, setSelectedLaytName] = useState("");
-    const [officeLayout, setOfficeLayouts] = useState({});
+    const [officeLayout, setOfficeLayout] = useState({});
     const [showLayoutModal, setShowLayoutModal] = useState(false);
     const [layoutModalTitle, setLayoutModalTitle] = useState("");
     const [layoutModalType, setLayoutModalType] = useState("");
     const [officeId, setOfficeId] = useState(0);
     const [clientId, setClientId] = useState(0);
     const [selectedTab, setSelectedTab] = useState("english");
-    const [emailTexte, setEmailTexte] = useState("");
+    const [emailTexteEnglish, setEmailTexteEnglish] = useState("");
+    const [emailTexteFrench, setEmailTexteFrench] = useState("");
+    const [emailTexteDutch, setEmailTexteDutch] = useState("");
     const [durationValue, setDurationValue] = useState("");
     const [triggerDetail, setTriggerDetail] = useState({});
     const [suveryLinkForEmail, setSuveryLinkForEmail] = useState(["https://survey.realadvice.be/", "", "/?"]);
+
+    const initEditorState = createEditorStateFromRaw();
+    const [editorStateEnglish, setEditorStateEnglish] = useState(initEditorState);
+    const [editorStateFrench, setEditorStateFrench] = useState(initEditorState);
+    const [editorStateDutch, setEditorStateDutch] = useState(initEditorState);
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -63,7 +75,7 @@ export const Trigger = (props) => {
         }
         else {
             //Bind saved survey Link on page load
-            suveryLinkForEmail[1] = location.state.WhiseOffice.id; 
+            suveryLinkForEmail[1] = location.state.WhiseOffice.id;
             let link = [...suveryLinkForEmail];
             let html = link.map((item, i) => {
                 if (i == 3) {
@@ -86,7 +98,7 @@ export const Trigger = (props) => {
         const response = await fetch(variables.API_URL + 'Layout/GetLayoutsByOffice?officeId=' + _localoffice.officeid);
         const jsonData = await response.json();
         if (jsonData != null) {
-            setOfficeLayouts(jsonData);
+            setOfficeLayout(jsonData);
         }
     }
 
@@ -126,18 +138,24 @@ export const Trigger = (props) => {
         //setSelectedTarget(targets);
         setSelectedTab(trigger.language);
 
-        const whiseOptions = document.getElementById("whiseAppointmentType");
         const transactionType = document.getElementById("transactionType");
         const transactionStatus = document.getElementById("transactionStatus");
 
         transactionType.value = trigger.transactionType;
         transactionStatus.value = trigger.transactionStatus;
 
-        setTimeout(function () {
-            document.getElementById("layoutDropdown").value = trigger.layoutid;
-            setSelectedLaytOutId(trigger.layoutid);
-            whiseOptions.value = trigger.appointmentType;
-        }, 1500)
+        //convert saved html into raw form and bind it with text editors
+        let rawStateEngTexte = fromHTMLToRawText(trigger.texteEnglish);
+        const latestEngEditorState = createEditorStateFromRaw(rawStateEngTexte);
+        setEditorStateEnglish(latestEngEditorState);
+
+        let rawStateFrenchTexte = fromHTMLToRawText(trigger.texteFrench);
+        const latestFrenchEditorState = createEditorStateFromRaw(rawStateFrenchTexte);
+        setEditorStateFrench(latestFrenchEditorState);
+
+        let rawStateDutchTexte = fromHTMLToRawText(trigger.texteDutch);
+        const latesDucthEditorState = createEditorStateFromRaw(rawStateDutchTexte);
+        setEditorStateDutch(latesDucthEditorState);
     }
 
     const populateSurveyLinkInEditMode = (_link) => {
@@ -236,6 +254,7 @@ export const Trigger = (props) => {
             })
             setFinalTriggerName(nameString);
         }
+
     }
 
     const resetConditionDropdowns = (e) => {
@@ -380,7 +399,7 @@ export const Trigger = (props) => {
     }
 
     const handleTabSelect = (e) => {
-        setSelectedTab({ e });
+        setSelectedTab(e);
     }
 
     const exporterConfigForTexte = {
@@ -419,8 +438,48 @@ export const Trigger = (props) => {
 
     //Read raw text from texteditor and convert it to meaningful html
     const convertTexteToHtml = (raw) => {
-        raw ? setEmailTexte(convertToHTML(exporterConfigForTexte)(convertFromRaw(raw))) : "";
-        console.log(emailTexte);
+        raw ? setEmailTexteEnglish(convertToHTML(exporterConfigForTexte)(convertFromRaw(raw))) : "";
+    }
+
+    const convertTexteToHtml_French = (raw) => {
+        raw ? setEmailTexteFrench(convertToHTML(exporterConfigForTexte)(convertFromRaw(raw))) : "";
+    }
+
+    const convertTexteToHtml_Dutch = (raw) => {
+        raw ? setEmailTexteDutch(convertToHTML(exporterConfigForTexte)(convertFromRaw(raw))) : "";
+    }
+
+    const importerConfig = {
+        htmlToEntity: (nodeName, node, createEntity) => {
+            // a tags will become LINK entities, marked as mutable, with only the URL as data.
+            if (nodeName === "a") {
+                return createEntity(ENTITY_TYPE.LINK, "MUTABLE", { url: node.href })
+            }
+
+            if (nodeName === "img") {
+                return createEntity(ENTITY_TYPE.IMAGE, "IMMUTABLE", {
+                    src: node.src,
+                })
+            }
+
+            if (nodeName === "hr") {
+                return createEntity(ENTITY_TYPE.HORIZONTAL_RULE, "IMMUTABLE", {})
+            }
+
+            return null
+        },
+        htmlToBlock: (nodeName) => {
+            if (nodeName === "hr" || nodeName === "img") {
+                // "atomic" blocks is how Draft.js structures block-level entities.
+                return "atomic"
+            }
+
+            return null
+        },
+    }
+
+    const fromHTMLToRawText = (html) => {
+        return convertToRaw(convertFromHTML(importerConfig)(html));
     }
 
     const replaceTriorFromLink = (e) => {
@@ -515,7 +574,7 @@ export const Trigger = (props) => {
         }
 
         if (isFRequiredFieldsEmpty == true) {
-            alert("please fill the required fields");
+            alert("Please fill the required fields");
             return
         }
 
@@ -546,7 +605,9 @@ export const Trigger = (props) => {
             TargetParticipant2: "",
             CTarget2: "",
             Language: language,
-            Texte: triggerDetail.texte != undefined && triggerDetail.texte != "" ? triggerDetail.texte : emailTexte,
+            TexteEnglish: triggerDetail.texteEnglish != undefined && triggerDetail.texteEnglish != "" ? triggerDetail.texteEnglish : emailTexteEnglish,
+            TexteFrench: triggerDetail.texteFrench != undefined && triggerDetail.texteFrench != "" ? triggerDetail.texteFrench : emailTexteFrench,
+            TexteDutch: triggerDetail.texteDutch != undefined && triggerDetail.texteDutch != "" ? triggerDetail.texteDutch : emailTexteDutch,
             AppointmentType: whiseOptions.value,
             TransactionType: transactionType.value,
             TransactionStatus: transactionStatus.value,
@@ -578,6 +639,9 @@ export const Trigger = (props) => {
         });
     }
 
+    const setWhiseDropdownValue = () => {
+    }
+
     useEffect(() => {
 
         if (location.state != null) {
@@ -601,7 +665,20 @@ export const Trigger = (props) => {
                 console.error('Error fetching data:', error);
             });
     }, [token])
-     
+
+    useEffect(() => {
+        if (location.state.TriggerDetail != undefined)
+            document.getElementById("whiseAppointmentType").value = location.state.TriggerDetail.appointmentType;
+    }, [data])
+
+    useEffect(() => {
+        if (location.state.TriggerDetail != undefined) {
+            setSelectedLaytOutId(location.state.TriggerDetail.layoutid);
+            document.getElementById("layoutDropdown").value = location.state.TriggerDetail.layoutid;
+        }
+    }, [officeLayout])
+
+
     return (
         <>
             <section className="client-setting">
@@ -615,7 +692,7 @@ export const Trigger = (props) => {
                         </h4>
                     </div>
                     <div className="col-sm-12">
-                        <label className="me-2 fw-bold">Client:</label><span>{clientDetail.name}</span><br/>
+                        <label className="me-2 fw-bold">Client:</label><span>{clientDetail.name}</span><br />
                         <label className="me-2 fw-bold">Office:</label><span>{whiseOfficeDetail.name}</span>
                     </div>
                 </div>
@@ -830,6 +907,7 @@ export const Trigger = (props) => {
                                             convertTexteToHtml(raw)
                                         }}
                                         rawContentState={null}
+                                        editorState={editorStateEnglish}
                                         blockTypes={[
                                             { type: BLOCK_TYPE.HEADER_ONE },
                                             { type: BLOCK_TYPE.HEADER_TWO },
@@ -871,9 +949,10 @@ export const Trigger = (props) => {
                                     <label>Texte</label>
                                     <DraftailEditor
                                         onSave={(raw) => {
-                                            convertTexteToHtml(raw)
+                                            convertTexteToHtml_French(raw)
                                         }}
                                         rawContentState={null}
+                                        editorState={editorStateFrench}
                                         blockTypes={[
                                             { type: BLOCK_TYPE.HEADER_ONE },
                                             { type: BLOCK_TYPE.HEADER_TWO },
@@ -915,9 +994,10 @@ export const Trigger = (props) => {
                                     <label>Texte</label>
                                     <DraftailEditor
                                         onSave={(raw) => {
-                                            convertTexteToHtml(raw)
+                                            convertTexteToHtml_Dutch(raw)
                                         }}
                                         rawContentState={null}
+                                        editorState={editorStateDutch}
                                         blockTypes={[
                                             { type: BLOCK_TYPE.HEADER_ONE },
                                             { type: BLOCK_TYPE.HEADER_TWO },
@@ -957,7 +1037,7 @@ export const Trigger = (props) => {
                     <div className="row">
                         <div className="col-sm-12 col-md-12 mb-3">
                             <label className="me-3">Link</label>
-                            <input type="text" className="form-control" id="inputSurveyLink" onChange={replaceTriorFromLink} />
+                            <textarea className="form-control" rows="3" id="inputSurveyLink" onChange={replaceTriorFromLink}></textarea>
                         </div>
                     </div>
                     <div className="row">

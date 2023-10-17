@@ -297,7 +297,7 @@ export const OfficeSettings = (props) => {
         let isRequiredFieldsEmpty = false; 
 
         if (currentClient.localclient == undefined) {
-            alert("please save client settings first");
+            alert("Please save client settings first");
             return;
         }
 
@@ -421,7 +421,7 @@ export const OfficeSettings = (props) => {
 
     const saveSmtpSetting = (e) => {
         if (location.state.LocalOffice == undefined) {
-            alert("please save office settings first");
+            alert("Please save office settings first");
             return;
         }
         let isFRequiredFieldsEmpty = false;
@@ -677,9 +677,7 @@ export const OfficeSettings = (props) => {
                                             <td></td>
                                             <td></td>
                                             <td></td>
-                                            <td></td>
                                             <td>No Trigger Found</td>
-                                            <td></td>
                                             <td></td>
                                             <td></td>
                                             <td></td>

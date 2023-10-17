@@ -20,6 +20,8 @@ using static System.Net.Mime.MediaTypeNames;
 using System.Diagnostics;
 using System.Security.Policy;
 using System.Text.RegularExpressions;
+using Microsoft.CodeAnalysis.Operations;
+using System.Collections;
 //using Newtonsoft.Json;
 //using JSON.Net;
 
@@ -30,44 +32,9 @@ namespace TriggerService
     {
         string prefrences = "all";
         // Your JSON data
-        string englishTemplate = "<h2>Hello {0}</h2><br><h2>{1}</h2>";
+        string englishTemplate = "<h2>Hello {0}</h2><br> <a href={1}>{1}</a>";
         string frenchTemplate = "<h2>Bonjour {name}</h2><br><h2>{link}</h2>";
         string germanTemplate = "<h2>Hello {name}</h2><br><h2>{link}</h2>";
-
-        string jsonData = @"[{
-                clients:[{
-                ""id"":12345
-              offices:[{
-                ""id"":13489
-              ""OfficeSettings"":{
-              ""officeTriggerid"": 1,
-              ""officeid"": 1,
-              ""layoutid"": 1,
-              ""triggerName"": ""Trigger: Evaluation (to sale) Email Days (1) Buyer  "",
-              ""keyMoment"": ""1"",
-              ""triggerType"": ""1"",
-              ""durationType"": ""1"",
-              ""durationValue"": 1,
-              ""targetParticipant1"": ""1"",
-              ""targetParticipant2"": """",
-              ""cTarget2"": """",
-              ""language"": ""english"",
-              ""texte"": """",
-              ""createdOn"": ""2023-10-06T11:35:27"",
-              ""updatedOn"": ""2023-10-06T11:35:26.980707"",
-              ""appointmentType"": ""131243"",
-              ""transactionType"": ""1"",
-              ""transactionStatus"": ""15""
-        }  ]  
-}]
-}]";
-
-        //enum timespan
-        //{
-        //    1 = "{value}, 0, 0, 0",
-        //    2 = "0,{value},0,0",
-        //    3 = "0,0,{value},0"
-        //}
         string baseUrl = "https://survey.realadvice.be/";
         bool smtpflage = true;
         static TimeSpan CreateTimeSpan(string flag, int value)
@@ -84,38 +51,6 @@ namespace TriggerService
                     throw new ArgumentException("Invalid flag");
             }
         }
-        enum transactionStatusManu
-        {
-            toSale = 1,
-            toRent = 2,
-            sold = 3,
-            rented = 4,
-            underOptionSale = 5,
-            UnderOptionRent = 6,
-            RetiréDeLaVente = 8,
-            RetiréDeLaLocation = 9,
-            suspenduVendu = 10,
-            suspenduLoué = 11,
-            OptionPropVendu = 12,
-            OptionPropLoué = 13,
-            VenduAvecCondSuspensive = 14,
-            AVendreEnViager = 15,
-            SousOptionEnViager = 16,
-            VenduEnViager = 17,
-            Prospection = 19,
-            préparationVente = 20,
-            Réservé = 21,
-            Compromis = 22,
-            ProspectionLocation = 23,
-            EstimationVente = 24,
-            EstimationLocation = 25,
-            EstimationRenteViagère = 26,
-            PréparationLocation = 27,
-            PréparationVenteEnViager = 28,
-        }
-        string appointmentType = "131243",
-              transactionType = "1",
-              transactionStatus = "1";
 
         List<Clients> clients = new List<Clients>();
         Clients cli = new Clients();
@@ -161,7 +96,6 @@ namespace TriggerService
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
@@ -222,7 +156,7 @@ namespace TriggerService
 
                 // Prepare the request content (JSON data)
                 var today = DateTime.UtcNow.Date;
-                var requestData = new { id = "5284008" };
+                var requestData = new { };
                 var json = JsonConvert.SerializeObject(requestData);
                 var requestContent = new StringContent(json, Encoding.UTF8, "application/json");
 
@@ -273,8 +207,6 @@ namespace TriggerService
                 // Read the response content
                 var responseContent = await response.Content.ReadAsStringAsync();
 
-                // Extract the token from the response JSON
-                //var token = JObject.Parse(responseContent)["token"].ToString();
                 return responseContent;
             }
             catch (Exception)
@@ -283,10 +215,21 @@ namespace TriggerService
                 throw;
             }
         }
-
-        private async Task<OfficeTriggers> GetTriggers()
+        public static void LogMessage(string message)
         {
-            return new OfficeTriggers();
+            try
+            {
+                string filePath = "output.txt";
+                using (StreamWriter writer = new StreamWriter(filePath, true))
+                {
+                    writer.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss} - {message}");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions or log them to another log file.
+                Console.WriteLine($"Error while writing to the log file: {ex.Message}");
+            }
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -294,22 +237,12 @@ namespace TriggerService
             {
                 var whiseToken = await GetTokenAsync();
 
-                //string y = null;
-                //var x = y;
                 while (!stoppingToken.IsCancellationRequested)
                 {
                     _emailService = new MandrillEmailService();
-                    //var triggers = await GetTriggerAsync();
-                    //await _emailService.SendEmailAsync("umarfarooq3540@email.com", "Subject", "Message body");
-                    // Get today's appointmentss
-                    //var clientsDetails = GetAllClientsDetail();
-
-                    //var list = JsonConvert.DeserializeObject<List<MyItem>>(json);
-
-                    //var jsonData = JsonConvert.DeserializeObject<dynamic>(JsonConvert.SerializeObject(clientsDetails));
+                    //1 - you collect all calendar event
                     var appointments = await GetTodaysAppointmentsAsync(whiseToken);// for all clients
                     var EstateList = await GetEstateListAsync(whiseToken);
-                    string filePath = "output.txt";
                     using (var con = new realadvicetriggeringsystemContext())
                     {
                         List<Clients> clients = con.Clients.ToList();
@@ -334,103 +267,110 @@ namespace TriggerService
                             var triggerList = clientObj.triggers.ToList();
                             if (clientObj.client.ActivationStatus != "suspended" && clientObj.client.ActivationStatus != "deactivated")
                             {
-                                using (StreamWriter writer = new StreamWriter(filePath, true))
-                                {
-                                    writer.WriteLine("control pass from ActivationStatus");
-                                }
+                                LogMessage("Control pass from ActivationStatus");
                                 foreach (var trigger in triggerList)
                                 {
+                                    //2 - For each calendar event you will start by looking to the estate related to this event
 
                                     foreach (var appointmentObj in appointments.Calendars)
                                     {
                                         TimeSpan timeSpan1 = CreateTimeSpan(trigger.DurationType, (int)trigger.DurationValue);
                                         // check here there must be a estate object , office id should be same and time period is passed of setting like 1hour,1 day etc
-                                        //if estate associate => you collect the information about the office link to that estate
+                                        //3-if estate associate => you collect the information about the office link to that estate
                                         //WITH THIS OFFICE ID you know now which trigger rules you need to follow
                                         if (appointmentObj.estates != null &&
                                             trigger.WhiseOfficeid == appointmentObj.Users[0].OfficeId &&
                                             Convert.ToDateTime(trigger.CreatedOn) + timeSpan1 > appointmentObj.CreateDateTime)
                                         {
-                                            using (StreamWriter writer = new StreamWriter(filePath, true))
-                                            {
-                                                writer.WriteLine("control pass from same office id and time check");
-                                            }
+                                            LogMessage("control pass from same office id and time check");
                                             foreach (var estateListObj in EstateList.estates)
                                             {
-
+                                                // point-2 condtion
                                                 if (appointmentObj.estates[0].estateId == estateListObj.Id)
                                                 {
-                                                    //THEN back to the calendar event you look to the action ID and you compare if this actionid is mapped to any of the triggers of this office
+                                                    //4-THEN back to the calendar event you look to the action ID and you compare if this actionid is mapped to any of the triggers of this office
                                                     // here action id is AppointmentType
-                                                    //THEN you will check if there is condition related to the estate transaction type and or transaction status
+                                                    //5-THEN you will check if there is condition related to the estate transaction type and or transaction status
                                                     if (appointmentObj.Action.Id == int.Parse(trigger.AppointmentType) &&
                                                         estateListObj.purpose.Id == int.Parse(trigger.TransactionType) &&
                                                         estateListObj.purposeStatus.Id == int.Parse(trigger.TransactionStatus) &&
                                                         appointmentObj.Contacts != null)
                                                     {
-                                                        using (StreamWriter writer = new StreamWriter(filePath, true))
-                                                        {
-                                                            writer.WriteLine("control pass from Transaction checks");
-                                                        }
+
+                                                        LogMessage("control pass from Transaction checks");
                                                         foreach (var contact in appointmentObj.Contacts)
                                                         {
-                                                            using (StreamWriter writer = new StreamWriter(filePath, true))
+                                                            var toEmail = "";
+                                                            if (contact.PrivateEmail != null && prefrences != "business")
                                                             {
-                                                                var email = "";
-                                                                if (contact.PrivateEmail != null && prefrences != "business")
+                                                                toEmail = contact.PrivateEmail;
+                                                            }
+                                                            else if (prefrences == "all" || prefrences == "business" || contact.PrivateEmail == null)
+                                                            {
+                                                                toEmail = contact.businessEmail;
+                                                            }
+                                                            // LINK FROM DB
+
+                                                            string inputString = string.Format(baseUrl + "agent={0}&Name={1}&Firstname={2}&language={3}&zip={4}&email={5}&country={6}&officeID={7}&loginOfficeID={8}&contactID={9}&profile=lessor&lessorestimation=1&npssatisfaction=0",
+                                                                appointmentObj.Users[0].UserId, contact.Name, contact.FirstName, contact.LanguageId, contact.zip, toEmail, contact.Country.Id, appointmentObj.estates[0].officeId, appointmentObj.Users[0].UserId, contact.ContactId);
+                                                            var smtp_settings = con.OfficeSmtpsettings.Where(t => t.WhiseOfficeid == trigger.WhiseOfficeid).FirstOrDefault();
+                                                            var office_settings = con.Offices.Where(t => t.WhiseOfficeid == trigger.WhiseOfficeid).FirstOrDefault();
+                                                            string link = trigger.SurveyLink;
+                                                            LogMessage(link);
+                                                            // Dictionary to store placeholder replacements
+                                                            Dictionary<string, string> replacements = new Dictionary<string, string>
+                                                            {
+                                                                { "firstName", (contact.FirstName==null)?"":contact.FirstName },
+                                                                { "name", (contact.Name==null)?"":contact.Name },
+                                                                { "language", (contact.LanguageId==null)?"" : contact.LanguageId},
+                                                                { "email", toEmail},
+                                                                { "agent", $"{appointmentObj.Users[0].UserId}"},
+                                                                { "zip", $"{contact.zip}"},
+                                                                { "officeid",$"{appointmentObj.estates[0].officeId}"},
+                                                                { "country",$"{contact.Country.Id}"},
+                                                                { "loginofficeid",$"{appointmentObj.Users[0].UserId}"},
+                                                                { "contactid",$"{contact.ContactId}"},
+                                                                { "lessorestimation","1"},
+                                                                { "npssatisfication","0"},
+                                                            };
+                                                            string pattern = @"\{([^}]+)\}";
+                                                            ////////////////
+                                                            string outputString = Regex.Replace(link, pattern, match =>
+                                                            {
+                                                                string key = match.Groups[1].Value;
+                                                                if (replacements.TryGetValue(key, out string replacement))
                                                                 {
-                                                                    email = contact.PrivateEmail;
+                                                                    return replacement;
                                                                 }
-                                                                else if (prefrences == "all" || prefrences == "business" || contact.PrivateEmail == null)
+                                                                // If no replacement is found, keep the original placeholder
+                                                                return match.Value;
+                                                            });
+                                                           
+                                                            LogMessage(outputString);
+
+                                                            var logdetailsforcurrentClientOffice = con.RtsEmailLog.Where(l => l.CalenderActonId == appointmentObj.Id && l.ContactId == contact.ContactId).FirstOrDefault();
+                                                            string emailbody = string.Format(englishTemplate, contact.FirstName, outputString);
+                                                            if (logdetailsforcurrentClientOffice == null)
+                                                            {
+
+                                                                if (office_settings != null && office_settings.SmtpSettingid == 1)
                                                                 {
-                                                                    email = contact.businessEmail;
+                                                                    smtpflage = true;
                                                                 }
-                                                                string inputString = string.Format(baseUrl + "agent={0}&Name={1}&Firstname={2}&language={3}&zip={4}&email={5}&country={6}&officeID={7}&loginOfficeID={8}&contactID={9}&profile=lessor&lessorestimation=1&npssatisfaction=0",
-                                                                    appointmentObj.Users[0].UserId, contact.Name, contact.FirstName, contact.LanguageId, contact.zip, email, contact.Country.Id, appointmentObj.estates[0].officeId, appointmentObj.Users[0].UserId, contact.ContactId);
-                                                                var smtp_settings = con.OfficeSmtpsettings.Where(t => t.WhiseOfficeid == trigger.WhiseOfficeid).FirstOrDefault();
-                                                                var office_settings = con.Offices.Where(t => t.WhiseOfficeid == trigger.WhiseClientid).FirstOrDefault();
-                                                                var logdetailsforcurrentClientOffice = con.RtsEmailLog.Where(l => l.CalenderActonId == appointmentObj.Id && l.ContactId == contact.ContactId).FirstOrDefault();
-                                                                string emailbody = string.Format(englishTemplate, contact.FirstName, inputString);
-                                                                if (logdetailsforcurrentClientOffice == null)
+                                                                else
                                                                 {
+                                                                    smtpflage = false;
+                                                                }
 
-                                                                    if (office_settings != null && office_settings.SmtpSettingid == 1)
+                                                                if (smtpflage is true)
+                                                                {
+                                                                    bool isEmailSend = SendEmailobj.emailSend(toEmail, "Sunject", emailbody, smtp_settings, true);
+                                                                    if (isEmailSend)
                                                                     {
-                                                                        smtpflage = true;
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        smtpflage = false;
-                                                                    }
-
-                                                                    if (smtpflage is true)
-                                                                    {
-                                                                        bool isEmailSend = SendEmailobj.emailSend("umarfarooq3540@gmail.com", "Sunject", emailbody, smtp_settings, true);
-                                                                        if (isEmailSend)
-                                                                        {
-                                                                            var t = new RtsEmailLog //Make sure you have a table called test in DB
-                                                                            {
-                                                                                OfficeTriggerid = trigger.OfficeTriggerid,
-                                                                                Email = email,
-                                                                                WhiseOfficeid = trigger.WhiseOfficeid,
-                                                                                WhiseClientid = trigger.WhiseClientid,
-                                                                                ContactId = contact.ContactId,
-                                                                                CalenderActonId = appointmentObj.Id,
-                                                                                EstateId = appointmentObj.estates[0].estateId
-                                                                            };
-
-                                                                            con.RtsEmailLog.Add(t);
-                                                                            con.SaveChanges();
-                                                                            writer.WriteLine("email send successfully to " + email);
-                                                                        }
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        //await _emailService.SendEmailAsync("umarfarooq3540@email.com", "Subject", emailbody);
                                                                         var t = new RtsEmailLog //Make sure you have a table called test in DB
                                                                         {
                                                                             OfficeTriggerid = trigger.OfficeTriggerid,
-                                                                            Email = email,
+                                                                            Email = toEmail,
                                                                             WhiseOfficeid = trigger.WhiseOfficeid,
                                                                             WhiseClientid = trigger.WhiseClientid,
                                                                             ContactId = contact.ContactId,
@@ -440,11 +380,31 @@ namespace TriggerService
 
                                                                         con.RtsEmailLog.Add(t);
                                                                         con.SaveChanges();
-                                                                        //send  email through mandrill 
+                                                                        LogMessage("email send successfully to " + toEmail);
                                                                     }
-
-
                                                                 }
+                                                                else
+                                                                {
+                                                                    //send  email through mandrill 
+
+                                                                    await _emailService.SendEmailAsync(toEmail, "Subject", emailbody);
+                                                                    var t = new RtsEmailLog
+                                                                    {
+                                                                        OfficeTriggerid = trigger.OfficeTriggerid,
+                                                                        Email = toEmail,
+                                                                        WhiseOfficeid = trigger.WhiseOfficeid,
+                                                                        WhiseClientid = trigger.WhiseClientid,
+                                                                        ContactId = contact.ContactId,
+                                                                        CalenderActonId = appointmentObj.Id,
+                                                                        EstateId = appointmentObj.estates[0].estateId
+                                                                    };
+
+                                                                    con.RtsEmailLog.Add(t);
+                                                                    con.SaveChanges();
+                                                                    LogMessage("email send successfully from mandrill to " + toEmail);
+                                                                }
+
+
                                                             }
 
                                                         }

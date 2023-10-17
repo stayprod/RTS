@@ -31,7 +31,7 @@ public partial class OfficeTrigger
 
     public string? Language { get; set; }
 
-    public string? Texte { get; set; }
+    public string? TexteEnglish { get; set; }
 
     public DateTime? CreatedOn { get; set; }
 
@@ -48,4 +48,8 @@ public partial class OfficeTrigger
     public int? WhiseClientid { get; set; }
 
     public string? SurveyLink { get; set; }
+
+    public string? TexteFrench { get; set; }
+
+    public string? TexteDutch { get; set; }
 }

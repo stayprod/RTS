@@ -287,9 +287,15 @@ public partial class RealadviceTriggeringSystemContext : DbContext
             entity.Property(e => e.TargetParticipant2)
                 .HasColumnType("text")
                 .HasColumnName("target_participant_2");
-            entity.Property(e => e.Texte)
+            entity.Property(e => e.TexteDutch)
                 .HasColumnType("text")
-                .HasColumnName("texte");
+                .HasColumnName("texte_dutch");
+            entity.Property(e => e.TexteEnglish)
+                .HasColumnType("text")
+                .HasColumnName("texte_english");
+            entity.Property(e => e.TexteFrench)
+                .HasColumnType("text")
+                .HasColumnName("texte_french");
             entity.Property(e => e.TransactionStatus)
                 .HasMaxLength(45)
                 .HasColumnName("transaction_status");

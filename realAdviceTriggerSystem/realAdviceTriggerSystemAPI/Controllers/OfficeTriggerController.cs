@@ -93,13 +93,15 @@ namespace realAdviceTriggerSystemAPI.Controllers
                         _trigger.TargetParticipant1 = officeTrigger.TargetParticipant1;
                         _trigger.CTarget1 = officeTrigger.CTarget1;
                         _trigger.Language = officeTrigger.Language;
-                        _trigger.Texte = officeTrigger.Texte;
                         _trigger.AppointmentType = officeTrigger.AppointmentType;
                         _trigger.TransactionType = officeTrigger.TransactionType;
                         _trigger.TransactionStatus = officeTrigger.TransactionStatus;
                         _trigger.WhiseOfficeid = officeTrigger.WhiseOfficeid;
                         _trigger.WhiseClientid = officeTrigger.WhiseClientid;
                         _trigger.SurveyLink = officeTrigger.SurveyLink;
+                        _trigger.TexteEnglish = officeTrigger.TexteEnglish;
+                        _trigger.TexteFrench = officeTrigger.TexteFrench;
+                        _trigger.TexteDutch = officeTrigger.TexteDutch;
                         con.SaveChanges();
                     }
                     else

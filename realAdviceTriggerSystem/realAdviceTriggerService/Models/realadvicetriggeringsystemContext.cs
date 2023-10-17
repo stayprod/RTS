@@ -334,6 +334,12 @@ namespace realAdviceTriggerSystemService.Models
 
                 entity.Property(e => e.Officeid).HasColumnName("officeid");
 
+                entity.Property(e => e.SurveyLink)
+                    .HasColumnName("survey_link")
+                    .HasColumnType("text")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
+
                 entity.Property(e => e.TargetParticipant1)
                     .HasColumnName("target_participant_1")
                     .HasColumnType("text")
@@ -484,7 +490,6 @@ namespace realAdviceTriggerSystemService.Models
                 entity.Property(e => e.EstateId).HasColumnName("estate_id");
 
                 entity.Property(e => e.OfficeTriggerid).HasColumnName("office_triggerid");
-
 
                 entity.Property(e => e.WhiseClientid).HasColumnName("whise_clientid");
 
