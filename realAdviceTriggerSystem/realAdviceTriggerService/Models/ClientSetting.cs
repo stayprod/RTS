@@ -10,8 +10,15 @@ namespace TriggerService.Models
         public string Password { get; set; }
     }
 
-    public class mandrillapikey
+    public class MandrillApiKey
     {
-        public string mandrillApiKey { get; set; }
+        public string ApiKey { get; set; }
+        public string ApiUrl { get; set; }
+        public string FromEmail { get; set; }
+    }
+    public class AppGeneralSettings
+    {
+        public string LogFileName { get; set; }
+        public string OccurrenceTimeInMinutes { get; set; }
     }
 } 

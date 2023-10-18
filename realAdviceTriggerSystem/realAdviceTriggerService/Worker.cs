@@ -31,12 +31,8 @@ namespace TriggerService
     public class Worker : BackgroundService
     {
         string prefrences = "all";
-        // Your JSON data
-        string englishTemplate = "<h2>Hello {0}</h2><br> <a href={1}>{1}</a>";
-        string frenchTemplate = "<h2>Bonjour {name}</h2><br><h2>{link}</h2>";
-        string germanTemplate = "<h2>Hello {name}</h2><br><h2>{link}</h2>";
-        string baseUrl = "https://survey.realadvice.be/";
         bool smtpflage = true;
+        
         static TimeSpan CreateTimeSpan(string flag, int value)
         {
             switch (flag)
@@ -51,6 +47,7 @@ namespace TriggerService
                     throw new ArgumentException("Invalid flag");
             }
         }
+
         public class Country
         {
             public int Id { get; set; }
@@ -64,7 +61,7 @@ namespace TriggerService
         }
         List<Country> countries = new List<Country>
         {
-            new Country(1, "United States"),
+            new Country(1, "Belgium"),
             new Country(2, "Canada"),
             new Country(3, "United Kingdom"),
             new Country(4, "Australia"),
@@ -75,24 +72,32 @@ namespace TriggerService
         List<Clients> clients = new List<Clients>();
         Clients cli = new Clients();
         EmailSend SendEmailobj = new EmailSend();
+
         private readonly ILogger<Worker> _logger;
         private readonly HttpClient _httpClient;
         private MandrillEmailService _emailService;
+
+        IConfigurationRoot configuration;
+        public static AppGeneralSettings appGeneralSettings;
 
         public Worker(ILogger<Worker> logger)
         {
             _logger = logger;
             _httpClient = new HttpClient();
+            
+            configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json")
+                .Build();
+
+            Worker.appGeneralSettings = configuration.GetSection("AppGeneralSettings").Get<AppGeneralSettings>();            
         }
         private async Task<string> GetTokenAsync()
         {
             try
             {
-                IConfigurationRoot configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
-                .Build();
-                ClientSetting clientSettings = configuration.GetSection("ClientCredential").Get<ClientSetting>();
+                ClientSetting clientSettings = configuration.GetSection("WhiseClientCredential").Get<ClientSetting>();
+              
                 // Prepare the request content
                 var requestContent = new StringContent(
                             "{\"username\": \"" + clientSettings.ClientName + "\", \"password\": \"" + clientSettings.Password + "\"}",
@@ -114,8 +119,9 @@ namespace TriggerService
 
                 return token;
             }
-            catch (Exception)
+            catch (Exception exp)
             {
+                Worker.LogMessage("Error while getting token from WHISE "+ exp.Message);
                 throw;
             }
         }
@@ -155,9 +161,9 @@ namespace TriggerService
 
                 return appointmentResponse;
             }
-            catch (Exception)
+            catch (Exception exp)
             {
-
+                Worker.LogMessage("Error while calling method GetTodaysAppointmentsAsync (whise) " + exp.Message);
                 throw;
             }
 
@@ -196,50 +202,18 @@ namespace TriggerService
 
                 return EstateResponse;
             }
-            catch (Exception)
+            catch (Exception exp)
             {
-
-                throw;
-            }
-
-        }
-
-        public async Task<object> GetTriggerAsync()
-        {
-            try
-            {
-                IConfigurationRoot configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
-                .Build();
-                ClientSetting clientSettings = configuration.GetSection("ClientCredential").Get<ClientSetting>();
-                // Prepare the request content
-                var requestContent = new StringContent(
-                            "application/json"
-                        );
-
-                // Send the POST request to obtain the token
-                var response = await _httpClient.GetAsync("https://localhost:7139/api/OfficeTrigger/GetAllTriggers");
-
-                // Ensure a successful response
-                //response.EnsureSuccessStatusCode();
-
-                // Read the response content
-                var responseContent = await response.Content.ReadAsStringAsync();
-
-                return responseContent;
-            }
-            catch (Exception)
-            {
-
+                Worker.LogMessage("Error while calling method GetEstateListAsync (whise) " + exp.Message);
                 throw;
             }
         }
+                
         public static void LogMessage(string message)
         {
             try
             {
-                string filePath = "output.txt";
+                string filePath = appGeneralSettings.LogFileName;
                 using (StreamWriter writer = new StreamWriter(filePath, true))
                 {
                     writer.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss} - {message}");
@@ -276,10 +250,13 @@ namespace TriggerService
             try
             {
                 var whiseToken = await GetTokenAsync();
+                Worker.LogMessage(" RTS Service has been started ");
+                _emailService = new MandrillEmailService();
 
                 while (!stoppingToken.IsCancellationRequested)
                 {
-                    _emailService = new MandrillEmailService();
+                    Worker.LogMessage("---------------------RTS Service processing is in iterations------------------");
+                    
                     //1 - you collect all calendar event
                     var appointments = await GetTodaysAppointmentsAsync(whiseToken);// for all clients
                     var EstateList = await GetEstateListAsync(whiseToken);
@@ -305,9 +282,9 @@ namespace TriggerService
                         foreach (var clientObj in result)
                         {
                             var triggerList = clientObj.triggers.ToList();
-                            if (clientObj.client.ActivationStatus != "suspended" && clientObj.client.ActivationStatus != "deactivated")
+                            if (clientObj.client.ActivationStatus != "deactivated")// && clientObj.client.ActivationStatus != "deactivated")
                             {
-                                LogMessage("Control pass from ActivationStatus");
+                                Worker.LogMessage("Control passed from Activation Status(client("+ clientObj.client.WhiseClientid + "  " + clientObj.client.CommercialName + ") is not deactivated)");
                                 foreach (var trigger in triggerList)
                                 {
                                     //2 - For each calendar event you will start by looking to the estate related to this event
@@ -319,12 +296,13 @@ namespace TriggerService
                                         // check here there must be a estate object , office id should be same and time period is passed of setting like 1hour,1 day etc
                                         //3-if estate associate => you collect the information about the office link to that estate
                                         //WITH THIS OFFICE ID you know now which trigger rules you need to follow
+                                        // TriggerType == "1" mean email and 2 mean sms
                                         if (appointmentObj.estates != null &&
                                             trigger.TriggerType == "1" &&
                                             trigger.WhiseOfficeid == appointmentObj.Users[0].OfficeId &&
                                             Convert.ToDateTime(trigger.CreatedOn) + timeSpan1 > appointmentObj.CreateDateTime)
                                         {
-                                            LogMessage("control pass from same office id and time check");
+                                            Worker.LogMessage("control passed from same office id and time check");
                                             foreach (var estateListObj in EstateList.estates)
                                             {
                                                 // point-2 condtion
@@ -338,8 +316,7 @@ namespace TriggerService
                                                         estateListObj.purposeStatus.Id == int.Parse(trigger.TransactionStatus) &&
                                                         appointmentObj.Contacts != null)
                                                     {
-
-                                                        LogMessage("control pass from Transaction checks");
+                                                        Worker.LogMessage("control pass from Transaction checks");
                                                         foreach (var contact in appointmentObj.Contacts)
                                                         {
                                                             var toEmail = "";
@@ -423,9 +400,9 @@ namespace TriggerService
                                                             var logdetailsforcurrentClientOffice = con.RtsEmailLog.Where(l => l.CalenderActonId == appointmentObj.Id && l.ContactId == contact.ContactId).FirstOrDefault();
                                                             //string emailbody = string.Format(etext, contact.FirstName, outputString);
                                                             string emailbody = layoutAfterAddingPlaceholders;
+                                                            
                                                             if (logdetailsforcurrentClientOffice == null)
                                                             {
-
                                                                 if (office_settings != null && office_settings.SmtpSettingid == 1)
                                                                 {
                                                                     smtpflage = true;
@@ -450,7 +427,7 @@ namespace TriggerService
                                                                                 {
                                                                                     insertLog(trigger.OfficeTriggerid, contact.PrivateEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
 
-                                                                                    LogMessage("email send successfully using private email to " + contact.PrivateEmail);
+                                                                                    Worker.LogMessage("email send successfully using private email to " + contact.PrivateEmail);
                                                                                 }
 
                                                                             }
@@ -461,7 +438,7 @@ namespace TriggerService
                                                                                 {
                                                                                     insertLog(trigger.OfficeTriggerid, contact.businessEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
 
-                                                                                    LogMessage("email send successfully to " + contact.businessEmail);
+                                                                                    Worker.LogMessage("email send successfully to " + contact.businessEmail);
                                                                                 }
                                                                             }
                                                                             break;
@@ -484,10 +461,9 @@ namespace TriggerService
                                                                         {
                                                                             insertLog(trigger.OfficeTriggerid, recipientEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
 
-                                                                            LogMessage("email send successfully to " + recipientEmail);
+                                                                            Worker.LogMessage("email send successfully to " + recipientEmail);
                                                                         }
                                                                     }
-
                                                                 }
                                                                 else
                                                                 {
@@ -500,10 +476,10 @@ namespace TriggerService
                                                                             // Send to both private and business email
                                                                             await _emailService.SendEmailAsync(contact.PrivateEmail, "Subject", emailbody);
                                                                             insertLog(trigger.OfficeTriggerid, contact.PrivateEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
-                                                                            LogMessage("email send successfully from mandrill using private email to " + contact.PrivateEmail);
+                                                                            Worker.LogMessage("email send successfully from mandrill using private email to " + contact.PrivateEmail);
                                                                             await _emailService.SendEmailAsync(contact.businessEmail, "Subject", emailbody);
                                                                             insertLog(trigger.OfficeTriggerid, contact.businessEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
-                                                                            LogMessage("email send successfully from mandrill using business email to  " + contact.businessEmail);
+                                                                            Worker.LogMessage("email send successfully from mandrill using business email to  " + contact.businessEmail);
                                                                             break;
                                                                         case "private":
                                                                             recipientEmail = contact.PrivateEmail;
@@ -521,15 +497,11 @@ namespace TriggerService
                                                                         // Send the email based on the selected option
                                                                         //await _emailService.SendEmailAsync(toEmail, "Subject", emailbody);
                                                                         insertLog(trigger.OfficeTriggerid, recipientEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
-                                                                        LogMessage("email send successfully from mandrill to " + toEmail);
+                                                                        Worker.LogMessage("Email send successfully from mandrill to " + toEmail);
                                                                     }
                                                                 }
-
-
                                                             }
-
                                                         }
-
                                                     }
                                                     else
                                                     {
@@ -542,26 +514,18 @@ namespace TriggerService
 
                                             }
                                         }
-
                                     }
-
-
                                 }
-
+                            }
+                            else
+                            {
+                                Worker.LogMessage("Client("+ clientObj.client.CommercialName + ") status is deactivated");
                             }
                         }
-
-
-
-                    }
-
-
-
-               
-
+                    }            
 
                     //_logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-                    await Task.Delay(TimeSpan.FromMinutes(2), stoppingToken); // Append every 60 seconds
+                    await Task.Delay(TimeSpan.FromMinutes(Convert.ToDouble(Worker.appGeneralSettings.OccurrenceTimeInMinutes)), stoppingToken); // Append every 60 seconds
                 }
             }
             catch (Exception ex)
@@ -569,6 +533,5 @@ namespace TriggerService
                 _logger.LogError(ex, "An error occurred while retrieving data from API");
             }
         }
-
     }
 }

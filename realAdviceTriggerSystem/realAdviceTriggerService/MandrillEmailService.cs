@@ -4,28 +4,33 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using TriggerService;
 using TriggerService.Models;
 
 public class MandrillEmailService
 {
-   
     private readonly HttpClient httpClient = new HttpClient();
+    MandrillApiKey mandrillAppSettings;
+    public MandrillEmailService()
+    {
+        IConfigurationRoot configuration = new ConfigurationBuilder()
+        .SetBasePath(Directory.GetCurrentDirectory())
+        .AddJsonFile("appsettings.json")
+        .Build();
+
+        mandrillAppSettings = configuration.GetSection("MandrillSettings").Get<MandrillApiKey>();
+    }
 
     public async Task SendEmailAsync(string toEmail, string subject, string message)
     {
-        IConfigurationRoot configuration = new ConfigurationBuilder()
-               .SetBasePath(Directory.GetCurrentDirectory())
-               .AddJsonFile("appsettings.json")
-               .Build();
-        mandrillapikey mandrillApiKey = configuration.GetSection("mandrillapikey").Get<mandrillapikey>();
-        var mandrillApiUrl = "https://mandrillapp.com/api/1.0/messages/send.json";
+        var mandrillApiUrl = mandrillAppSettings.ApiUrl;
 
         var emailContent = new
         {
-            key = mandrillApiKey.mandrillApiKey, 
+            key = mandrillAppSettings.ApiKey, 
             message = new 
             {
-                from_email = "info@realadvice.be",
+                from_email = mandrillAppSettings.FromEmail,
                 to = new List<object>
                 {
                     new
@@ -46,7 +51,7 @@ public class MandrillEmailService
         }
         catch (HttpRequestException ex)
         {
-            Console.WriteLine($"Error sending email: {ex.Message}");
+            Worker.LogMessage($"Error while sending email through manrdill: {ex.Message}");
         }
     }
 }
