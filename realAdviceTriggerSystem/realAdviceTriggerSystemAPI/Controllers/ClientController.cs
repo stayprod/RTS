@@ -81,7 +81,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("GetAllClientsDetail")]
         public JsonResult GetAllClientsDetail()
         {
@@ -110,6 +110,21 @@ namespace realAdviceTriggerSystemAPI.Controllers
             }
             catch (Exception exp)
             {
+                string filePath = @"E:\LogFile.txt";
+
+                using (StreamWriter writer = new StreamWriter(filePath, true))
+                {
+                    writer.WriteLine("-----------------------------------------------------------------------------");
+                    writer.WriteLine("Date : " + DateTime.Now.ToString());
+                    writer.WriteLine();
+
+                    while (exp != null)
+                    {
+                        writer.WriteLine(exp.GetType().FullName);
+                        writer.WriteLine("Message : " + exp.Message);
+                        writer.WriteLine("StackTrace : " + exp.StackTrace);
+                    }
+                }
                 return new JsonResult(exp.Message);
             }
         }

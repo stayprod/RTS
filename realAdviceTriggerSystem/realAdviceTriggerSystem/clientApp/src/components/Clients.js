@@ -48,7 +48,7 @@ export const Clients = (props) => {
                     'Content-Type': 'application/json'
                 },
             };
-            axios.post(variables.API_URL + `Client/GetAllClientsDetail?`, {}, config) // ASP.NET Core API endpoint with headers
+            axios.get(variables.API_URL + `Client/GetAllClientsDetail`) // ASP.NET Core API endpoint with headers
                 .then(async response => {
                     const clientsCollection = response.data;
 
