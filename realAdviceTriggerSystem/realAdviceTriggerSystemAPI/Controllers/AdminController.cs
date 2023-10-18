@@ -29,7 +29,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
             }
             catch (Exception exp)
             {
-                return new JsonResult(exp);
+                return new JsonResult(exp.Message);
             }
         }
 
@@ -58,7 +58,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
             }
             catch (Exception exp)
             {
-                return new JsonResult(exp);
+                return new JsonResult(exp.Message);
             }
         }
     }

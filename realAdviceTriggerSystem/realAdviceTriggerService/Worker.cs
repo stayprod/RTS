@@ -37,6 +37,7 @@ namespace TriggerService
         string germanTemplate = "<h2>Hello {name}</h2><br><h2>{link}</h2>";
         string baseUrl = "https://survey.realadvice.be/";
         bool smtpflage = true;
+        string[] countries = { "United States", "Canada", "United Kingdom", "Australia", "Germany" };
         static TimeSpan CreateTimeSpan(string flag, int value)
         {
             switch (flag)
@@ -231,6 +232,26 @@ namespace TriggerService
                 Console.WriteLine($"Error while writing to the log file: {ex.Message}");
             }
         }
+        public static void insertLog(int OffTriggerid, string toEmail, int WhiseOffid, int WhiseClntid, int ContId, int appointmentObjID, int appointmentObjEstateID)
+        {
+            using (var con = new realadvicetriggeringsystemContext())
+            {
+                var t = new RtsEmailLog //Make sure you have a table called test in DB
+                {
+                    OfficeTriggerid = OffTriggerid,
+                    Email = toEmail,
+                    WhiseOfficeid = WhiseOffid,
+                    WhiseClientid = WhiseClntid,
+                    ContactId = ContId,
+                    CalenderActonId = appointmentObjID,
+                    EstateId = appointmentObjEstateID
+                };
+
+                con.RtsEmailLog.Add(t);
+                con.SaveChanges();
+            }
+
+        }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             try
@@ -274,11 +295,13 @@ namespace TriggerService
 
                                     foreach (var appointmentObj in appointments.Calendars)
                                     {
+                                        // get trigger duration set for current appointment
                                         TimeSpan timeSpan1 = CreateTimeSpan(trigger.DurationType, (int)trigger.DurationValue);
                                         // check here there must be a estate object , office id should be same and time period is passed of setting like 1hour,1 day etc
                                         //3-if estate associate => you collect the information about the office link to that estate
                                         //WITH THIS OFFICE ID you know now which trigger rules you need to follow
                                         if (appointmentObj.estates != null &&
+                                            trigger.TriggerType == "1" &&
                                             trigger.WhiseOfficeid == appointmentObj.Users[0].OfficeId &&
                                             Convert.ToDateTime(trigger.CreatedOn) + timeSpan1 > appointmentObj.CreateDateTime)
                                         {
@@ -301,22 +324,19 @@ namespace TriggerService
                                                         foreach (var contact in appointmentObj.Contacts)
                                                         {
                                                             var toEmail = "";
-                                                            if (contact.PrivateEmail != null && prefrences != "business")
+                                                            if (contact.PrivateEmail != null)
                                                             {
                                                                 toEmail = contact.PrivateEmail;
                                                             }
-                                                            else if (prefrences == "all" || prefrences == "business" || contact.PrivateEmail == null)
+                                                            else
                                                             {
                                                                 toEmail = contact.businessEmail;
                                                             }
-                                                            // LINK FROM DB
 
-                                                            string inputString = string.Format(baseUrl + "agent={0}&Name={1}&Firstname={2}&language={3}&zip={4}&email={5}&country={6}&officeID={7}&loginOfficeID={8}&contactID={9}&profile=lessor&lessorestimation=1&npssatisfaction=0",
-                                                                appointmentObj.Users[0].UserId, contact.Name, contact.FirstName, contact.LanguageId, contact.zip, toEmail, contact.Country.Id, appointmentObj.estates[0].officeId, appointmentObj.Users[0].UserId, contact.ContactId);
                                                             var smtp_settings = con.OfficeSmtpsettings.Where(t => t.WhiseOfficeid == trigger.WhiseOfficeid).FirstOrDefault();
                                                             var office_settings = con.Offices.Where(t => t.WhiseOfficeid == trigger.WhiseOfficeid).FirstOrDefault();
+                                                            // survey link
                                                             string link = trigger.SurveyLink;
-                                                            LogMessage(link);
                                                             // Dictionary to store placeholder replacements
                                                             Dictionary<string, string> replacements = new Dictionary<string, string>
                                                             {
@@ -327,7 +347,7 @@ namespace TriggerService
                                                                 { "agent", $"{appointmentObj.Users[0].UserId}"},
                                                                 { "zip", $"{contact.zip}"},
                                                                 { "officeid",$"{appointmentObj.estates[0].officeId}"},
-                                                                { "country",$"{contact.Country.Id}"},
+                                                                { "country",$"{countries[contact.Country.Id - 1]}"},
                                                                 { "loginofficeid",$"{appointmentObj.Users[0].UserId}"},
                                                                 { "contactid",$"{contact.ContactId}"},
                                                                 { "lessorestimation","1"},
@@ -345,11 +365,22 @@ namespace TriggerService
                                                                 // If no replacement is found, keep the original placeholder
                                                                 return match.Value;
                                                             });
-                                                           
-                                                            LogMessage(outputString);
-
+                                                            string etext = "";
+                                                            switch (contact.LanguageId)
+                                                            {
+                                                                case "fr-BE":
+                                                                    etext = trigger.TexteFrench;
+                                                                    break;
+                                                                case "en-GB":
+                                                                    etext = trigger.TexteEnglish;
+                                                                    break;
+                                                                case "nl-de":
+                                                                    etext = trigger.TexteDutch;
+                                                                    break;
+                                                            }
+                                                            prefrences = trigger.ContactPreference;
                                                             var logdetailsforcurrentClientOffice = con.RtsEmailLog.Where(l => l.CalenderActonId == appointmentObj.Id && l.ContactId == contact.ContactId).FirstOrDefault();
-                                                            string emailbody = string.Format(englishTemplate, contact.FirstName, outputString);
+                                                            string emailbody = string.Format(etext, contact.FirstName, outputString);
                                                             if (logdetailsforcurrentClientOffice == null)
                                                             {
 
@@ -364,44 +395,95 @@ namespace TriggerService
 
                                                                 if (smtpflage is true)
                                                                 {
-                                                                    bool isEmailSend = SendEmailobj.emailSend(toEmail, "Sunject", emailbody, smtp_settings, true);
-                                                                    if (isEmailSend)
-                                                                    {
-                                                                        var t = new RtsEmailLog //Make sure you have a table called test in DB
-                                                                        {
-                                                                            OfficeTriggerid = trigger.OfficeTriggerid,
-                                                                            Email = toEmail,
-                                                                            WhiseOfficeid = trigger.WhiseOfficeid,
-                                                                            WhiseClientid = trigger.WhiseClientid,
-                                                                            ContactId = contact.ContactId,
-                                                                            CalenderActonId = appointmentObj.Id,
-                                                                            EstateId = appointmentObj.estates[0].estateId
-                                                                        };
+                                                                    string recipientEmail = "";
 
-                                                                        con.RtsEmailLog.Add(t);
-                                                                        con.SaveChanges();
-                                                                        LogMessage("email send successfully to " + toEmail);
+                                                                    switch (prefrences)
+                                                                    {
+                                                                        case "all":
+                                                                            // Send to both private and business email
+                                                                            if (contact.PrivateEmail != null)
+                                                                            {
+                                                                                //bool isSecondEmailSend = SendEmailobj.emailSend(contact.PrivateEmail, "Subject", emailbody, smtp_settings, true);
+                                                                                bool isEmailSend = SendEmailobj.emailSend("umarfarooq3540@gmail.com", "Subject", emailbody, smtp_settings, true);
+                                                                                if (isEmailSend)
+                                                                                {
+                                                                                    insertLog(trigger.OfficeTriggerid, contact.PrivateEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
+
+                                                                                    LogMessage("email send successfully using private email to " + contact.PrivateEmail);
+                                                                                }
+
+                                                                            }
+                                                                            if (contact.businessEmail != null)
+                                                                            {
+                                                                                //bool isSecondEmailSend = SendEmailobj.emailSend(contact.businessEmail, "Subject", emailbody, smtp_settings, true);
+                                                                                bool isSecondEmailSend = SendEmailobj.emailSend("umarfarooq3540@gmail.com", "Subject", emailbody, smtp_settings, true);
+                                                                                if (isSecondEmailSend)
+                                                                                {
+                                                                                    insertLog(trigger.OfficeTriggerid, contact.businessEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
+
+                                                                                    LogMessage("email send successfully to " + contact.businessEmail);
+                                                                                }
+                                                                            }
+                                                                            break;
+                                                                        case "private":
+                                                                            recipientEmail = contact.PrivateEmail;
+                                                                            break;
+                                                                        case "business":
+                                                                            recipientEmail = contact.businessEmail;
+                                                                            break;
+                                                                        default:
+                                                                            Console.WriteLine("Invalid choice.");
+                                                                            return;
                                                                     }
+
+                                                                    if (prefrences != "all")
+                                                                    {
+                                                                        // Send the email based on the selected option
+                                                                        //bool isEmailSend = SendEmailobj.emailSend(recipientEmail, "Subject", emailbody, smtp_settings, true);
+                                                                        bool isEmailSend = SendEmailobj.emailSend("umarfarooq3540@gmail.com", "Subject", emailbody, smtp_settings, true);
+                                                                        if (isEmailSend)
+                                                                        {
+                                                                            insertLog(trigger.OfficeTriggerid, recipientEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
+
+                                                                            LogMessage("email send successfully to " + recipientEmail);
+                                                                        }
+                                                                    }
+
                                                                 }
                                                                 else
                                                                 {
                                                                     //send  email through mandrill 
+                                                                    string recipientEmail = "";
 
-                                                                    await _emailService.SendEmailAsync(toEmail, "Subject", emailbody);
-                                                                    var t = new RtsEmailLog
+                                                                    switch (prefrences)
                                                                     {
-                                                                        OfficeTriggerid = trigger.OfficeTriggerid,
-                                                                        Email = toEmail,
-                                                                        WhiseOfficeid = trigger.WhiseOfficeid,
-                                                                        WhiseClientid = trigger.WhiseClientid,
-                                                                        ContactId = contact.ContactId,
-                                                                        CalenderActonId = appointmentObj.Id,
-                                                                        EstateId = appointmentObj.estates[0].estateId
-                                                                    };
+                                                                        case "all":
+                                                                            // Send to both private and business email
+                                                                            //await _emailService.SendEmailAsync(contact.PrivateEmail, "Subject", emailbody);
+                                                                            insertLog(trigger.OfficeTriggerid, contact.PrivateEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
+                                                                            LogMessage("email send successfully from mandrill using private email to " + contact.PrivateEmail);
+                                                                            //await _emailService.SendEmailAsync(contact.businessEmail, "Subject", emailbody);
+                                                                            insertLog(trigger.OfficeTriggerid, contact.businessEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
+                                                                            LogMessage("email send successfully from mandrill using business email to  " + contact.businessEmail);
+                                                                            break;
+                                                                        case "private":
+                                                                            recipientEmail = contact.PrivateEmail;
+                                                                            break;
+                                                                        case "business":
+                                                                            recipientEmail = contact.businessEmail;
+                                                                            break;
+                                                                        default:
+                                                                            Console.WriteLine("Invalid choice.");
+                                                                            return;
+                                                                    }
 
-                                                                    con.RtsEmailLog.Add(t);
-                                                                    con.SaveChanges();
-                                                                    LogMessage("email send successfully from mandrill to " + toEmail);
+                                                                    if (prefrences != "all")
+                                                                    {
+                                                                        // Send the email based on the selected option
+                                                                        //await _emailService.SendEmailAsync(toEmail, "Subject", emailbody);
+                                                                        insertLog(trigger.OfficeTriggerid, recipientEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
+                                                                        LogMessage("email send successfully from mandrill to " + toEmail);
+                                                                    }
                                                                 }
 
 
@@ -412,10 +494,11 @@ namespace TriggerService
                                                     }
                                                     else
                                                     {
+                                                        string emailbody = $"<h2>Error</h2><br><p>There is no contact exist <strong>against this userID {appointmentObj.Users[0].UserId} userName {appointmentObj.Users[0].FirstName} Email {appointmentObj.Users[0].Email} </strong></p>";
                                                         //if no contact then you send a error message to the user's email
+                                                        //await _emailService.SendEmailAsync(appointmentObj.Users[0].Email, "Subject", emailbody);
+                                                        LogMessage("error email send successfully from mandrill to " + appointmentObj.Users[0].Email);
                                                     }
-                                                    //if (appointmentObj.Action.Id ==)
-
                                                 }
 
                                             }
@@ -428,6 +511,8 @@ namespace TriggerService
 
                             }
                         }
+
+
 
                     }
 

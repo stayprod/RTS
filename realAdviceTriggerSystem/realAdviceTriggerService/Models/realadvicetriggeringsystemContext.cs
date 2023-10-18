@@ -306,6 +306,12 @@ namespace realAdviceTriggerSystemService.Models
                     .HasCharSet("latin1")
                     .HasCollation("latin1_swedish_ci");
 
+                entity.Property(e => e.ContactPreference)
+                    .HasColumnName("contact_preference")
+                    .HasColumnType("text")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
+
                 entity.Property(e => e.CreatedOn)
                     .HasColumnName("created_on")
                     .HasColumnType("datetime");
@@ -352,8 +358,20 @@ namespace realAdviceTriggerSystemService.Models
                     .HasCharSet("latin1")
                     .HasCollation("latin1_swedish_ci");
 
-                entity.Property(e => e.Texte)
-                    .HasColumnName("texte")
+                entity.Property(e => e.TexteDutch)
+                    .HasColumnName("texte_dutch")
+                    .HasColumnType("text")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
+
+                entity.Property(e => e.TexteEnglish)
+                    .HasColumnName("texte_english")
+                    .HasColumnType("text")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
+
+                entity.Property(e => e.TexteFrench)
+                    .HasColumnName("texte_french")
                     .HasColumnType("text")
                     .HasCharSet("latin1")
                     .HasCollation("latin1_swedish_ci");

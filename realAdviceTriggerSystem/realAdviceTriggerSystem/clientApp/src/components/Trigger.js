@@ -53,6 +53,7 @@ export const Trigger = (props) => {
     const [durationValue, setDurationValue] = useState("");
     const [triggerDetail, setTriggerDetail] = useState({});
     const [suveryLinkForEmail, setSuveryLinkForEmail] = useState(["https://survey.realadvice.be/", "", "/?"]);
+    const [contactPreference, setContactPreference] = useState("all");
 
     const initEditorState = createEditorStateFromRaw();
     const [editorStateEnglish, setEditorStateEnglish] = useState(initEditorState);
@@ -102,6 +103,7 @@ export const Trigger = (props) => {
         }
     }
 
+    //set trigger detail in form while editing a trigger
     const loadTriggerDetailInEdit = (trigger) => {
 
         setTriggerDetail(trigger);
@@ -145,17 +147,24 @@ export const Trigger = (props) => {
         transactionStatus.value = trigger.transactionStatus;
 
         //convert saved html into raw form and bind it with text editors
-        let rawStateEngTexte = fromHTMLToRawText(trigger.texteEnglish);
-        const latestEngEditorState = createEditorStateFromRaw(rawStateEngTexte);
-        setEditorStateEnglish(latestEngEditorState);
+        //let rawStateEngTexte = fromHTMLToRawText(trigger.texteEnglish);
+        //const latestEngEditorState = createEditorStateFromRaw(rawStateEngTexte);
+        //setEditorStateEnglish(latestEngEditorState);
+        setEmailTexteEnglish(trigger.texteEnglish);
 
-        let rawStateFrenchTexte = fromHTMLToRawText(trigger.texteFrench);
-        const latestFrenchEditorState = createEditorStateFromRaw(rawStateFrenchTexte);
-        setEditorStateFrench(latestFrenchEditorState);
+        //let rawStateFrenchTexte = fromHTMLToRawText(trigger.texteFrench);
+        //const latestFrenchEditorState = createEditorStateFromRaw(rawStateFrenchTexte);
+        //setEditorStateFrench(latestFrenchEditorState);
+        setEmailTexteFrench(trigger.texteFrench);
 
-        let rawStateDutchTexte = fromHTMLToRawText(trigger.texteDutch);
-        const latesDucthEditorState = createEditorStateFromRaw(rawStateDutchTexte);
-        setEditorStateDutch(latesDucthEditorState);
+        //let rawStateDutchTexte = fromHTMLToRawText(trigger.texteDutch);
+        //const latesDucthEditorState = createEditorStateFromRaw(rawStateDutchTexte);
+        //setEditorStateDutch(latesDucthEditorState);
+        setEmailTexteDutch(trigger.texteDutch);
+
+        if (trigger.contactPreference != '') {
+            setContactPreference(trigger.contactPreference);
+        }
     }
 
     const populateSurveyLinkInEditMode = (_link) => {
@@ -185,10 +194,10 @@ export const Trigger = (props) => {
         if (remainingString.indexOf("profile=tenant") != -1) {
             document.getElementById("checkTenant").checked = true;
         }
-        if (remainingString.indexOf("name") != -1) {
+        if (remainingString.indexOf("name={n") != -1) {
             document.getElementById("checkName").checked = true;
         }
-        if (remainingString.indexOf("Firstname") != -1) {
+        if (remainingString.indexOf("Firstname={f") != -1) {
             document.getElementById("checkFirstname").checked = true;
         }
         if (remainingString.indexOf("language") != -1) {
@@ -245,6 +254,140 @@ export const Trigger = (props) => {
                 nameString += triggerNameBuilder[item] + " ";
             })
             setFinalTriggerName(nameString);
+
+
+
+            //unchecked survey link checkboxes dynamically when keymoment dropdown get changed
+            let _existinglink = [...suveryLinkForEmail];
+            let surveyLinkParametersArray = _existinglink.slice(0, 3);
+
+            if (e.target.id != "keymomentDropdown") {
+                return;
+            }
+
+            document.getElementById("checkAgent").checked = false;
+            document.getElementById("checkBuyer").checked = false;
+            document.getElementById("checkTenant").checked = false;
+            document.getElementById("checkName").checked = false;
+            document.getElementById("checkFirstname").checked = false;
+            document.getElementById("checkLanguage").checked = false;
+            document.getElementById("checkVendor").checked = false;
+            document.getElementById("checkZip").checked = false;
+            document.getElementById("checkEstimation").checked = false;
+            document.getElementById("checkEmail").checked = false;
+            document.getElementById("checkCountry").checked = false;
+            document.getElementById("checkSatisfaction").checked = false;
+            document.getElementById("checkOfficeid").checked = false;
+            document.getElementById("checkLoginofficeid").checked = false;
+            document.getElementById("checkContactid").checked = false;
+            document.getElementById("checkLessor").checked = false;
+
+            if (location.state.TriggerDetail != undefined && location.state.TriggerDetail.keyMoment == e.target.value) {
+                populateSurveyLinkInEditMode(location.state.TriggerDetail.surveyLink);
+                return
+            }
+
+            if (e.target.value == "1") {
+                document.getElementById("checkName").checked = true;
+                document.getElementById("checkBuyer").checked = true;
+                document.getElementById("checkFirstname").checked = true;
+                surveyLinkParametersArray = generateSurveyLinkOnKeyMomentDropdownChange(document.getElementById("checkName"), surveyLinkParametersArray);
+                surveyLinkParametersArray = generateSurveyLinkOnKeyMomentDropdownChange(document.getElementById("checkBuyer"), surveyLinkParametersArray);
+                surveyLinkParametersArray = generateSurveyLinkOnKeyMomentDropdownChange(document.getElementById("checkFirstname"), surveyLinkParametersArray);
+            }
+            if (e.target.value == "2") {
+                document.getElementById("checkBuyer").checked = true;
+                document.getElementById("checkName").checked = true;
+                surveyLinkParametersArray = generateSurveyLinkOnKeyMomentDropdownChange(document.getElementById("checkBuyer"), surveyLinkParametersArray);
+                surveyLinkParametersArray = generateSurveyLinkOnKeyMomentDropdownChange(document.getElementById("checkName"), surveyLinkParametersArray);
+            }
+            if (e.target.value == "3") {
+                document.getElementById("checkOfficeid").checked = true;
+                document.getElementById("checkContactid").checked = true;
+                surveyLinkParametersArray = generateSurveyLinkOnKeyMomentDropdownChange(document.getElementById("checkOfficeid"), surveyLinkParametersArray);
+                surveyLinkParametersArray = generateSurveyLinkOnKeyMomentDropdownChange(document.getElementById("checkContactid"), surveyLinkParametersArray);
+            }
+            if (e.target.value == "4") {
+                document.getElementById("checkVendor").checked = true;
+                surveyLinkParametersArray = generateSurveyLinkOnKeyMomentDropdownChange(document.getElementById("checkVendor"), surveyLinkParametersArray);
+            }
+            if (e.target.value == "5") {
+                document.getElementById("checkEstimation").checked = true;
+                document.getElementById("checkCountry").checked = true;
+                surveyLinkParametersArray = generateSurveyLinkOnKeyMomentDropdownChange(document.getElementById("checkEstimation"), surveyLinkParametersArray);
+                surveyLinkParametersArray = generateSurveyLinkOnKeyMomentDropdownChange(document.getElementById("checkCountry"), surveyLinkParametersArray);
+            }
+            if (e.target.value == "6") {
+                document.getElementById("checkEstimation").checked = true;
+                document.getElementById("checkSatisfaction").checked = true;
+                document.getElementById("checkTenant").checked = true;
+                document.getElementById("checkCountry").checked = true;
+                surveyLinkParametersArray = generateSurveyLinkOnKeyMomentDropdownChange(document.getElementById("checkEstimation"), surveyLinkParametersArray);
+                surveyLinkParametersArray = generateSurveyLinkOnKeyMomentDropdownChange(document.getElementById("checkSatisfaction"), surveyLinkParametersArray);
+                surveyLinkParametersArray = generateSurveyLinkOnKeyMomentDropdownChange(document.getElementById("checkTenant"), surveyLinkParametersArray);
+                surveyLinkParametersArray = generateSurveyLinkOnKeyMomentDropdownChange(document.getElementById("checkCountry"), surveyLinkParametersArray);
+            }
+            if (e.target.value == "7") {
+                document.getElementById("checkZip").checked = true;
+                document.getElementById("checkLanguage").checked = true;
+                document.getElementById("checkLessor").checked = true;
+                document.getElementById("checkCountry").checked = true;
+                surveyLinkParametersArray = generateSurveyLinkOnKeyMomentDropdownChange(document.getElementById("checkZip"), surveyLinkParametersArray);
+                surveyLinkParametersArray = generateSurveyLinkOnKeyMomentDropdownChange(document.getElementById("checkLanguage"), surveyLinkParametersArray);
+                surveyLinkParametersArray = generateSurveyLinkOnKeyMomentDropdownChange(document.getElementById("checkLessor"), surveyLinkParametersArray);
+                surveyLinkParametersArray = generateSurveyLinkOnKeyMomentDropdownChange(document.getElementById("checkCountry"), surveyLinkParametersArray);
+            }
+            if (e.target.value == "8") {
+                document.getElementById("checkZip").checked = true;
+                surveyLinkParametersArray = generateSurveyLinkOnKeyMomentDropdownChange(document.getElementById("checkZip"), surveyLinkParametersArray);
+            }
+            if (e.target.value == "9") {
+                document.getElementById("checkEstimation").checked = true;
+                document.getElementById("checkTenant").checked = true;
+                document.getElementById("checkCountry").checked = true;
+                surveyLinkParametersArray = generateSurveyLinkOnKeyMomentDropdownChange(document.getElementById("checkEstimation"), surveyLinkParametersArray);
+                surveyLinkParametersArray = generateSurveyLinkOnKeyMomentDropdownChange(document.getElementById("checkTenant"), surveyLinkParametersArray);
+                surveyLinkParametersArray = generateSurveyLinkOnKeyMomentDropdownChange(document.getElementById("checkCountry"), surveyLinkParametersArray);
+            }
+            if (e.target.value == "10") {
+                document.getElementById("checkTenant").checked = true;
+                document.getElementById("checkCountry").checked = true;
+                surveyLinkParametersArray = generateSurveyLinkOnKeyMomentDropdownChange(document.getElementById("checkTenant"), surveyLinkParametersArray);
+                surveyLinkParametersArray = generateSurveyLinkOnKeyMomentDropdownChange(document.getElementById("checkCountry"), surveyLinkParametersArray);
+            }
+            if (e.target.value == "11") {
+                document.getElementById("checkZip").checked = true;
+                document.getElementById("checkLanguage").checked = true;
+                document.getElementById("checkLessor").checked = true;
+                document.getElementById("checkCountry").checked = true;
+                document.getElementById("checkFirstname").checked = true;
+                surveyLinkParametersArray = generateSurveyLinkOnKeyMomentDropdownChange(document.getElementById("checkZip"), surveyLinkParametersArray);
+                surveyLinkParametersArray = generateSurveyLinkOnKeyMomentDropdownChange(document.getElementById("checkLanguage"), surveyLinkParametersArray);
+                surveyLinkParametersArray = generateSurveyLinkOnKeyMomentDropdownChange(document.getElementById("checkLessor"), surveyLinkParametersArray);
+                surveyLinkParametersArray = generateSurveyLinkOnKeyMomentDropdownChange(document.getElementById("checkCountry"), surveyLinkParametersArray);
+                surveyLinkParametersArray = generateSurveyLinkOnKeyMomentDropdownChange(document.getElementById("checkFirstname"), surveyLinkParametersArray);
+            }
+            if (e.target.value == "12") {
+                document.getElementById("checkCountry").checked = true;
+                document.getElementById("checkFirstname").checked = true;
+                surveyLinkParametersArray = generateSurveyLinkOnKeyMomentDropdownChange(document.getElementById("checkCountry"), surveyLinkParametersArray);
+                surveyLinkParametersArray = generateSurveyLinkOnKeyMomentDropdownChange(document.getElementById("checkFirstname"), surveyLinkParametersArray);
+            }
+
+
+            let finalSurveyLink = surveyLinkParametersArray.map((item, i) => {
+                if (i == 3) {
+                    item = item.replace("&", "");
+                    return item;
+                }
+                else {
+                    return item;
+                }
+            }).join("")
+
+            document.getElementById("inputSurveyLink").value = finalSurveyLink;
+
+            setSuveryLinkForEmail(current => surveyLinkParametersArray);
         }
         else {
             triggerNameBuilder[e.target.id] = "";
@@ -255,6 +398,34 @@ export const Trigger = (props) => {
             setFinalTriggerName(nameString);
         }
 
+
+
+    }
+
+    //push selected checkbox value in survey link parameter array and return updated array
+    const generateSurveyLinkOnKeyMomentDropdownChange = (e, _linkArray) => {
+        let checked = e.checked;
+        let placeholder = e.getAttribute("placeholder");
+        let paramName = e.getAttribute("parameter");
+
+        let symbol = "&";
+
+        if (checked == true) {
+            let finalValue = symbol + paramName + "=" + placeholder;
+            const existingParam = _linkArray.filter(item => {
+                return item == finalValue;
+            })
+            if (existingParam.length == 0) {
+                _linkArray.push(finalValue);
+            }
+        }
+        else {
+            let finalValue = symbol + paramName + "=" + placeholder;
+            const indexOfItem = _linkArray.indexOf(finalValue);
+            _linkArray.splice(indexOfItem, 1);
+        }
+
+        return _linkArray;
     }
 
     const resetConditionDropdowns = (e) => {
@@ -605,13 +776,14 @@ export const Trigger = (props) => {
             TargetParticipant2: "",
             CTarget2: "",
             Language: language,
-            TexteEnglish: triggerDetail.texteEnglish != undefined && triggerDetail.texteEnglish != "" ? triggerDetail.texteEnglish : emailTexteEnglish,
-            TexteFrench: triggerDetail.texteFrench != undefined && triggerDetail.texteFrench != "" ? triggerDetail.texteFrench : emailTexteFrench,
-            TexteDutch: triggerDetail.texteDutch != undefined && triggerDetail.texteDutch != "" ? triggerDetail.texteDutch : emailTexteDutch,
+            TexteEnglish: emailTexteEnglish,
+            TexteFrench: emailTexteFrench,
+            TexteDutch: emailTexteDutch,
             AppointmentType: whiseOptions.value,
             TransactionType: transactionType.value,
             TransactionStatus: transactionStatus.value,
-            SurveyLink: document.getElementById("inputSurveyLink").value
+            SurveyLink: document.getElementById("inputSurveyLink").value,
+            ContactPreference: contactPreference
         }
         let triggerurl = variables.API_URL + `OfficeTrigger/SaveOfficeTriggerDetail?`;
         return axios.post(triggerurl, JSON.stringify(objOfficeTrigger), jsonconfig)
@@ -639,7 +811,9 @@ export const Trigger = (props) => {
         });
     }
 
-    const setWhiseDropdownValue = () => {
+    const contactPreferenceChangeHandler = (e) => {
+        const checkedOption = e.target.getAttribute("preferencevalue");
+        setContactPreference(checkedOption);
     }
 
     useEffect(() => {
@@ -677,7 +851,6 @@ export const Trigger = (props) => {
             document.getElementById("layoutDropdown").value = location.state.TriggerDetail.layoutid;
         }
     }, [officeLayout])
-
 
     return (
         <>
@@ -907,7 +1080,7 @@ export const Trigger = (props) => {
                                             convertTexteToHtml(raw)
                                         }}
                                         rawContentState={null}
-                                        editorState={editorStateEnglish}
+                                        //editorState={editorStateEnglish}
                                         blockTypes={[
                                             { type: BLOCK_TYPE.HEADER_ONE },
                                             { type: BLOCK_TYPE.HEADER_TWO },
@@ -952,7 +1125,7 @@ export const Trigger = (props) => {
                                             convertTexteToHtml_French(raw)
                                         }}
                                         rawContentState={null}
-                                        editorState={editorStateFrench}
+                                        //editorState={editorStateFrench}
                                         blockTypes={[
                                             { type: BLOCK_TYPE.HEADER_ONE },
                                             { type: BLOCK_TYPE.HEADER_TWO },
@@ -997,7 +1170,7 @@ export const Trigger = (props) => {
                                             convertTexteToHtml_Dutch(raw)
                                         }}
                                         rawContentState={null}
-                                        editorState={editorStateDutch}
+                                        //editorState={editorStateDutch}
                                         blockTypes={[
                                             { type: BLOCK_TYPE.HEADER_ONE },
                                             { type: BLOCK_TYPE.HEADER_TWO },
@@ -1108,15 +1281,34 @@ export const Trigger = (props) => {
                             </div>
                         </div>
                     </div>
+                    <div>
+                        <h6 className="sub-heading fw-bold mb-3">Preferences:</h6>
+                    </div>
                     <div className="row">
                         <div className="col-sm-12 col-md-12 mb-3">
-                            <div className="form-check form-check-inline">
-                                <input className="form-check-input" type="checkbox" name="activateReminderOptions" id="activateReminder" defaultValue="option1" />
-                                <label className="form-check-label" htmlFor="activateReminder">Activate Reminder</label>
+                            <div className="form-check form-check-inline me-4">
+                                <input className="form-check-input" type="radio" name="preferenceRadio" id="checkAllEmail"
+                                    preferencevalue="all" onChange={contactPreferenceChangeHandler} checked={contactPreference == "all"} />
+                                <label className="form-check-label" htmlFor="checkAllEmail">
+                                    Send mail to all contact's email
+                                </label>
+                            </div>
+                            <div className="form-check form-check-inline me-4">
+                                <input className="form-check-input" type="radio" name="preferenceRadio" id="checkPrivateEamil"
+                                    preferencevalue="private" onChange={contactPreferenceChangeHandler} checked={contactPreference == "private"} />
+                                <label className="form-check-label" htmlFor="checkPrivateEamil">
+                                    Private email only
+                                </label>
+                            </div>
+                            <div className="form-check form-check-inline me-4">
+                                <input className="form-check-input" type="radio" name="preferenceRadio" id="checkBusinessEamil"
+                                    preferencevalue="business" onChange={contactPreferenceChangeHandler} checked={contactPreference == "business"} />
+                                <label className="form-check-label" htmlFor="checkBusinessEamil">
+                                    Business email
+                                </label>
                             </div>
                         </div>
                     </div>
-
                     <div className="text-center">
                         <button className="btn-site me-2" onClick={saveTrigger}>Save Trigger</button>{/*<button className="btn-site" onClick={createNewSurveyEmail}>Create New Version of Email</button>*/}
                     </div>

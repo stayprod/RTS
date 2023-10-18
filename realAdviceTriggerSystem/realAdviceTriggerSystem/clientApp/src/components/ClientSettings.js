@@ -118,7 +118,7 @@ export const ClientSettings = (props) => {
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);
-                });
+                }); 
         }
 
     }
@@ -154,6 +154,10 @@ export const ClientSettings = (props) => {
         let clientId = jsonData.clientid;
 
         if (clientId > 0) {
+            if (location.state.localclient == undefined) {
+                location.state.localclient = { client: jsonData };
+                setClientDetail(location.state);
+            }
 
             _admin.clientid = clientId;
             _admin.legalName = document.getElementById("legalName").value;

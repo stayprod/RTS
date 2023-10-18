@@ -257,6 +257,9 @@ public partial class RealadviceTriggeringSystemContext : DbContext
             entity.Property(e => e.CTarget2)
                 .HasColumnType("text")
                 .HasColumnName("c_target_2");
+            entity.Property(e => e.ContactPreference)
+                .HasColumnType("text")
+                .HasColumnName("contact_preference");
             entity.Property(e => e.CreatedOn)
                 .HasColumnType("datetime")
                 .HasColumnName("created_on");

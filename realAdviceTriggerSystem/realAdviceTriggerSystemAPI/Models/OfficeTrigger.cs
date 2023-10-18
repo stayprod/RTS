@@ -52,4 +52,6 @@ public partial class OfficeTrigger
     public string? TexteFrench { get; set; }
 
     public string? TexteDutch { get; set; }
+
+    public string? ContactPreference { get; set; }
 }

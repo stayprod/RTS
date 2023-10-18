@@ -351,9 +351,21 @@ export const OfficeSettings = (props) => {
                 setLocalOffice(response.data);
 
                 location.state.LocalOffice = response.data;
-                location.state.LocalOfficesList.push(response.data);
+                if (location.state.LocalOfficesList == undefined) {
+                    location.state.LocalOfficesList = [];
+                }
+                const existingOfficeInDb = location.state.LocalOfficesList.filter(item => {
+                    return item.officeid == response.data.officeid;
+                })
+                if (existingOfficeInDb.length == 0) {
+                    location.state.LocalOfficesList.push(response.data);
+                }
+                else {
+                    const indexOfExistedOffice = location.state.LocalOfficesList.indexOf(existingOfficeInDb[0]);
+                    location.state.LocalOfficesList[indexOfExistedOffice] = response.data;
+                }
 
-                //setClientLocalOffices(current => [...current, response.data]);
+                setClientLocalOffices(location.state.LocalOfficesList);
                 if (settingsToBeRemoved.length > 0) {
                     removePimcoreSettings();
                 }

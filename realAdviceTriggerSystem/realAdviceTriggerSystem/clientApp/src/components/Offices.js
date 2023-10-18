@@ -56,23 +56,19 @@ export const Offices = (props) => {
             .then(response => {
                 let finalArrayToSet = [];
                 response.data.offices.forEach(item => {
-                    let existedOffInDb = client.localclient?.office.filter(_off => {
+                    let existedTriggerInDb = client.localclient?.triggers.filter(_off => {
                         return _off.whiseOfficeid == item.id
                     })
-                    if (existedOffInDb && existedOffInDb.length > 0) {
+                    if (existedTriggerInDb && existedTriggerInDb.length > 0) {
                         item.warning = false;
-                        let isAlreadyPushed = finalArrayToSet.includes(item, 0);
-                        if (isAlreadyPushed == false) {
-                            finalArrayToSet.push(item);
-                        }
                     }
                     else {
                         warningCount++;
                         item.warning = true;
-                        let isAlreadyPushed = finalArrayToSet.includes(item, 0);
-                        if (isAlreadyPushed == false) {
-                            finalArrayToSet.push(item);
-                        }
+                    }
+                    let isAlreadyPushed = finalArrayToSet.includes(item, 0);
+                    if (isAlreadyPushed == false) {
+                        finalArrayToSet.push(item);
                     }
                 })
                 setWhiseOfficesList(finalArrayToSet);

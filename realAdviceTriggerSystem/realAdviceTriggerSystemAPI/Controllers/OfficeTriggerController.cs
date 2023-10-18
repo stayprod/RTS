@@ -28,7 +28,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
             }
             catch (Exception exp)
             {
-                return new JsonResult(exp);
+                return new JsonResult(exp.Message);
             }
         }
 
@@ -47,7 +47,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
             }
             catch (Exception exp)
             {
-                return new JsonResult(exp);
+                return new JsonResult(exp.Message);
             }
         }
 
@@ -65,7 +65,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
             }
             catch (Exception exp)
             {
-                return new JsonResult(exp);
+                return new JsonResult(exp.Message);
             }
         }
 
@@ -102,6 +102,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
                         _trigger.TexteEnglish = officeTrigger.TexteEnglish;
                         _trigger.TexteFrench = officeTrigger.TexteFrench;
                         _trigger.TexteDutch = officeTrigger.TexteDutch;
+                        _trigger.ContactPreference = officeTrigger.ContactPreference;
                         con.SaveChanges();
                     }
                     else
@@ -117,7 +118,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
             }
             catch (Exception exp)
             {
-                return new JsonResult(exp);
+                return new JsonResult(exp.Message);
             }
         }
 
@@ -141,7 +142,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
             }
             catch (Exception exp)
             {
-                return new JsonResult(exp);
+                return new JsonResult(exp.Message);
             }
         }
     }

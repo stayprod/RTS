@@ -35,7 +35,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
             }
             catch (Exception exp)
             {
-                return new JsonResult(exp);
+                return new JsonResult(exp.Message);
             }
         }
 
@@ -77,7 +77,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
             }
             catch (Exception exp)
             {
-                return new JsonResult(exp);
+                return new JsonResult(exp.Message);
             }
         }
 
@@ -92,14 +92,17 @@ namespace realAdviceTriggerSystemAPI.Controllers
                     List<Client> clients = con.Clients.ToList();
                     List<AdminDetail> admindetails = con.AdminDetails.ToList();
                     List<Office> offices = con.Offices.ToList();
+                    List<OfficeTrigger> triggers = con.OfficeTriggers.ToList();
 
                     var _clients = from c in clients
                                    join ad in admindetails on c.Clientid equals ad.Clientid into cl_ad
                                    join o in offices on c.Clientid equals o.Clientid into cl_of
+                                   join t in triggers on c.WhiseClientid equals t.WhiseClientid into of_triggers
                                    select ( new {
                                         client = c,
                                         admin = cl_ad,
-                                        office = cl_of
+                                        office = cl_of,
+                                        triggers = of_triggers
                                    });
 
                     return new JsonResult(_clients);
@@ -107,7 +110,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
             }
             catch (Exception exp)
             {
-                return new JsonResult(exp);
+                return new JsonResult(exp.Message);
             }
         }
 
@@ -149,7 +152,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
             }
             catch (Exception exp)
             {
-                return new JsonResult(exp);
+                return new JsonResult(exp.Message);
             }
         }
 
@@ -167,7 +170,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
             }
             catch (Exception exp)
             {
-                return new JsonResult(exp);
+                return new JsonResult(exp.Message);
             }
         }
     }

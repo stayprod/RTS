@@ -15,7 +15,7 @@ namespace TriggerService
     public class EmailSend
     {
 
-        public bool emailSend(string SenderEmail, string Subject, string Message, OfficeSmtpsettings settings, bool IsBodyHtml = true)
+        public bool emailSend(string ToEmail, string Subject, string Message, OfficeSmtpsettings settings, bool IsBodyHtml = true)
         {
             bool status = false;
             try
@@ -37,7 +37,7 @@ namespace TriggerService
                 mailMessage.Subject = Subject;
                 mailMessage.Body = Message;
                 mailMessage.IsBodyHtml = IsBodyHtml;
-                mailMessage.To.Add(new MailAddress(SenderEmail));// (SenderEmail));
+                mailMessage.To.Add(new MailAddress(ToEmail));// (SenderEmail));
                 if (CC != "")
                 {
                     mailMessage.CC.Add(new MailAddress(CC));// (SenderEmail));
