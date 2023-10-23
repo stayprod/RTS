@@ -9,7 +9,7 @@ import { Offices } from "./Offices";
 import { ClientSettings } from "./ClientSettings";
 import image from '../assets/images/profile_image.png'
 import { useToken } from './tokenContext';
-import { variables } from '../Variables';
+import { variables, EnumobjClientStatus } from '../Variables';
 
 export const Clients = (props) => {
 
@@ -134,7 +134,7 @@ export const Clients = (props) => {
                                 <br />
                                 <span className="titleSpan fw-bold">CRM CLIENT ID:</span> {item.id}
                                 <br />
-                                <span className="titleSpan fw-bold">STATUS:</span> {item.localclient != null && item.localclient.client.activationStatus != null ? item.localclient.client.activationStatus : "Pending"}
+                                <span className="titleSpan fw-bold">STATUS:</span> {EnumobjClientStatus[item.localclient != null && item.localclient.client.activationStatus != null ? item.localclient.client.activationStatus : "1"]}
                                 <br />
                                 <div>
                                     <FontAwesomeIcon icon={faExclamationTriangle} />

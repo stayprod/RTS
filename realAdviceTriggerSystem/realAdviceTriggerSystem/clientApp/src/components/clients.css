@@ -99,11 +99,14 @@
 
 .remove-setting-icon {
     position: absolute;
-    right: -6px;
+    right: -4px;
     bottom: 23px;
     width: auto;
-    padding: 0;
     cursor: pointer;
+    padding: 0;
+    background-color: transparent;
+    border: none;
+    font-size: 1.3rem;
 }
 
 .back-arrow{

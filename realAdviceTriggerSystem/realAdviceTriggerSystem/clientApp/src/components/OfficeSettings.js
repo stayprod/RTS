@@ -128,13 +128,14 @@ export const OfficeSettings = (props) => {
         if (pimcoreSettingsRows == 1) {
             return;
         }
-        let element;
-        if (e.target.nodeName == "path") {
-            element = e.target.parentNode.parentNode;
-        }
-        if (e.target.nodeName == "svg") {
-            element = e.target.parentNode;
-        }
+
+        let element = e.target;
+        //if (e.target.nodeName == "path") {
+        //    element = e.target.parentNode.parentNode;
+        //}
+        //if (e.target.nodeName == "svg") {
+        //    element = e.target.parentNode;
+        //}
 
         const objSettings = JSON.parse(element.getAttribute("settingdetail"));
         const elementIndex = +element.getAttribute("parentid").split("-")[1];
@@ -348,6 +349,8 @@ export const OfficeSettings = (props) => {
         let url = variables.API_URL + `Office/SaveOfficeDetail?`;
         axios.post(url, JSON.stringify(objOfficeSettings), jsonconfig)
             .then((response) => {
+
+                //uploadImage();
                 setLocalOffice(response.data);
 
                 location.state.LocalOffice = response.data;
@@ -422,6 +425,25 @@ export const OfficeSettings = (props) => {
         if (e.target.style.borderColor == "red") {
             e.target.style.borderColor = "#ced4da";
         }
+    }
+
+    //update empty pimcoresetting object values when user type anything in newly added row of pimcore settings
+    const setStateValueOfPimcoreFieldsOnBlur = (e) => {
+        const objSettings = JSON.parse(e.target.getAttribute("settingObj"));
+        const elementIndex = +e.target.getAttribute("parentid").split("-")[1];
+
+        let settingsArray = [...pimcoreSettings]; // make a separate copy of the array
+
+        if (e.target.id.indexOf("pimcoreFName") != -1) {
+            settingsArray[elementIndex].firstName = e.target.value;
+        }
+        if (e.target.id.indexOf("pimcoreLName") != -1) {
+            settingsArray[elementIndex].lastName = e.target.value;
+        }
+        if (e.target.id.indexOf("pimcoreLoginID") != -1) {
+            settingsArray[elementIndex].loginId = e.target.value;
+        }
+        setPimcoreSettings(settingsArray);
     }
 
     const resetSMTPFormFieldsStyle = (e) => {
@@ -589,7 +611,7 @@ export const OfficeSettings = (props) => {
                 </div>
                 <div className="row">
                     <div className="col-sm-12">
-                        <PimcoreSettings pcSettingsList={pimcoreSettings} removePimcoreSettings={removePimcoreSettingsRow} resetRequireField={resetOfficeSettingFields} />
+                        <PimcoreSettings pcSettingsList={pimcoreSettings} removePimcoreSettings={removePimcoreSettingsRow} resetRequireField={resetOfficeSettingFields} onBlurHandler={setStateValueOfPimcoreFieldsOnBlur} />
                     </div>
                     <div className="col-sm-12 mb-3">
                         <div className="form-check form-check-inline">

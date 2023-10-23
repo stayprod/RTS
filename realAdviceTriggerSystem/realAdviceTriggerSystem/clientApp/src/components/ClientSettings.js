@@ -96,16 +96,22 @@ export const ClientSettings = (props) => {
         //}
     }
 
+    const readStateElements = () => {
+        if (location.state.localclient != undefined) {
+            setClientDetailFromDB(location.state.localclient.client)
+            setAdminDetail(location.state.localclient.admin[0]);
+            document.getElementById("status").value = location.state.localclient.client.activationStatus;
+            document.getElementById("crmName").value = location.state.localclient.client.crmDetail;
+            document.getElementById("country").value = location.state.localclient.client.country;
+        }
+    }
+
     const getOfficesList = () => {
         if (location.state != null) {
-            if (location.state.localclient != undefined) {
-                setClientDetailFromDB(location.state.localclient.client)
-                setAdminDetail(location.state.localclient.admin[0]);
-            }
-            //get client offices and pass to setting screen
-            //const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImlhdCI6MTY5MzI5MTY4OH0.eyJzZXJ2aWNlQ29uc3VtZXJJZCI6MTMzNywidHlwZUlkIjo0LCJjbGllbnRJZCI6MTAyNjN9.1-9mYean_qX58r6ykhP545Y3r8IGK53PgDOoyIja8YM';
-            // Replace with your actual token
+            readStateElements();
 
+            //get client offices and pass to setting screen
+            // Replace with your actual token
             const config = {
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -124,6 +130,7 @@ export const ClientSettings = (props) => {
     }
 
     const saveClientDetail = async (e) => {
+        _client.clientid = clientDetailFromDB.clientid != undefined ? clientDetailFromDB.clientid : 0;
         _client.whiseClientid = clientDetail.id
         _client.commercialName = document.getElementById("commercialName").value;
         _client.activationStatus = document.getElementById("status").value;
@@ -132,6 +139,7 @@ export const ClientSettings = (props) => {
         _client.boxNumber = document.getElementById("box").value;
         _client.zipCode = document.getElementById("zipcode").value;
         _client.city = document.getElementById("city").value;
+        _client.country = document.getElementById("country").value;
         _client.email = document.getElementById("email").value;
         _client.phoneNumber = document.getElementById("phoneNumber").value;
         _client.website = document.getElementById("website").value;
@@ -157,6 +165,7 @@ export const ClientSettings = (props) => {
             if (location.state.localclient == undefined) {
                 location.state.localclient = { client: jsonData };
                 setClientDetail(location.state);
+                setClientDetailFromDB(location.state.localclient.client)
             }
 
             _admin.clientid = clientId;
@@ -228,12 +237,12 @@ export const ClientSettings = (props) => {
                     </div>
                     <div className="col-sm-12 col-md-4 mb-0">
                         <label>Status</label>
-                        <select className="form-select" id="status" defaultValue={clientDetailFromDB.activationStatus}>
-                            <option value="Pending">Pending</option>
-                            <option value="Demo">Demo</option>
-                            <option value="Activate">Activate</option>
-                            <option value="Suspended">Suspended</option>
-                            <option value="Deactivate">Deactivate</option>
+                        <select className="form-select" id="status">
+                            <option value="1">Pending</option>
+                            <option value="2">Demo</option>
+                            <option value="3">Activate</option>
+                            <option value="4">Suspended</option>
+                            <option value="5">Deactivate</option>
                         </select>
                     </div>
                 </div>
@@ -269,11 +278,12 @@ export const ClientSettings = (props) => {
                     </div>
                     <div className="col-sm-4 mb-3">
                         <label>Country List</label>
-                        <select className="form-select" id="country" defaultValue={clientDetailFromDB.country != undefined ? clientDetailFromDB.country : "german"}>
+                        <select className="form-select" id="country">
                             <option value="">Select an option</option>
-                            <option value="german">German</option>
-                            <option value="unitedstates">United States</option>
-                            <option value="russia">Russia</option>
+                            <option value="1">German</option>
+                            <option value="2">United States</option>
+                            <option value="3">Russia</option>
+                            <option value="4">France</option>
                         </select>
                     </div>
                     <div className="col-sm-4 mb-3">
@@ -328,7 +338,7 @@ export const ClientSettings = (props) => {
                 <div className="row">
                     <div className="col-sm-4 mb-3">
                         <label>CRM Name</label>
-                        <select className="form-select" id="crmName" defaultValue={clientDetailFromDB.comments}>
+                        <select className="form-select" id="crmName">
                             <option value="">Select an option</option>
                             <option value="Whise">Whise</option>
                             <option value="Omnicasa">Omnicasa</option>

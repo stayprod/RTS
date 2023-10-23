@@ -32,7 +32,7 @@ namespace TriggerService
     {
         string prefrences = "all";
         bool smtpflage = true;
-        
+
         static TimeSpan CreateTimeSpan(string flag, int value)
         {
             switch (flag)
@@ -84,20 +84,20 @@ namespace TriggerService
         {
             _logger = logger;
             _httpClient = new HttpClient();
-            
+
             configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json")
                 .Build();
 
-            Worker.appGeneralSettings = configuration.GetSection("AppGeneralSettings").Get<AppGeneralSettings>();            
+            Worker.appGeneralSettings = configuration.GetSection("AppGeneralSettings").Get<AppGeneralSettings>();
         }
         private async Task<string> GetTokenAsync()
         {
             try
             {
                 ClientSetting clientSettings = configuration.GetSection("WhiseClientCredential").Get<ClientSetting>();
-              
+
                 // Prepare the request content
                 var requestContent = new StringContent(
                             "{\"username\": \"" + clientSettings.ClientName + "\", \"password\": \"" + clientSettings.Password + "\"}",
@@ -121,7 +121,7 @@ namespace TriggerService
             }
             catch (Exception exp)
             {
-                Worker.LogMessage("Error while getting token from WHISE "+ exp.Message);
+                Worker.LogMessage("Error while getting token from WHISE " + exp.Message);
                 throw;
             }
         }
@@ -208,7 +208,7 @@ namespace TriggerService
                 throw;
             }
         }
-                
+
         public static void LogMessage(string message)
         {
             try
@@ -256,7 +256,7 @@ namespace TriggerService
                 while (!stoppingToken.IsCancellationRequested)
                 {
                     Worker.LogMessage("---------------------RTS Service processing is in iterations------------------");
-                    
+
                     //1 - you collect all calendar event
                     var appointments = await GetTodaysAppointmentsAsync(whiseToken);// for all clients
                     var EstateList = await GetEstateListAsync(whiseToken);
@@ -284,7 +284,7 @@ namespace TriggerService
                             var triggerList = clientObj.triggers.ToList();
                             if (clientObj.client.ActivationStatus != "deactivated")// && clientObj.client.ActivationStatus != "deactivated")
                             {
-                                Worker.LogMessage("Control passed from Activation Status(client("+ clientObj.client.WhiseClientid + "  " + clientObj.client.CommercialName + ") is not deactivated)");
+                                Worker.LogMessage("Control passed from Activation Status(client(" + clientObj.client.WhiseClientid + "  " + clientObj.client.CommercialName + ") is not deactivated)");
                                 foreach (var trigger in triggerList)
                                 {
                                     //2 - For each calendar event you will start by looking to the estate related to this event
@@ -298,7 +298,8 @@ namespace TriggerService
                                         //WITH THIS OFFICE ID you know now which trigger rules you need to follow
                                         // TriggerType == "1" mean email and 2 mean sms
                                         if (appointmentObj.estates != null &&
-                                            trigger.TriggerType == "1" &&
+                                            trigger.TriggerType == "1" && // 1 means email and 2 means sms
+                                            trigger.TargetParticipant1 == "1" && // 1 means there are some partipents and 2 means no partipents
                                             trigger.WhiseOfficeid == appointmentObj.Users[0].OfficeId &&
                                             Convert.ToDateTime(trigger.CreatedOn) + timeSpan1 > appointmentObj.CreateDateTime)
                                         {
@@ -311,6 +312,13 @@ namespace TriggerService
                                                     //4-THEN back to the calendar event you look to the action ID and you compare if this actionid is mapped to any of the triggers of this office
                                                     // here action id is AppointmentType
                                                     //5-THEN you will check if there is condition related to the estate transaction type and or transaction status
+                                                    if (appointmentObj.Contacts == null)
+                                                    {
+                                                        string emailbody = $"<h2>Error</h2><br><p>There is no contact exist <strong>against this userID {appointmentObj.Users[0].UserId} userName {appointmentObj.Users[0].FirstName} Email {appointmentObj.Users[0].Email} </strong></p>";
+                                                        //if no contact then you send a error message to the user's email
+                                                        await _emailService.SendEmailAsync(appointmentObj.Users[0].Email, "error", emailbody);
+                                                        LogMessage("error email send successfully from mandrill to " + appointmentObj.Users[0].Email);
+                                                    }
                                                     if (appointmentObj.Action.Id == int.Parse(trigger.AppointmentType) &&
                                                         estateListObj.purpose.Id == int.Parse(trigger.TransactionType) &&
                                                         estateListObj.purposeStatus.Id == int.Parse(trigger.TransactionStatus) &&
@@ -351,8 +359,8 @@ namespace TriggerService
                                                                 { "contactid",$"{contact.ContactId}"},
                                                                 { "lessorestimation","1"},
                                                                 { "npssatisfication","0"},
-                                                            }; 
-                                                          
+                                                            };
+
                                                             string pattern = @"\{([^}]+)\}";
                                                             ////////////////
                                                             string outputString = Regex.Replace(link, pattern, match =>
@@ -365,24 +373,29 @@ namespace TriggerService
                                                                 // If no replacement is found, keep the original placeholder
                                                                 return match.Value;
                                                             });
-                                                       
+
                                                             string etext = "";
+                                                            string subject = "";
+
                                                             switch (contact.LanguageId)
                                                             {
                                                                 case "fr-BE":
                                                                     etext = trigger.TexteFrench;
+                                                                    subject = "Évaluez notre entreprise!";
                                                                     break;
                                                                 case "en-GB":
                                                                     etext = trigger.TexteEnglish;
+                                                                    subject = "Evaluate our company!";
                                                                     break;
-                                                                case "nl-de":
+                                                                case "nl-BE":
                                                                     etext = trigger.TexteDutch;
+                                                                    subject = "Uw mening telt !";
                                                                     break;
                                                             }
                                                             prefrences = trigger.ContactPreference;
                                                             Dictionary<string, string> emailBodyLayout = new Dictionary<string, string>
                                                             {
-                                                                { "name", (contact.FirstName == null) ? "" : contact.FirstName },
+                                                                { "name", (contact.FirstName == null) ? contact.Name : contact.FirstName },
                                                                 { "texte", etext},
                                                                 { "link", outputString },
                                                                 { "signature", "signature"},
@@ -400,7 +413,7 @@ namespace TriggerService
                                                             var logdetailsforcurrentClientOffice = con.RtsEmailLog.Where(l => l.CalenderActonId == appointmentObj.Id && l.ContactId == contact.ContactId).FirstOrDefault();
                                                             //string emailbody = string.Format(etext, contact.FirstName, outputString);
                                                             string emailbody = layoutAfterAddingPlaceholders;
-                                                            
+
                                                             if (logdetailsforcurrentClientOffice == null)
                                                             {
                                                                 if (office_settings != null && office_settings.SmtpSettingid == 1)
@@ -422,7 +435,7 @@ namespace TriggerService
                                                                             // Send to both private and business email
                                                                             if (contact.PrivateEmail != null)
                                                                             {
-                                                                                bool isEmailSend = SendEmailobj.emailSend(contact.PrivateEmail, "Subject", emailbody, smtp_settings, true);
+                                                                                bool isEmailSend = SendEmailobj.emailSend(contact.PrivateEmail, subject, emailbody, smtp_settings, true);
                                                                                 if (isEmailSend)
                                                                                 {
                                                                                     insertLog(trigger.OfficeTriggerid, contact.PrivateEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
@@ -433,7 +446,7 @@ namespace TriggerService
                                                                             }
                                                                             if (contact.businessEmail != null)
                                                                             {
-                                                                                bool isSecondEmailSend = SendEmailobj.emailSend(contact.businessEmail, "Subject", emailbody, smtp_settings, true);
+                                                                                bool isSecondEmailSend = SendEmailobj.emailSend(contact.businessEmail, subject, emailbody, smtp_settings, true);
                                                                                 if (isSecondEmailSend)
                                                                                 {
                                                                                     insertLog(trigger.OfficeTriggerid, contact.businessEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
@@ -456,7 +469,7 @@ namespace TriggerService
                                                                     if (prefrences != "all")
                                                                     {
                                                                         // Send the email based on the selected option
-                                                                        bool isEmailSend = SendEmailobj.emailSend(recipientEmail, "Subject", emailbody, smtp_settings, true);
+                                                                        bool isEmailSend = SendEmailobj.emailSend(recipientEmail, subject, emailbody, smtp_settings, true);
                                                                         if (isEmailSend)
                                                                         {
                                                                             insertLog(trigger.OfficeTriggerid, recipientEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
@@ -474,10 +487,10 @@ namespace TriggerService
                                                                     {
                                                                         case "all":
                                                                             // Send to both private and business email
-                                                                            await _emailService.SendEmailAsync(contact.PrivateEmail, "Subject", emailbody);
+                                                                            await _emailService.SendEmailAsync(contact.PrivateEmail, subject, emailbody);
                                                                             insertLog(trigger.OfficeTriggerid, contact.PrivateEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
                                                                             Worker.LogMessage("email send successfully from mandrill using private email to " + contact.PrivateEmail);
-                                                                            await _emailService.SendEmailAsync(contact.businessEmail, "Subject", emailbody);
+                                                                            await _emailService.SendEmailAsync(contact.businessEmail, subject, emailbody);
                                                                             insertLog(trigger.OfficeTriggerid, contact.businessEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
                                                                             Worker.LogMessage("email send successfully from mandrill using business email to  " + contact.businessEmail);
                                                                             break;
@@ -495,9 +508,9 @@ namespace TriggerService
                                                                     if (prefrences != "all")
                                                                     {
                                                                         // Send the email based on the selected option
-                                                                        //await _emailService.SendEmailAsync(toEmail, "Subject", emailbody);
+                                                                        await _emailService.SendEmailAsync(recipientEmail, subject, emailbody);
                                                                         insertLog(trigger.OfficeTriggerid, recipientEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
-                                                                        Worker.LogMessage("Email send successfully from mandrill to " + toEmail);
+                                                                        Worker.LogMessage("Email send successfully from mandrill to " + recipientEmail);
                                                                     }
                                                                 }
                                                             }
@@ -505,10 +518,7 @@ namespace TriggerService
                                                     }
                                                     else
                                                     {
-                                                        string emailbody = $"<h2>Error</h2><br><p>There is no contact exist <strong>against this userID {appointmentObj.Users[0].UserId} userName {appointmentObj.Users[0].FirstName} Email {appointmentObj.Users[0].Email} </strong></p>";
-                                                        //if no contact then you send a error message to the user's email
-                                                        await _emailService.SendEmailAsync(appointmentObj.Users[0].Email, "Subject", emailbody);
-                                                        LogMessage("error email send successfully from mandrill to " + appointmentObj.Users[0].Email);
+                                                        Worker.LogMessage("Client(" + clientObj.client.CommercialName + ") control cannot pass from Transaction checks");
                                                     }
                                                 }
 
@@ -519,10 +529,10 @@ namespace TriggerService
                             }
                             else
                             {
-                                Worker.LogMessage("Client("+ clientObj.client.CommercialName + ") status is deactivated");
+                                Worker.LogMessage("Client(" + clientObj.client.CommercialName + ") status is deactivated");
                             }
                         }
-                    }            
+                    }
 
                     //_logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
                     await Task.Delay(TimeSpan.FromMinutes(Convert.ToDouble(Worker.appGeneralSettings.OccurrenceTimeInMinutes)), stoppingToken); // Append every 60 seconds

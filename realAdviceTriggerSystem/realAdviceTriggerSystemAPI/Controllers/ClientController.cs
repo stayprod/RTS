@@ -47,7 +47,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
             {
                 using (var con = new RealadviceTriggeringSystemContext())
                 {
-                    Client? _client = con.Clients.Where(c => c.WhiseClientid == client.WhiseClientid).FirstOrDefault();
+                    Client? _client = con.Clients.Where(c => c.Clientid == client.Clientid).FirstOrDefault();
 
                     if (_client != null)
                     {

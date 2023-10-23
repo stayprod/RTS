@@ -1,6 +1,6 @@
 ﻿export const variables = {
-    //API_URL: "https://localhost:7139/api/"
-    API_URL: "http://localhost:54372/api/"
+    API_URL: "https://localhost:7139/api/"
+    //API_URL: "http://localhost:54372/api/"
 };
 
 export const validEmail = new RegExp(
@@ -35,4 +35,12 @@ export const EnumobjKeyMoments = {
 export const EnumobjParticipentType = {
     "1": "Participant",
     "2": "No Participant"
+};
+
+export const EnumobjClientStatus = {
+    "1": "Pending",
+    "2": "Demo",
+    "3": "Activate",
+    "4": "Suspended",
+    "5": "Deactivate"
 };
