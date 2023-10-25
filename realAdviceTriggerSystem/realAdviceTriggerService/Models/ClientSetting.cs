@@ -20,5 +20,6 @@ namespace TriggerService.Models
     {
         public string LogFileName { get; set; }
         public string OccurrenceTimeInMinutes { get; set; }
+        public int TimeZoneDifferenceInHours { get; set; }
     }
 } 
