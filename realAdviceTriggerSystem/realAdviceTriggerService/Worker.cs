@@ -333,7 +333,7 @@ namespace TriggerService
                         foreach (var clientObj in result)
                         {
                             var triggerList = clientObj.triggers.ToList();
-                            // five options in list of status manu
+                            // five options in list 
                             //1=pending
                             // 2=demo
                             // 3=activate
@@ -349,16 +349,21 @@ namespace TriggerService
                                     foreach (var appointmentObj in appointments.Calendars)
                                     {
                                         // get trigger duration set for current appointment
-                                        TimeSpan timeSpan1 = CreateTimeSpan(trigger.DurationType, (int)trigger.DurationValue);
+                                        TimeSpan triggerSettingTimeSpan = CreateTimeSpan(trigger.DurationType, (int)trigger.DurationValue);
                                         // check here there must be a estate object , office id should be same and time period is passed of setting like 1hour,1 day etc
                                         //3-if estate associate => you collect the information about the office link to that estate
                                         //WITH THIS OFFICE ID you know now which trigger rules you need to follow
                                         // TriggerType == "1" mean email and 2 mean sms
+                                        DateTime createdOn = appointmentObj.CreateDateTime;
+                                        DateTime appointmentTime = createdOn.AddHours(Worker.appGeneralSettings.TimeZoneDifferenceInHours);
+                                        DateTime currentTime = DateTime.Now;
+                                        TimeSpan timeDifference = currentTime - appointmentTime;
+                                        Console.WriteLine(Convert.ToDateTime(trigger.CreatedOn) + "    " + appointmentTime +"    "+ triggerSettingTimeSpan);
                                         if (appointmentObj.estates != null &&
                                             trigger.TriggerType == "1" && // 1 means email and 2 means sms
                                             trigger.TargetParticipant1 == "1" && // 1 means there are some partipents and 2 means no partipents
                                             trigger.WhiseOfficeid == appointmentObj.Users[0].OfficeId &&
-                                            Convert.ToDateTime(trigger.CreatedOn) + timeSpan1 > appointmentObj.CreateDateTime)
+                                            timeDifference >= triggerSettingTimeSpan)
                                         {
                                             Worker.LogMessage("control passed from same office id and time check");
                                             foreach (var estateListObj in EstateList.estates)
@@ -373,9 +378,11 @@ namespace TriggerService
                                                     {
                                                         string emailbody = $"<h2>Error</h2><br><p>There is no contact exist <strong>against this userID {appointmentObj.Users[0].UserId} userName {appointmentObj.Users[0].FirstName} Email {appointmentObj.Users[0].Email} </strong></p>";
                                                         //if no contact then you send a error message to the user's email
-                                                        //await _emailService.SendEmailAsync("Umarfarooq3540@gmail.com", "error", emailbody);
-                                                        await _emailService.SendEmailAsync(appointmentObj.Users[0].Email, "error", emailbody);
-                                                        LogMessage("error email send successfully from mandrill to " + appointmentObj.Users[0].Email);
+                                                        bool response = await _emailService.SendEmailAsync(appointmentObj.Users[0].Email, "error", emailbody);
+                                                        if (response)
+                                                        {
+                                                            LogMessage("error email send successfully from mandrill to " + appointmentObj.Users[0].Email);
+                                                        }
                                                     }
                                                     if (appointmentObj.Action.Id == int.Parse(trigger.AppointmentType) &&
                                                         estateListObj.purpose.Id == int.Parse(trigger.TransactionType) &&
@@ -502,18 +509,19 @@ namespace TriggerService
                                                                             if (contact.PrivateEmail != null)
                                                                             {
                                                                                 bool isEmailSend = SendEmailobj.emailSend(contact.PrivateEmail, subject, emailbody, smtp_settings, true);
-                                                                                //bool isEmailSend = SendEmailobj.emailSend("umarfarooq3540@gmail.com", subject, emailbody, smtp_settings, true);
                                                                                 if (isEmailSend)
                                                                                 {
                                                                                     insertLog(trigger.OfficeTriggerid, contact.PrivateEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
 
                                                                                     Worker.LogMessage("email send successfully using private email to " + contact.PrivateEmail);
                                                                                 }
-
+                                                                                else
+                                                                                {
+                                                                                    Worker.LogMessage("email is not sent to email " + contact.PrivateEmail + " - error while sending SMTP settings");
+                                                                                }
                                                                             }
                                                                             if (contact.businessEmail != null)
                                                                             {
-                                                                                //bool isSecondEmailSend = SendEmailobj.emailSend("umarfarooq3540@gmail.com", subject, emailbody, smtp_settings, true);
                                                                                 bool isSecondEmailSend = SendEmailobj.emailSend(contact.businessEmail, subject, emailbody, smtp_settings, true);
                                                                                 if (isSecondEmailSend)
                                                                                 {
@@ -538,7 +546,6 @@ namespace TriggerService
                                                                     {
                                                                         // Send the email based on the selected option
                                                                         bool isEmailSend = SendEmailobj.emailSend(recipientEmail, subject, emailbody, smtp_settings, true);
-                                                                        //bool isEmailSend = SendEmailobj.emailSend("umarfarooq3540@gmail.com", subject, emailbody, smtp_settings, true);
                                                                         if (isEmailSend)
                                                                         {
                                                                             insertLog(trigger.OfficeTriggerid, recipientEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
@@ -556,14 +563,25 @@ namespace TriggerService
                                                                     {
                                                                         case "all":
                                                                             // Send to both private and business email
-                                                                            await _emailService.SendEmailAsync(contact.PrivateEmail, subject, emailbody);
-                                                                            //await _emailService.SendEmailAsync("Umarfarooq3540@gmail.com", subject, emailbody);
-                                                                            insertLog(trigger.OfficeTriggerid, contact.PrivateEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
-                                                                            Worker.LogMessage("email send successfully from mandrill using private email to " + contact.PrivateEmail);
-                                                                            await _emailService.SendEmailAsync(contact.businessEmail, subject, emailbody);
-                                                                            //await _emailService.SendEmailAsync("Umarfarooq3540@gmail.com", subject, emailbody);
-                                                                            insertLog(trigger.OfficeTriggerid, contact.businessEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
-                                                                            Worker.LogMessage("email send successfully from mandrill using business email to  " + contact.businessEmail);
+                                                                            if (!string.IsNullOrEmpty(contact.PrivateEmail))
+                                                                            {
+                                                                                bool response = await _emailService.SendEmailAsync(contact.PrivateEmail, subject, emailbody);
+                                                                                if (response)
+                                                                                {
+                                                                                    insertLog(trigger.OfficeTriggerid, contact.PrivateEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
+                                                                                    Worker.LogMessage("email send successfully from mandrill using private email to " + contact.PrivateEmail);
+                                                                                }
+                                                                            }
+                                                                            if (!string.IsNullOrEmpty(contact.businessEmail))
+                                                                            {
+                                                                                bool secondresponse = await _emailService.SendEmailAsync(contact.businessEmail, subject, emailbody);
+                                                                                if (secondresponse)
+                                                                                {
+                                                                                    insertLog(trigger.OfficeTriggerid, contact.businessEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
+                                                                                    Worker.LogMessage("email send successfully from mandrill using business email to  " + contact.businessEmail);
+                                                                                }
+                                                                            }
+                                                                            
                                                                             break;
                                                                         case "private":
                                                                             recipientEmail = contact.PrivateEmail;
@@ -576,13 +594,19 @@ namespace TriggerService
                                                                             return;
                                                                     }
 
-                                                                    if (prefrences != "all")
+                                                                    if (prefrences != "all" && !string.IsNullOrEmpty(recipientEmail))
                                                                     {
                                                                         // Send the email based on the selected option
-                                                                        await _emailService.SendEmailAsync(recipientEmail, subject, emailbody);
-                                                                        //await _emailService.SendEmailAsync("Umarfarooq3540@gmail.com", subject, emailbody);
-                                                                        insertLog(trigger.OfficeTriggerid, recipientEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
-                                                                        Worker.LogMessage("Email send successfully from mandrill to " + recipientEmail);
+                                                                        bool response = await _emailService.SendEmailAsync(recipientEmail, subject, emailbody);
+                                                                        if (response)
+                                                                        {
+                                                                            insertLog(trigger.OfficeTriggerid, recipientEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
+                                                                            Worker.LogMessage("Email send successfully from mandrill to " + recipientEmail);
+                                                                        }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        Worker.LogMessage("Client(" + clientObj.client.CommercialName + ") prefrence email does not exist");
                                                                     }
                                                                 }
                                                             }

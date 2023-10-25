@@ -1024,7 +1024,7 @@ export const Trigger = (props) => {
                                             buttonList: editorButtons
                                         }}
                                     />
-                                    <button className="btn-site mt-3">View</button>
+                                    {/*<button className="btn-site mt-3">View</button>*/}
                                 </div>
                             </div>
                         </Tab>

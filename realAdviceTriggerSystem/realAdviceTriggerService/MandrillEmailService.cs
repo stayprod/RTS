@@ -21,7 +21,7 @@ public class MandrillEmailService
         mandrillAppSettings = configuration.GetSection("MandrillSettings").Get<MandrillApiKey>();
     }
 
-    public async Task SendEmailAsync(string toEmail, string subject, string message)
+    public async Task<bool> SendEmailAsync(string toEmail, string subject, string message)
     {
         var mandrillApiUrl = mandrillAppSettings.ApiUrl;
 
@@ -47,11 +47,22 @@ public class MandrillEmailService
         try
         {
             var response = await httpClient.PostAsJsonAsync(mandrillApiUrl, emailContent);
-            response.EnsureSuccessStatusCode();
+            if (response.IsSuccessStatusCode)
+            {
+                // Email sent successfully
+                return true;
+            }
+            else
+            {
+                // Email sending failed
+                Worker.LogMessage($"Failed to send email through Mandrill. Status Code: {response.StatusCode}");
+                return false;
+            }
         }
         catch (HttpRequestException ex)
         {
-            Worker.LogMessage($"Error while sending email through manrdill: {ex.Message}");
+            Worker.LogMessage($"Error while sending email through Mandrill: {ex.Message}");
+            return false;
         }
     }
 }

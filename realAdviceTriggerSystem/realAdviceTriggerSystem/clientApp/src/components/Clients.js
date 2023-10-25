@@ -27,7 +27,7 @@ export const Clients = (props) => {
 
         document.querySelector("#" + id).classList.toggle("hidden");
         document.querySelector("#" + id).classList.contains("hidden") ?
-            e.target.textContent = 'SEE OFFICES +' : e.target.textContent = 'SEE OFFICES -'
+            e.target.textContent = 'See Offices +' : e.target.textContent = 'See Offices -'
         setShowAppended(prevState => !prevState);
     };
 
@@ -146,7 +146,7 @@ export const Clients = (props) => {
                                     Settings
                                 </button>
                                 <button className="btn-site-expand expand-button" onClick={handleClick} clientid={item.id} key={index} id={`button-${index}`}>
-                                    SEE OFFICES <span className={`expand-icon${index}`} id={`expand-button${index}`}>+</span>
+                                    See Offices <span className={`expand-icon${index}`} id={`expand-button${index}`}>+</span>
                                 </button>
                             </div>
                         </div>
