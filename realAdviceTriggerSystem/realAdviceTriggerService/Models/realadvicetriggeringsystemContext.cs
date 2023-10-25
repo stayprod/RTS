@@ -324,6 +324,24 @@ namespace realAdviceTriggerSystemService.Models
 
                 entity.Property(e => e.DurationValue).HasColumnName("duration_value");
 
+                entity.Property(e => e.DutchSubject)
+                    .HasColumnName("dutch_subject")
+                    .HasColumnType("text")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
+
+                entity.Property(e => e.EnglishSubject)
+                    .HasColumnName("english_subject")
+                    .HasColumnType("text")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
+
+                entity.Property(e => e.FrenchSubject)
+                    .HasColumnName("french_subject")
+                    .HasColumnType("text")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
+
                 entity.Property(e => e.KeyMoment)
                     .HasColumnName("key_moment")
                     .HasColumnType("varchar(200)")

@@ -103,6 +103,9 @@ namespace realAdviceTriggerSystemAPI.Controllers
                         _trigger.TexteFrench = officeTrigger.TexteFrench;
                         _trigger.TexteDutch = officeTrigger.TexteDutch;
                         _trigger.ContactPreference = officeTrigger.ContactPreference;
+                        _trigger.EnglishSubject = officeTrigger.EnglishSubject;
+                        _trigger.FrenchSubject = officeTrigger.FrenchSubject;
+                        _trigger.DutchSubject = officeTrigger.DutchSubject;
                         con.SaveChanges();
                     }
                     else

@@ -269,6 +269,15 @@ public partial class RealadviceTriggeringSystemContext : DbContext
             entity.Property(e => e.DurationValue)
                 .HasColumnType("int(11)")
                 .HasColumnName("duration_value");
+            entity.Property(e => e.DutchSubject)
+                .HasColumnType("text")
+                .HasColumnName("dutch_subject");
+            entity.Property(e => e.EnglishSubject)
+                .HasColumnType("text")
+                .HasColumnName("english_subject");
+            entity.Property(e => e.FrenchSubject)
+                .HasColumnType("text")
+                .HasColumnName("french_subject");
             entity.Property(e => e.KeyMoment)
                 .HasMaxLength(200)
                 .HasColumnName("key_moment");

@@ -94,7 +94,15 @@ namespace realAdviceTriggerSystemService.Models
         public int TotalCount { get; set; }
         public bool IsValidRequest { get; set; }
     }
-
+    public class countryList
+    {
+        public List<countries> countries { get; set; }
+    }
+    public class countries
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
     public class Action
     {
         public int Id { get; set; }

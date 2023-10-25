@@ -44,3 +44,21 @@ export const EnumobjClientStatus = {
     "4": "Suspended",
     "5": "Deactivate"
 };
+
+
+
+export const editorButtons = [
+    // default
+    ['undo', 'redo'],
+    ['font', 'fontSize', 'formatBlock', 'align', 'lineHeight'],
+    ['paragraphStyle', 'blockquote'],
+    ['bold', 'underline', 'italic', 'list', 'strike', 'subscript', 'superscript'],
+    ['fontColor', 'hiliteColor', 'textStyle'],
+    ['removeFormat'],
+    ['outdent', 'indent'],
+    ['horizontalRule'],
+    ['table', 'link', 'image', 'video', 'audio'],
+    ['imageGallery'],
+    ['fullScreen', 'showBlocks', 'codeView'],
+    ['preview', 'print']
+]

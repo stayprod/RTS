@@ -22,7 +22,7 @@ export const PimcoreSettings = (props) => {
                             defaultValue={item.firstName}
                             onInput={resetRequireField}
                             key={item.firstName}
-                            settingObj={JSON.stringify(item)}
+                            settingobj={JSON.stringify(item)}
                             parentid={"row-" + i}
                             onBlur={onBlurHandler}
                         />
@@ -35,7 +35,7 @@ export const PimcoreSettings = (props) => {
                             id={"pimcoreLName" + i}
                             defaultValue={item.lastName}
                             key={item.lastName}
-                            settingObj={JSON.stringify(item)}
+                            settingobj={JSON.stringify(item)}
                             parentid={"row-" + i}
                             onBlur={onBlurHandler}
                         />
@@ -49,7 +49,7 @@ export const PimcoreSettings = (props) => {
                             defaultValue={item.loginId}
                             onInput={resetRequireField}
                             key={item.loginId}
-                            settingObj={JSON.stringify(item)}
+                            settingobj={JSON.stringify(item)}
                             parentid={"row-" + i}
                             onBlur={onBlurHandler}
                         />

@@ -23,6 +23,8 @@ using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis.Operations;
 using System.Collections;
 using static TriggerService.Worker;
+using System.ComponentModel;
+using System.Xml.Linq;
 //using Newtonsoft.Json;
 //using JSON.Net;
 
@@ -67,7 +69,7 @@ namespace TriggerService
             new Country(4, "Australia"),
             new Country(5, "Germany")
         };
-
+        string currentCountry = "";
 
         List<Clients> clients = new List<Clients>();
         Clients cli = new Clients();
@@ -209,6 +211,54 @@ namespace TriggerService
             }
         }
 
+
+        private async Task<countryList> GetCountryList(string token)
+        {
+            try
+            {
+                // Prepare the request headers
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                // Build the request URL
+                var apiUrl = "https://api.whise.eu/v1/estates/usedcountries/list";
+                string requestBody = "{\"EstateFilter\": {\"WithRefDescriptions\": true}}";
+                HttpContent requestContent = new StringContent(requestBody, Encoding.UTF8, "application/json");
+
+                // Prepare the request content (JSON data)
+                var today = DateTime.UtcNow.Date;
+                var requestData = new
+                {
+                    EstateFilter = new
+                    {
+                        WithRefDescriptions = new[] { "true" }
+                    }
+                };
+                var json = JsonConvert.SerializeObject(requestData);
+                var requestContent1 = new StringContent(json, Encoding.UTF8, "application/json");
+
+                // Send the POST request to retrieve Estate
+                var response = await _httpClient.PostAsync(apiUrl, requestContent);
+
+                // Ensure a successful response
+                response.EnsureSuccessStatusCode();
+
+                // Read the response content
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                // Deserialize the response JSON into a list of Estate objects
+
+                countryList EstateResponse = JsonConvert.DeserializeObject<countryList>(responseContent);
+
+
+                return EstateResponse;
+            }
+            catch (Exception exp)
+            {
+                Worker.LogMessage("Error while calling method GetCountryListAsync (whise) " + exp.Message);
+                throw;
+            }
+        }
         public static void LogMessage(string message)
         {
             try
@@ -260,6 +310,7 @@ namespace TriggerService
                     //1 - you collect all calendar event
                     var appointments = await GetTodaysAppointmentsAsync(whiseToken);// for all clients
                     var EstateList = await GetEstateListAsync(whiseToken);
+                    var countryList = await GetCountryList(whiseToken);
                     using (var con = new realadvicetriggeringsystemContext())
                     {
                         List<Clients> clients = con.Clients.ToList();
@@ -282,7 +333,13 @@ namespace TriggerService
                         foreach (var clientObj in result)
                         {
                             var triggerList = clientObj.triggers.ToList();
-                            if (clientObj.client.ActivationStatus != "deactivated")// && clientObj.client.ActivationStatus != "deactivated")
+                            // five options in list of status manu
+                            //1=pending
+                            // 2=demo
+                            // 3=activate
+                            // 4=suspended
+                            // 5=deactivate
+                            if (clientObj.client.ActivationStatus != "5")// && clientObj.client.ActivationStatus != "deactivated")
                             {
                                 Worker.LogMessage("Control passed from Activation Status(client(" + clientObj.client.WhiseClientid + "  " + clientObj.client.CommercialName + ") is not deactivated)");
                                 foreach (var trigger in triggerList)
@@ -316,6 +373,7 @@ namespace TriggerService
                                                     {
                                                         string emailbody = $"<h2>Error</h2><br><p>There is no contact exist <strong>against this userID {appointmentObj.Users[0].UserId} userName {appointmentObj.Users[0].FirstName} Email {appointmentObj.Users[0].Email} </strong></p>";
                                                         //if no contact then you send a error message to the user's email
+                                                        //await _emailService.SendEmailAsync("Umarfarooq3540@gmail.com", "error", emailbody);
                                                         await _emailService.SendEmailAsync(appointmentObj.Users[0].Email, "error", emailbody);
                                                         LogMessage("error email send successfully from mandrill to " + appointmentObj.Users[0].Email);
                                                     }
@@ -344,7 +402,14 @@ namespace TriggerService
                                                             // survey link
                                                             string link = trigger.SurveyLink;
                                                             // Dictionary to store placeholder replacements
-                                                            Country cntry = countries.FirstOrDefault(c => c.Id == contact.Country.Id);
+                                                            //Country cntry = countries.FirstOrDefault(c => c.Id == contact.Country.Id);
+                                                            foreach (var ccountry in countryList.countries)
+                                                            {
+                                                                if (ccountry.Id == contact.Country.Id)
+                                                                {
+                                                                    currentCountry = ccountry.Name; break;
+                                                                }
+                                                            }
                                                             Dictionary<string, string> replacements = new Dictionary<string, string>
                                                             {
                                                                 { "firstName", (contact.FirstName==null)?"":contact.FirstName },
@@ -354,7 +419,7 @@ namespace TriggerService
                                                                 { "agent", $"{appointmentObj.Users[0].UserId}"},
                                                                 { "zip", $"{contact.zip}"},
                                                                 { "officeid",$"{appointmentObj.estates[0].officeId}"},
-                                                                { "country",$"{cntry}"},
+                                                                { "country",$"{currentCountry}"},
                                                                 { "loginofficeid",$"{appointmentObj.Users[0].UserId}"},
                                                                 { "contactid",$"{contact.ContactId}"},
                                                                 { "lessorestimation","1"},
@@ -381,23 +446,24 @@ namespace TriggerService
                                                             {
                                                                 case "fr-BE":
                                                                     etext = trigger.TexteFrench;
-                                                                    subject = "Évaluez notre entreprise!";
+                                                                    subject = trigger.FrenchSubject;
                                                                     break;
                                                                 case "en-GB":
                                                                     etext = trigger.TexteEnglish;
-                                                                    subject = "Evaluate our company!";
+                                                                    subject = trigger.EnglishSubject;
                                                                     break;
                                                                 case "nl-BE":
                                                                     etext = trigger.TexteDutch;
-                                                                    subject = "Uw mening telt !";
+                                                                    subject = trigger.DutchSubject;
                                                                     break;
                                                             }
+                                                            string url = "<a href=" + outputString + " >" + outputString + "</a>";
                                                             prefrences = trigger.ContactPreference;
                                                             Dictionary<string, string> emailBodyLayout = new Dictionary<string, string>
                                                             {
                                                                 { "name", (contact.FirstName == null) ? contact.Name : contact.FirstName },
                                                                 { "texte", etext},
-                                                                { "link", outputString },
+                                                                { "link", url },
                                                                 { "signature", "signature"},
                                                             };
                                                             string layoutAfterAddingPlaceholders = Regex.Replace(layout.LayoutDetail, pattern, match =>
@@ -436,6 +502,7 @@ namespace TriggerService
                                                                             if (contact.PrivateEmail != null)
                                                                             {
                                                                                 bool isEmailSend = SendEmailobj.emailSend(contact.PrivateEmail, subject, emailbody, smtp_settings, true);
+                                                                                //bool isEmailSend = SendEmailobj.emailSend("umarfarooq3540@gmail.com", subject, emailbody, smtp_settings, true);
                                                                                 if (isEmailSend)
                                                                                 {
                                                                                     insertLog(trigger.OfficeTriggerid, contact.PrivateEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
@@ -446,6 +513,7 @@ namespace TriggerService
                                                                             }
                                                                             if (contact.businessEmail != null)
                                                                             {
+                                                                                //bool isSecondEmailSend = SendEmailobj.emailSend("umarfarooq3540@gmail.com", subject, emailbody, smtp_settings, true);
                                                                                 bool isSecondEmailSend = SendEmailobj.emailSend(contact.businessEmail, subject, emailbody, smtp_settings, true);
                                                                                 if (isSecondEmailSend)
                                                                                 {
@@ -470,6 +538,7 @@ namespace TriggerService
                                                                     {
                                                                         // Send the email based on the selected option
                                                                         bool isEmailSend = SendEmailobj.emailSend(recipientEmail, subject, emailbody, smtp_settings, true);
+                                                                        //bool isEmailSend = SendEmailobj.emailSend("umarfarooq3540@gmail.com", subject, emailbody, smtp_settings, true);
                                                                         if (isEmailSend)
                                                                         {
                                                                             insertLog(trigger.OfficeTriggerid, recipientEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
@@ -488,9 +557,11 @@ namespace TriggerService
                                                                         case "all":
                                                                             // Send to both private and business email
                                                                             await _emailService.SendEmailAsync(contact.PrivateEmail, subject, emailbody);
+                                                                            //await _emailService.SendEmailAsync("Umarfarooq3540@gmail.com", subject, emailbody);
                                                                             insertLog(trigger.OfficeTriggerid, contact.PrivateEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
                                                                             Worker.LogMessage("email send successfully from mandrill using private email to " + contact.PrivateEmail);
                                                                             await _emailService.SendEmailAsync(contact.businessEmail, subject, emailbody);
+                                                                            //await _emailService.SendEmailAsync("Umarfarooq3540@gmail.com", subject, emailbody);
                                                                             insertLog(trigger.OfficeTriggerid, contact.businessEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
                                                                             Worker.LogMessage("email send successfully from mandrill using business email to  " + contact.businessEmail);
                                                                             break;
@@ -509,6 +580,7 @@ namespace TriggerService
                                                                     {
                                                                         // Send the email based on the selected option
                                                                         await _emailService.SendEmailAsync(recipientEmail, subject, emailbody);
+                                                                        //await _emailService.SendEmailAsync("Umarfarooq3540@gmail.com", subject, emailbody);
                                                                         insertLog(trigger.OfficeTriggerid, recipientEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
                                                                         Worker.LogMessage("Email send successfully from mandrill to " + recipientEmail);
                                                                     }

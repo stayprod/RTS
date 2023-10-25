@@ -5,9 +5,9 @@ import { Row, Col, Nav, Form, Image, Button, Navbar, Dropdown, Container, ListGr
 import { MultiSelect } from "react-multi-select-component";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
-import "draftail/dist/draftail.css";
-import { convertToRaw, convertFromRaw } from "draft-js";
-import { convertFromHTML, convertToHTML } from "draft-convert";
+import SunEditor, { buttonList, height } from 'suneditor-react';
+import 'suneditor/dist/css/suneditor.min.css';
+
 import {
     DraftailEditor, BLOCK_TYPE, INLINE_STYLE, ENTITY_TYPE, UNDO_ICON,
     createEditorStateFromRaw,
@@ -15,7 +15,7 @@ import {
 } from "draftail";
 
 import { useToken } from './tokenContext';
-import { variables } from '../Variables';
+import { variables, editorButtons } from '../Variables';
 
 import { EmailLayoutModal } from './EmailLayout';
 
@@ -54,11 +54,6 @@ export const Trigger = (props) => {
     const [triggerDetail, setTriggerDetail] = useState({});
     const [suveryLinkForEmail, setSuveryLinkForEmail] = useState(["https://survey.realadvice.be/", "", "/?"]);
     const [contactPreference, setContactPreference] = useState("all");
-
-    const initEditorState = createEditorStateFromRaw();
-    const [editorStateEnglish, setEditorStateEnglish] = useState(initEditorState);
-    const [editorStateFrench, setEditorStateFrench] = useState(initEditorState);
-    const [editorStateDutch, setEditorStateDutch] = useState(initEditorState);
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -146,21 +141,13 @@ export const Trigger = (props) => {
         transactionType.value = trigger.transactionType;
         transactionStatus.value = trigger.transactionStatus;
 
-        //convert saved html into raw form and bind it with text editors
-        //let rawStateEngTexte = fromHTMLToRawText(trigger.texteEnglish);
-        //const latestEngEditorState = createEditorStateFromRaw(rawStateEngTexte);
-        //setEditorStateEnglish(latestEngEditorState);
         setEmailTexteEnglish(trigger.texteEnglish);
-
-        //let rawStateFrenchTexte = fromHTMLToRawText(trigger.texteFrench);
-        //const latestFrenchEditorState = createEditorStateFromRaw(rawStateFrenchTexte);
-        //setEditorStateFrench(latestFrenchEditorState);
         setEmailTexteFrench(trigger.texteFrench);
-
-        //let rawStateDutchTexte = fromHTMLToRawText(trigger.texteDutch);
-        //const latesDucthEditorState = createEditorStateFromRaw(rawStateDutchTexte);
-        //setEditorStateDutch(latesDucthEditorState);
         setEmailTexteDutch(trigger.texteDutch);
+
+        document.getElementById("texteEngSubject").value = trigger.englishSubject;
+        document.getElementById("texteFrSubject").value = trigger.frenchSubject;
+        document.getElementById("texteDuSubject").value = trigger.dutchSubject;
 
         if (trigger.contactPreference != '') {
             setContactPreference(trigger.contactPreference);
@@ -573,86 +560,6 @@ export const Trigger = (props) => {
         setSelectedTab(e);
     }
 
-    const exporterConfigForTexte = {
-        blockToHTML: (block) => {
-            if (block.type === BLOCK_TYPE.BLOCKQUOTE) {
-                return <blockquote />
-            }
-
-            // Discard atomic blocks, as they get converted based on their entity.
-            if (block.type === BLOCK_TYPE.ATOMIC) {
-                return {
-                    start: "",
-                    end: "",
-                }
-            }
-
-            return null
-        },
-
-        entityToHTML: (entity, originalText) => {
-            if (entity.type === ENTITY_TYPE.LINK) {
-                return <a href={entity.data.url}>{originalText}</a>
-            }
-
-            if (entity.type === ENTITY_TYPE.IMAGE) {
-                return <img src={entity.data.src} alt={entity.data.alt} />
-            }
-
-            if (entity.type === ENTITY_TYPE.HORIZONTAL_RULE) {
-                return <hr />
-            }
-
-            return originalText
-        },
-    }
-
-    //Read raw text from texteditor and convert it to meaningful html
-    const convertTexteToHtml = (raw) => {
-        raw ? setEmailTexteEnglish(convertToHTML(exporterConfigForTexte)(convertFromRaw(raw))) : "";
-    }
-
-    const convertTexteToHtml_French = (raw) => {
-        raw ? setEmailTexteFrench(convertToHTML(exporterConfigForTexte)(convertFromRaw(raw))) : "";
-    }
-
-    const convertTexteToHtml_Dutch = (raw) => {
-        raw ? setEmailTexteDutch(convertToHTML(exporterConfigForTexte)(convertFromRaw(raw))) : "";
-    }
-
-    const importerConfig = {
-        htmlToEntity: (nodeName, node, createEntity) => {
-            // a tags will become LINK entities, marked as mutable, with only the URL as data.
-            if (nodeName === "a") {
-                return createEntity(ENTITY_TYPE.LINK, "MUTABLE", { url: node.href })
-            }
-
-            if (nodeName === "img") {
-                return createEntity(ENTITY_TYPE.IMAGE, "IMMUTABLE", {
-                    src: node.src,
-                })
-            }
-
-            if (nodeName === "hr") {
-                return createEntity(ENTITY_TYPE.HORIZONTAL_RULE, "IMMUTABLE", {})
-            }
-
-            return null
-        },
-        htmlToBlock: (nodeName) => {
-            if (nodeName === "hr" || nodeName === "img") {
-                // "atomic" blocks is how Draft.js structures block-level entities.
-                return "atomic"
-            }
-
-            return null
-        },
-    }
-
-    const fromHTMLToRawText = (html) => {
-        return convertToRaw(convertFromHTML(importerConfig)(html));
-    }
-
     const replaceTriorFromLink = (e) => {
         const value = e.target.value;
         const splitedValue = value.split("/");
@@ -714,6 +621,9 @@ export const Trigger = (props) => {
         const whiseOptions = document.getElementById("whiseAppointmentType");
         const transactionType = document.getElementById("transactionType");
         const transactionStatus = document.getElementById("transactionStatus");
+        const englishSubject = document.getElementById("texteEngSubject");
+        const frenchSubject = document.getElementById("texteFrSubject");
+        const dutchSubject = document.getElementById("texteDuSubject");
 
         if (keymomentDropdown.value == "") {
             keymomentDropdown.style.borderColor = "red";
@@ -743,6 +653,18 @@ export const Trigger = (props) => {
             transactionStatus.style.borderColor = "red";
             isFRequiredFieldsEmpty = true;
         }
+        //if (englishSubject.value == "") {
+        //    englishSubject.style.borderColor = "red";
+        //    isFRequiredFieldsEmpty = true;
+        //}
+        //if (frenchSubject.value == "") {
+        //    frenchSubject.style.borderColor = "red";
+        //    isFRequiredFieldsEmpty = true;
+        //}
+        //if (dutchSubject.value == "") {
+        //    dutchSubject.style.borderColor = "red";
+        //    isFRequiredFieldsEmpty = true;
+        //}
 
         if (isFRequiredFieldsEmpty == true) {
             alert("Please fill the required fields");
@@ -776,8 +698,11 @@ export const Trigger = (props) => {
             TargetParticipant2: "",
             CTarget2: "",
             Language: language,
+            EnglishSubject: englishSubject.value,
             TexteEnglish: emailTexteEnglish,
+            FrenchSubject: frenchSubject.value,
             TexteFrench: emailTexteFrench,
+            DutchSubject: dutchSubject.value,
             TexteDutch: emailTexteDutch,
             AppointmentType: whiseOptions.value,
             TransactionType: transactionType.value,
@@ -814,6 +739,18 @@ export const Trigger = (props) => {
     const contactPreferenceChangeHandler = (e) => {
         const checkedOption = e.target.getAttribute("preferencevalue");
         setContactPreference(checkedOption);
+    }
+
+    const handleEditorChangeEnglish = (content) => {
+        setEmailTexteEnglish(content);
+    };
+
+    const handleEditorChangeFrench = (content) => {
+        setEmailTexteFrench(content);
+    }
+
+    const handleEditorChangeDutch = (content) => {
+        setEmailTexteDutch(content);
     }
 
     useEffect(() => {
@@ -1073,44 +1010,19 @@ export const Trigger = (props) => {
                     >
                         <Tab eventKey="english" title="English">
                             <div className="row">
+                                <div className="col-sm-12 col-md-4 mb-3">
+                                    <label>Subject</label>
+                                    <input type="text" className="form-control" id="texteEngSubject" onInput={resetConditionDropdowns} />
+                                </div>
                                 <div className="col-sm-12 col-md-12 mb-3">
                                     <label>Texte</label>
-                                    <DraftailEditor
-                                        onSave={(raw) => {
-                                            convertTexteToHtml(raw)
+                                    <SunEditor
+                                        onChange={handleEditorChangeEnglish}
+                                        setContents={emailTexteEnglish}
+                                        setOptions={{
+                                            height: 200,
+                                            buttonList: editorButtons
                                         }}
-                                        rawContentState={null}
-                                        //editorState={editorStateEnglish}
-                                        blockTypes={[
-                                            { type: BLOCK_TYPE.HEADER_ONE },
-                                            { type: BLOCK_TYPE.HEADER_TWO },
-                                            { type: BLOCK_TYPE.HEADER_THREE },
-                                            { type: BLOCK_TYPE.HEADER_FOUR },
-                                            { type: BLOCK_TYPE.HEADER_FIVE },
-                                            { type: BLOCK_TYPE.HEADER_SIX },
-                                            { type: BLOCK_TYPE.BLOCKQUOTE },
-                                            { type: BLOCK_TYPE.UNORDERED_LIST_ITEM },
-                                            { type: BLOCK_TYPE.ORDERED_LIST_ITEM }
-                                        ]}
-                                        inlineStyles={
-                                            [
-                                                { type: INLINE_STYLE.BOLD },
-                                                { type: INLINE_STYLE.ITALIC },
-                                                { type: INLINE_STYLE.CODE },
-                                                { type: INLINE_STYLE.UNDERLINE },
-                                                { type: INLINE_STYLE.STRIKETHROUGH },
-                                                { type: INLINE_STYLE.SUBSCRIPT },
-                                                { type: INLINE_STYLE.SUPERSCRIPT },
-                                                { type: INLINE_STYLE.MARK },
-                                                { type: INLINE_STYLE.SMALL },
-                                                { type: INLINE_STYLE.INSERT },
-                                                { type: INLINE_STYLE.DELETE },
-                                                { type: INLINE_STYLE.QUOTATION }
-                                            ]}
-                                        entityTypes={[
-                                            { type: ENTITY_TYPE.LINK },
-                                            { type: ENTITY_TYPE.IMAGE }
-                                        ]}
                                     />
                                     <button className="btn-site mt-3">View</button>
                                 </div>
@@ -1118,44 +1030,19 @@ export const Trigger = (props) => {
                         </Tab>
                         <Tab eventKey="french" title="French">
                             <div className="row">
+                                <div className="col-sm-12 col-md-4 mb-3">
+                                    <label>Subject</label>
+                                    <input type="text" className="form-control" id="texteFrSubject" onInput={resetConditionDropdowns} />
+                                </div>
                                 <div className="col-sm-12 col-md-12 mb-3">
                                     <label>Texte</label>
-                                    <DraftailEditor
-                                        onSave={(raw) => {
-                                            convertTexteToHtml_French(raw)
+                                    <SunEditor
+                                        onChange={handleEditorChangeFrench}
+                                        setContents={emailTexteFrench}
+                                        setOptions={{
+                                            height: 200,
+                                            buttonList: editorButtons
                                         }}
-                                        rawContentState={null}
-                                        //editorState={editorStateFrench}
-                                        blockTypes={[
-                                            { type: BLOCK_TYPE.HEADER_ONE },
-                                            { type: BLOCK_TYPE.HEADER_TWO },
-                                            { type: BLOCK_TYPE.HEADER_THREE },
-                                            { type: BLOCK_TYPE.HEADER_FOUR },
-                                            { type: BLOCK_TYPE.HEADER_FIVE },
-                                            { type: BLOCK_TYPE.HEADER_SIX },
-                                            { type: BLOCK_TYPE.BLOCKQUOTE },
-                                            { type: BLOCK_TYPE.UNORDERED_LIST_ITEM },
-                                            { type: BLOCK_TYPE.ORDERED_LIST_ITEM }
-                                        ]}
-                                        inlineStyles={
-                                            [
-                                                { type: INLINE_STYLE.BOLD },
-                                                { type: INLINE_STYLE.ITALIC },
-                                                { type: INLINE_STYLE.CODE },
-                                                { type: INLINE_STYLE.UNDERLINE },
-                                                { type: INLINE_STYLE.STRIKETHROUGH },
-                                                { type: INLINE_STYLE.SUBSCRIPT },
-                                                { type: INLINE_STYLE.SUPERSCRIPT },
-                                                { type: INLINE_STYLE.MARK },
-                                                { type: INLINE_STYLE.SMALL },
-                                                { type: INLINE_STYLE.INSERT },
-                                                { type: INLINE_STYLE.DELETE },
-                                                { type: INLINE_STYLE.QUOTATION }
-                                            ]}
-                                        entityTypes={[
-                                            { type: ENTITY_TYPE.LINK },
-                                            { type: ENTITY_TYPE.IMAGE }
-                                        ]}
                                     />
                                     <button className="btn-site mt-3">View</button>
                                 </div>
@@ -1163,44 +1050,19 @@ export const Trigger = (props) => {
                         </Tab>
                         <Tab eventKey="dutch" title="Dutch">
                             <div className="row">
+                                <div className="col-sm-12 col-md-4 mb-3">
+                                    <label>Subject</label>
+                                    <input type="text" className="form-control" id="texteDuSubject" onInput={resetConditionDropdowns} />
+                                </div>
                                 <div className="col-sm-12 col-md-12 mb-3">
                                     <label>Texte</label>
-                                    <DraftailEditor
-                                        onSave={(raw) => {
-                                            convertTexteToHtml_Dutch(raw)
+                                    <SunEditor
+                                        onChange={handleEditorChangeDutch}
+                                        setContents={emailTexteDutch}
+                                        setOptions={{
+                                            height: 200,
+                                            buttonList: editorButtons
                                         }}
-                                        rawContentState={null}
-                                        //editorState={editorStateDutch}
-                                        blockTypes={[
-                                            { type: BLOCK_TYPE.HEADER_ONE },
-                                            { type: BLOCK_TYPE.HEADER_TWO },
-                                            { type: BLOCK_TYPE.HEADER_THREE },
-                                            { type: BLOCK_TYPE.HEADER_FOUR },
-                                            { type: BLOCK_TYPE.HEADER_FIVE },
-                                            { type: BLOCK_TYPE.HEADER_SIX },
-                                            { type: BLOCK_TYPE.BLOCKQUOTE },
-                                            { type: BLOCK_TYPE.UNORDERED_LIST_ITEM },
-                                            { type: BLOCK_TYPE.ORDERED_LIST_ITEM }
-                                        ]}
-                                        inlineStyles={
-                                            [
-                                                { type: INLINE_STYLE.BOLD },
-                                                { type: INLINE_STYLE.ITALIC },
-                                                { type: INLINE_STYLE.CODE },
-                                                { type: INLINE_STYLE.UNDERLINE },
-                                                { type: INLINE_STYLE.STRIKETHROUGH },
-                                                { type: INLINE_STYLE.SUBSCRIPT },
-                                                { type: INLINE_STYLE.SUPERSCRIPT },
-                                                { type: INLINE_STYLE.MARK },
-                                                { type: INLINE_STYLE.SMALL },
-                                                { type: INLINE_STYLE.INSERT },
-                                                { type: INLINE_STYLE.DELETE },
-                                                { type: INLINE_STYLE.QUOTATION }
-                                            ]}
-                                        entityTypes={[
-                                            { type: ENTITY_TYPE.LINK },
-                                            { type: ENTITY_TYPE.IMAGE }
-                                        ]}
                                     />
                                     <button className="btn-site mt-3">View</button>
                                 </div>

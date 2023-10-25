@@ -1,0 +1,11 @@
+Go to following path
+realAdviceTriggerSystem\clientApp
+
+Open cmd from directory path and run following command to install node modules
+1- npm install
+
+Run below commands when node.js version conflict errors appeared in cmd while running npm install command
+1- npm i @fortawesome/react-fontawesome --force
+2- npm i draft-js --force
+3- npm i draft-convert --force
+4- npm i suneditor-react --force

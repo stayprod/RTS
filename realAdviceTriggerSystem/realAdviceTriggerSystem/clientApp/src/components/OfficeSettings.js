@@ -429,7 +429,7 @@ export const OfficeSettings = (props) => {
 
     //update empty pimcoresetting object values when user type anything in newly added row of pimcore settings
     const setStateValueOfPimcoreFieldsOnBlur = (e) => {
-        const objSettings = JSON.parse(e.target.getAttribute("settingObj"));
+        const objSettings = JSON.parse(e.target.getAttribute("settingobj"));
         const elementIndex = +e.target.getAttribute("parentid").split("-")[1];
 
         let settingsArray = [...pimcoreSettings]; // make a separate copy of the array

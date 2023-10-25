@@ -18,7 +18,7 @@ namespace realAdviceTriggerSystemService.Models
         public string TargetParticipant2 { get; set; }
         public string CTarget2 { get; set; }
         public string Language { get; set; }
-        public string TexteEnglish { get; set; }
+        public string FrenchSubject { get; set; }
         public DateTime? CreatedOn { get; set; }
         public DateTime? UpdatedOn { get; set; }
         public string AppointmentType { get; set; }
@@ -27,7 +27,10 @@ namespace realAdviceTriggerSystemService.Models
         public int? WhiseOfficeid { get; set; }
         public int? WhiseClientid { get; set; }
         public string SurveyLink { get; set; }
+        public string EnglishSubject { get; set; }
+        public string TexteEnglish { get; set; }
         public string TexteFrench { get; set; }
+        public string DutchSubject { get; set; }
         public string TexteDutch { get; set; }
         public string ContactPreference { get; set; }
     }
