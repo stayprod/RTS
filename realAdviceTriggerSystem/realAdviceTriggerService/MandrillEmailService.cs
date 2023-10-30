@@ -61,7 +61,8 @@ public class MandrillEmailService
         }
         catch (HttpRequestException ex)
         {
-            Worker.LogMessage($"Error while sending email through Mandrill: {ex.Message}");
+            Worker.LogMessage($"Error while sending email through Mandrill to : {toEmail} and exception message is : {ex.Message}");
+            Worker.ExceptionsLog($"Error while sending email through Mandrill to : {toEmail} and exception message is : {ex.Message}");
             return false;
         }
     }

@@ -3,21 +3,28 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using realAdviceTriggerSystemAPI.Models;
+using realAdviceTriggerSystemAPI.Repository;
+using System.Diagnostics;
 using System.Drawing;
 using System.IdentityModel.Tokens.Jwt;
+using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace realAdviceTriggerSystemAPI.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ClientController : ControllerBase
     {
+        private readonly IJWTManagerRepository jWTManagerRepository;
         private readonly IConfiguration _config;
-        public ClientController(IConfiguration config)
+        private ExceptionWriter _exceptionWriter = new ExceptionWriter();
+        public ClientController(IJWTManagerRepository jWTManagerRepository, IConfiguration config)
         {
+            this.jWTManagerRepository = jWTManagerRepository;
             _config = config;
         }
 
@@ -35,6 +42,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
             }
             catch (Exception exp)
             {
+                _exceptionWriter.WriteException(exp);
                 return new JsonResult(exp.Message);
             }
         }
@@ -77,6 +85,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
             }
             catch (Exception exp)
             {
+                _exceptionWriter.WriteException(exp);
                 return new JsonResult(exp.Message);
             }
         }
@@ -110,21 +119,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
             }
             catch (Exception exp)
             {
-                string filePath = @"E:\LogFile.txt";
-
-                using (StreamWriter writer = new StreamWriter(filePath, true))
-                {
-                    writer.WriteLine("-----------------------------------------------------------------------------");
-                    writer.WriteLine("Date : " + DateTime.Now.ToString());
-                    writer.WriteLine();
-
-                    while (exp != null)
-                    {
-                        writer.WriteLine(exp.GetType().FullName);
-                        writer.WriteLine("Message : " + exp.Message);
-                        writer.WriteLine("StackTrace : " + exp.StackTrace);
-                    }
-                }
+                _exceptionWriter.WriteException(exp);
                 return new JsonResult(exp.Message);
             }
         }
@@ -167,6 +162,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
             }
             catch (Exception exp)
             {
+                _exceptionWriter.WriteException(exp);
                 return new JsonResult(exp.Message);
             }
         }
@@ -185,6 +181,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
             }
             catch (Exception exp)
             {
+                _exceptionWriter.WriteException(exp);
                 return new JsonResult(exp.Message);
             }
         }

@@ -1,16 +1,22 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using realAdviceTriggerSystemAPI.Models;
+using realAdviceTriggerSystemAPI.Repository;
 
 namespace realAdviceTriggerSystemAPI.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class OfficeTriggerController : ControllerBase
     {
+        private readonly IJWTManagerRepository jWTManagerRepository;
         private readonly IConfiguration _config;
-        public OfficeTriggerController(IConfiguration config)
+        private ExceptionWriter _exceptionWriter = new ExceptionWriter();
+        public OfficeTriggerController(IJWTManagerRepository jWTManagerRepository, IConfiguration config)
         {
+            this.jWTManagerRepository = jWTManagerRepository;
             _config = config;
         }
 
@@ -28,6 +34,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
             }
             catch (Exception exp)
             {
+                _exceptionWriter.WriteException(exp);
                 return new JsonResult(exp.Message);
             }
         }
@@ -47,6 +54,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
             }
             catch (Exception exp)
             {
+                _exceptionWriter.WriteException(exp);
                 return new JsonResult(exp.Message);
             }
         }
@@ -65,6 +73,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
             }
             catch (Exception exp)
             {
+                _exceptionWriter.WriteException(exp);
                 return new JsonResult(exp.Message);
             }
         }
@@ -121,6 +130,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
             }
             catch (Exception exp)
             {
+                _exceptionWriter.WriteException(exp);
                 return new JsonResult(exp.Message);
             }
         }
@@ -145,6 +155,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
             }
             catch (Exception exp)
             {
+                _exceptionWriter.WriteException(exp);
                 return new JsonResult(exp.Message);
             }
         }

@@ -3,10 +3,15 @@ import { Offices } from "./components/Offices";
 import { ClientSettings } from "./components/ClientSettings";
 import { OfficeSettings } from "./components/OfficeSettings";
 import { Trigger } from "./components/Trigger";
+import { Login } from "./components/Login";
 
 const AppRoutes = [
     {
         index: true,
+        element: <Login />
+    },
+    {
+        path: "/clients",
         element: <Clients />
     },
     {

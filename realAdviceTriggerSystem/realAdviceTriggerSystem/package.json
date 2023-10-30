@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "moment": "^2.29.4"
+    "suneditor": "^2.45.1",
+    "suneditor-react": "^3.6.1"
   }
 }

@@ -89,3 +89,24 @@ code {
 .new-layout-modal .modal-dialog {
     max-width: 70%;
 }
+
+.btn-login {
+    padding: 0.25rem 3rem;
+}
+
+.h-custom {
+    height: calc(100% - 73px);
+}
+
+@media (max-width: 450px) {
+    .h-custom {
+        height: 100%;
+    }
+}
+.empty {
+    border-color: red;
+}
+
+textarea {
+    resize: none;
+}

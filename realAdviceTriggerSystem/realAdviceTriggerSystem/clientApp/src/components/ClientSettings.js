@@ -2,6 +2,7 @@
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import axios from 'axios';
 import { Row, Col, Nav, Form, Image, Button, Navbar, Dropdown, Container, ListGroup, InputGroup, NavDropdown, Modal } from 'react-bootstrap';
+import { UseAuthContext } from '../context/AuthContext';
 
 import { variables } from '../Variables';
 import { useToken } from './tokenContext';
@@ -17,6 +18,12 @@ export const ClientSettings = (props) => {
     const { clientid } = useParams();
     const location = useLocation();
     const navigate = useNavigate();
+    const {
+        authUser,
+        setAuthUser,
+        isLoggedIn,
+        setIsLoggedIn
+    } = UseAuthContext();
 
     let _client = {
         "clientid": 0,
@@ -152,7 +159,7 @@ export const ClientSettings = (props) => {
         const response = await fetch(url, {
             method: 'POST',
             headers: {
-                'Accept': 'application/json',
+                'Authorization': `Bearer ${authUser.tokenValue}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(_client)
@@ -180,7 +187,7 @@ export const ClientSettings = (props) => {
             const adminResponse = await fetch(adminUrl, {
                 method: 'POST',
                 headers: {
-                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${authUser.tokenValue}`,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(_admin)

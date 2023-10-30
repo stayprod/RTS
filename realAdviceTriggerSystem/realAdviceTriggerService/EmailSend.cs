@@ -62,6 +62,8 @@ namespace TriggerService
             }
             catch (Exception ex)
             {
+                Worker.ExceptionsLog("Error while sending email using SMTP setting contact email address is:" + ToEmail + "  and the exception is " + ex.Message);
+                Worker.LogMessage("Error while sending email using SMTP setting contact email address is:" + ToEmail + "  and the exception is " + ex.Message);
                 return status;
             }
         }

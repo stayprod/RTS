@@ -1,17 +1,24 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MySqlX.XDevAPI;
 using realAdviceTriggerSystemAPI.Models;
+using realAdviceTriggerSystemAPI;
+using realAdviceTriggerSystemAPI.Repository;
 
 namespace realAdviceTriggerSystemAPI.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class AdminController : ControllerBase
     {
+        private readonly IJWTManagerRepository jWTManagerRepository;
         private readonly IConfiguration _config;
-        public AdminController(IConfiguration config)
+        private ExceptionWriter _exceptionWriter = new ExceptionWriter();
+        public AdminController(IJWTManagerRepository jWTManagerRepository, IConfiguration config)
         {
+            this.jWTManagerRepository = jWTManagerRepository;
             _config = config;
         }
 
@@ -29,6 +36,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
             }
             catch (Exception exp)
             {
+                _exceptionWriter.WriteException(exp);
                 return new JsonResult(exp.Message);
             }
         }
@@ -58,6 +66,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
             }
             catch (Exception exp)
             {
+                _exceptionWriter.WriteException(exp);
                 return new JsonResult(exp.Message);
             }
         }

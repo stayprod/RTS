@@ -25,6 +25,7 @@ using System.Collections;
 using static TriggerService.Worker;
 using System.ComponentModel;
 using System.Xml.Linq;
+using System.Timers;
 //using Newtonsoft.Json;
 //using JSON.Net;
 
@@ -123,6 +124,7 @@ namespace TriggerService
             }
             catch (Exception exp)
             {
+                ExceptionsLog("Error while getting token from WHISE " + exp.Message);
                 Worker.LogMessage("Error while getting token from WHISE " + exp.Message);
                 throw;
             }
@@ -144,8 +146,22 @@ namespace TriggerService
                 {
 
                 };
+                DateTime dateTime = DateTime.Now; // Replace this with your desired date and time
+                string formattedDateTime = dateTime.ToString("yyyy-MM-ddTHH:mm:ss");
+                var data = new
+                {
+                    Filter = new
+                    {
+                        DateTimeRange = new
+                        {
+                            Min = appGeneralSettings.ServiceStartTime,
+                            Max = formattedDateTime
+                        }
+                    }
+                };
+                string jsonData = JsonConvert.SerializeObject(data);
                 var json = JsonConvert.SerializeObject(requestData);
-                var requestContent = new StringContent(json, Encoding.UTF8, "application/json");
+                var requestContent = new StringContent(jsonData, Encoding.UTF8, "application/json");
 
                 // Send the POST request to retrieve today's appointments
                 var response = await _httpClient.PostAsync(apiUrl, requestContent);
@@ -165,6 +181,7 @@ namespace TriggerService
             }
             catch (Exception exp)
             {
+                ExceptionsLog("Error while calling method GetTodaysAppointmentsAsync (whise) " + exp.Message);
                 Worker.LogMessage("Error while calling method GetTodaysAppointmentsAsync (whise) " + exp.Message);
                 throw;
             }
@@ -206,6 +223,7 @@ namespace TriggerService
             }
             catch (Exception exp)
             {
+                ExceptionsLog("Error while calling method GetEstateListAsync (whise) " + exp.Message);
                 Worker.LogMessage("Error while calling method GetEstateListAsync (whise) " + exp.Message);
                 throw;
             }
@@ -255,6 +273,7 @@ namespace TriggerService
             }
             catch (Exception exp)
             {
+                ExceptionsLog("Error while calling method GetCountryListAsync (whise) " + exp.Message);
                 Worker.LogMessage("Error while calling method GetCountryListAsync (whise) " + exp.Message);
                 throw;
             }
@@ -272,6 +291,24 @@ namespace TriggerService
             catch (Exception ex)
             {
                 // Handle exceptions or log them to another log file.
+                Console.WriteLine($"Error while writing to the log file: {ex.Message}");
+            }
+        }
+
+        public static void ExceptionsLog(string message)
+        {
+            try
+            {
+                string filePath = appGeneralSettings.ExceptionLogFileName;
+                using (StreamWriter writer = new StreamWriter(filePath, true))
+                {
+                    writer.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss} - {message}");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions or log them to another log file.
+                Worker.LogMessage($"Error while writing to the log file: {ex.Message}");
                 Console.WriteLine($"Error while writing to the log file: {ex.Message}");
             }
         }
@@ -313,7 +350,14 @@ namespace TriggerService
                     var countryList = await GetCountryList(whiseToken);
                     using (var con = new realadvicetriggeringsystemContext())
                     {
+                        //con.OfficeSmtpsettings.Where(t => t.WhiseOfficeid == trigger.WhiseOfficeid)
                         List<Clients> clients = con.Clients.ToList();
+                        if (Worker.appGeneralSettings.TargetClientIds != null && clients.Count>0)
+                        {
+                            clients = clients.Where(item => Worker.appGeneralSettings.TargetClientIds.Contains(item.WhiseClientid)).ToList();
+                        }
+
+
                         List<AdminDetail> admindetails = con.AdminDetail.ToList();
                         List<Offices> offices = con.Offices.ToList();
                         List<OfficeTriggers> triggers = con.OfficeTriggers.ToList();
@@ -333,6 +377,10 @@ namespace TriggerService
                         foreach (var clientObj in result)
                         {
                             var triggerList = clientObj.triggers.ToList();
+                            if (triggerList.Count == 0)
+                            {
+                                continue;
+                            }
                             // five options in list 
                             //1=pending
                             // 2=demo
@@ -358,14 +406,13 @@ namespace TriggerService
                                         DateTime appointmentTime = createdOn.AddHours(Worker.appGeneralSettings.TimeZoneDifferenceInHours);
                                         DateTime currentTime = DateTime.Now;
                                         TimeSpan timeDifference = currentTime - appointmentTime;
-                                        Console.WriteLine(Convert.ToDateTime(trigger.CreatedOn) + "    " + appointmentTime +"    "+ triggerSettingTimeSpan);
                                         if (appointmentObj.estates != null &&
                                             trigger.TriggerType == "1" && // 1 means email and 2 means sms
                                             trigger.TargetParticipant1 == "1" && // 1 means there are some partipents and 2 means no partipents
                                             trigger.WhiseOfficeid == appointmentObj.Users[0].OfficeId &&
                                             timeDifference >= triggerSettingTimeSpan)
                                         {
-                                            Worker.LogMessage("control passed from same office id and time check");
+                                            Worker.LogMessage("control passed from condition of same whise office ids of both trigger settings and appointment onject.\n office id is : " + trigger.WhiseOfficeid + " and time durtion that is in min,hours or days");
                                             foreach (var estateListObj in EstateList.estates)
                                             {
                                                 // point-2 condtion
@@ -381,15 +428,16 @@ namespace TriggerService
                                                         bool response = await _emailService.SendEmailAsync(appointmentObj.Users[0].Email, "error", emailbody);
                                                         if (response)
                                                         {
-                                                            LogMessage("error email send successfully from mandrill to " + appointmentObj.Users[0].Email);
+                                                            LogMessage("error email send successfully from mandrill to " + appointmentObj.Users[0].Email + "because no contact email found.\n Whise client id is:" + trigger.WhiseClientid + "whsie office id is :" + trigger.WhiseOfficeid);
                                                         }
                                                     }
                                                     if (appointmentObj.Action.Id == int.Parse(trigger.AppointmentType) &&
-                                                        estateListObj.purpose.Id == int.Parse(trigger.TransactionType) &&
-                                                        estateListObj.purposeStatus.Id == int.Parse(trigger.TransactionStatus) &&
-                                                        appointmentObj.Contacts != null)
+                                                        ((string.IsNullOrEmpty(trigger.TransactionType) || !int.TryParse(trigger.TransactionType, out _)) ||
+                                                        estateListObj.purpose.Id == int.Parse(trigger.TransactionType)) &&
+                                                        ((string.IsNullOrEmpty(trigger.TransactionType) || !int.TryParse(trigger.TransactionType, out _)) ||
+                                                        estateListObj.purpose.Id == int.Parse(trigger.TransactionType)))
                                                     {
-                                                        Worker.LogMessage("control pass from Transaction checks");
+                                                        Worker.LogMessage("control pass from Transaction checks with whise office id :" + trigger.WhiseOfficeid + "and whsie client id" + trigger.WhiseClientid);
                                                         foreach (var contact in appointmentObj.Contacts)
                                                         {
                                                             var toEmail = "";
@@ -464,13 +512,18 @@ namespace TriggerService
                                                                     subject = trigger.DutchSubject;
                                                                     break;
                                                             }
-                                                            string url = "<a href=" + outputString + " >" + outputString + "</a>";
+                                                            //string url = "<a href=" + outputString + " >" + outputString + "</a>";
+                                                            StringBuilder htmlBuilder = new StringBuilder();
+                                                            for (int i = 1; i <= 10; i++)
+                                                            {
+                                                                htmlBuilder.Append($"<a href=\"{outputString}\"><button>{i}</button></a>");
+                                                            }
                                                             prefrences = trigger.ContactPreference;
                                                             Dictionary<string, string> emailBodyLayout = new Dictionary<string, string>
                                                             {
                                                                 { "name", (contact.FirstName == null) ? contact.Name : contact.FirstName },
                                                                 { "texte", etext},
-                                                                { "link", url },
+                                                                { "link", Convert.ToString(htmlBuilder)},
                                                                 { "signature", "signature"},
                                                             };
                                                             string layoutAfterAddingPlaceholders = Regex.Replace(layout.LayoutDetail, pattern, match =>
@@ -515,10 +568,7 @@ namespace TriggerService
 
                                                                                     Worker.LogMessage("email send successfully using private email to " + contact.PrivateEmail);
                                                                                 }
-                                                                                else
-                                                                                {
-                                                                                    Worker.LogMessage("email is not sent to email " + contact.PrivateEmail + " - error while sending SMTP settings");
-                                                                                }
+
                                                                             }
                                                                             if (contact.businessEmail != null)
                                                                             {
@@ -581,7 +631,7 @@ namespace TriggerService
                                                                                     Worker.LogMessage("email send successfully from mandrill using business email to  " + contact.businessEmail);
                                                                                 }
                                                                             }
-                                                                            
+
                                                                             break;
                                                                         case "private":
                                                                             recipientEmail = contact.PrivateEmail;
@@ -604,9 +654,9 @@ namespace TriggerService
                                                                             Worker.LogMessage("Email send successfully from mandrill to " + recipientEmail);
                                                                         }
                                                                     }
-                                                                    else
+                                                                    else if(prefrences != "all")
                                                                     {
-                                                                        Worker.LogMessage("Client(" + clientObj.client.CommercialName + ") prefrence email does not exist");
+                                                                        Worker.LogMessage($"Client( {clientObj.client.CommercialName}) prefrence email does not exist whise client id is : {trigger.WhiseClientid} whise office id is :{trigger.WhiseOfficeid}");
                                                                     }
                                                                 }
                                                             }
@@ -614,11 +664,15 @@ namespace TriggerService
                                                     }
                                                     else
                                                     {
-                                                        Worker.LogMessage("Client(" + clientObj.client.CommercialName + ") control cannot pass from Transaction checks");
+                                                        Worker.LogMessage($"Client({clientObj.client.CommercialName }) control cannot pass from Transaction checks and its whise client id is : {trigger.WhiseClientid} whise office id is :{trigger.WhiseOfficeid}");
                                                     }
                                                 }
 
                                             }
+                                        }
+                                        else
+                                        {
+                                            Worker.LogMessage("control cannot passed from condition of same whise office ids of both trigger settings and appointment object.\n office id is : " + trigger.WhiseOfficeid + " and time durtion that is in min, hours or days");
                                         }
                                     }
                                 }
@@ -630,12 +684,14 @@ namespace TriggerService
                         }
                     }
 
+
                     //_logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
                     await Task.Delay(TimeSpan.FromMinutes(Convert.ToDouble(Worker.appGeneralSettings.OccurrenceTimeInMinutes)), stoppingToken); // Append every 60 seconds
                 }
             }
             catch (Exception ex)
             {
+                ExceptionsLog("An error occurred while retrieving data from API" + ex);
                 _logger.LogError(ex, "An error occurred while retrieving data from API");
             }
         }

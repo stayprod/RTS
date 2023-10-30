@@ -10,16 +10,25 @@ import { ClientSettings } from "./ClientSettings";
 import image from '../assets/images/profile_image.png'
 import { useToken } from './tokenContext';
 import { variables, EnumobjClientStatus } from '../Variables';
+import { UseAuthContext } from '../context/AuthContext';
 
 export const Clients = (props) => {
-
-    const [data, setData] = useState([]);
+    const { isUserLoggedIn } = props;
+    const [clientData, setClientData] = useState([]);
     const [settingObj, setSettingObj] = useState({});
-    const [showAppended, setShowAppended] = useState(false);
     const [clientOffices, setClientOffices] = useState({});
     const [clientWarning, setClientWarning] = useState(0);
+    const [searchedText, setSearchedText] = useState("");
+    const [whiseOfficesList, setWhiseOfficesList] = useState([]);
+    const [clientIdsOfOffices, setClientIdsOfOffices] = useState([]);
     const navigate = useNavigate();
     const token = useToken();
+    const {
+        authUser,
+        setAuthUser,
+        isLoggedIn,
+        setIsLoggedIn
+    } = UseAuthContext();
 
     const handleClick = (e) => {
 
@@ -28,7 +37,6 @@ export const Clients = (props) => {
         document.querySelector("#" + id).classList.toggle("hidden");
         document.querySelector("#" + id).classList.contains("hidden") ?
             e.target.textContent = 'See Offices +' : e.target.textContent = 'See Offices -'
-        setShowAppended(prevState => !prevState);
     };
 
     const showClientSettingsHandler = (e) => {
@@ -40,17 +48,54 @@ export const Clients = (props) => {
         })
     }
 
+    const handlerSearchClientOrOffice = (e) => {
+        let inputValue = e.target.value;
+        let clients = JSON.parse(window.localStorage.getItem('clientData'));
+
+        if (inputValue == "") {
+            setClientData(clients);
+            setSearchedText("");
+            document.querySelectorAll(".offices").forEach(element => {
+                element.classList.toggle("hidden");
+            })
+            document.querySelectorAll(".btn-site-expand").forEach(element => {
+                element.textContent = "See Offices +";
+            })
+            return;
+        }
+
+        let filteredClients = clients.filter(d => {
+            return d.name.toLowerCase().includes(inputValue.toLowerCase()) || (d.id + "").toLowerCase().includes(inputValue.toLowerCase());
+        })
+
+        setClientData(filteredClients);
+        setSearchedText(inputValue);
+        filteredClients.forEach(d => {
+            document.getElementById("button-" + d.id).textContent = "See Offices -";
+            if (document.getElementById("officeList" + d.id).classList.contains("hidden")) {
+                document.getElementById("officeList" + d.id).classList.toggle("hidden");
+            }
+        })
+    }
+
     useEffect(() => {
-        if (token != null) {
-            const config = {
+        if (token != null && authUser != null) {
+            const jsonconfig = {
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    'Authorization': `Bearer ${authUser.tokenValue}`,
                     'Content-Type': 'application/json'
-                },
+                }
             };
-            axios.get(variables.API_URL + `Client/GetAllClientsDetail`) // ASP.NET Core API endpoint with headers
+            axios.get(variables.API_URL + `Client/GetAllClientsDetail`, jsonconfig) // ASP.NET Core API endpoint with headers
                 .then(async response => {
                     const clientsCollection = response.data;
+
+                    const config = {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                    };
 
                     axios.post('https://api.whise.eu/v1/admin/clients/list', {}, config) // ASP.NET Core API endpoint with headers
                         .then(async response => {
@@ -71,7 +116,8 @@ export const Clients = (props) => {
                             const clientDataWithSettings = await Promise.all(settingsPromises);
 
                             console.log(clientDataWithSettings);
-                            setData(clientDataWithSettings);
+                            setClientData(clientDataWithSettings);
+                            window.localStorage.setItem('clientData', JSON.stringify(clientDataWithSettings));
                         })
                         .catch(error => {
                             console.error('Error fetching data:', error);
@@ -92,7 +138,7 @@ export const Clients = (props) => {
             </div>
             <div className="row pb-3">
                 <div className="col-sm-12 col-md-4 d-flex align-items-center">
-                    <input type="text" className="form-control" placeholder="Search..." />
+                    <input type="text" className="form-control" placeholder="Search..." onChange={handlerSearchClientOrOffice} />
                     <Dropdown>
                         <Dropdown.Toggle className="btn-filter">
                             <FontAwesomeIcon icon={faFilter} className="ms-2" />
@@ -121,8 +167,8 @@ export const Clients = (props) => {
                 </div>
             </div>
             {
-                data?.map((item, index) => (
-                    <div className='clients-container' key={index}>
+                clientData?.map((item, index) => (
+                    <div className='clients-container' clientname={item.name} clientid={item.id} key={index}>
                         <div className='profile-container'>
                             {
                                 item.settings != undefined ?
@@ -145,13 +191,13 @@ export const Clients = (props) => {
                                 <button className='btn-site button top-right' clientdetail={JSON.stringify(item)} onClick={showClientSettingsHandler}>
                                     Settings
                                 </button>
-                                <button className="btn-site-expand expand-button" onClick={handleClick} clientid={item.id} key={index} id={`button-${index}`}>
-                                    See Offices <span className={`expand-icon${index}`} id={`expand-button${index}`}>+</span>
+                                <button className="btn-site-expand expand-button" onClick={handleClick} clientid={item.id} key={index} id={`button-${item.id}`}>
+                                    See Offices +
                                 </button>
                             </div>
                         </div>
-                        <div className="hidden" id={"officeList" + item.id}>
-                            <Offices clientId={item.id} client={item} />
+                        <div className="offices hidden" id={"officeList" + item.id}>
+                            <Offices clientId={item.id} client={item} searchedValue={searchedText} />
                         </div>
                     </div>
 

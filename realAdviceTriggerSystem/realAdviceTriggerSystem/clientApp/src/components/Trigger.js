@@ -7,11 +7,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import SunEditor, { buttonList, height } from 'suneditor-react';
 import 'suneditor/dist/css/suneditor.min.css';
+import { UseAuthContext } from '../context/AuthContext';
 
 import {
     DraftailEditor, BLOCK_TYPE, INLINE_STYLE, ENTITY_TYPE, UNDO_ICON,
     createEditorStateFromRaw,
-    serialiseEditorStateToRaw
+    serialiseEditorStateToRaw 
 } from "draftail";
 
 import { useToken } from './tokenContext';
@@ -54,6 +55,12 @@ export const Trigger = (props) => {
     const [triggerDetail, setTriggerDetail] = useState({});
     const [suveryLinkForEmail, setSuveryLinkForEmail] = useState(["https://survey.realadvice.be/", "", "/?"]);
     const [contactPreference, setContactPreference] = useState("all");
+    const {
+        authUser,
+        setAuthUser,
+        isLoggedIn,
+        setIsLoggedIn
+    } = UseAuthContext();
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -91,7 +98,14 @@ export const Trigger = (props) => {
         if (_localoffice == undefined) {
             _localoffice = location.state.LocalOfficeDetail;
         }
-        const response = await fetch(variables.API_URL + 'Layout/GetLayoutsByOffice?officeId=' + _localoffice.officeid);
+        const response = await fetch(variables.API_URL + 'Layout/GetLayoutsByOffice?officeId=' + _localoffice.officeid, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${authUser.tokenValue}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
         const jsonData = await response.json();
         if (jsonData != null) {
             setOfficeLayout(jsonData);
@@ -645,14 +659,14 @@ export const Trigger = (props) => {
             whiseOptions.style.borderColor = "red";
             isFRequiredFieldsEmpty = true;
         }
-        if (transactionType.value == "") {
-            transactionType.style.borderColor = "red";
-            isFRequiredFieldsEmpty = true;
-        }
-        if (transactionStatus.value == "") {
-            transactionStatus.style.borderColor = "red";
-            isFRequiredFieldsEmpty = true;
-        }
+        //if (transactionType.value == "") {
+        //    transactionType.style.borderColor = "red";
+        //    isFRequiredFieldsEmpty = true;
+        //}
+        //if (transactionStatus.value == "") {
+        //    transactionStatus.style.borderColor = "red";
+        //    isFRequiredFieldsEmpty = true;
+        //}
         //if (englishSubject.value == "") {
         //    englishSubject.style.borderColor = "red";
         //    isFRequiredFieldsEmpty = true;
@@ -674,6 +688,7 @@ export const Trigger = (props) => {
         //configurations to post json data
         const jsonconfig = {
             headers: {
+                'Authorization': `Bearer ${authUser.tokenValue}`,
                 'Content-Type': 'application/json'
             }
         };

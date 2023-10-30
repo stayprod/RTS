@@ -9,9 +9,11 @@ import { faExclamationTriangle, faFilter } from '@fortawesome/free-solid-svg-ico
 
 
 export const Offices = (props) => {
-    const { clientId, client } = props;
+    const { clientId, client, isUserLoggedIn, searchedValue } = props;
     const [whiseOfficesList, setWhiseOfficesList] = useState([]);
     const navigate = useNavigate();
+
+
 
     const officeSettingClickHandler = (e) => {
         let _whiseOffice = JSON.parse(e.target.getAttribute("officedetail"));
@@ -72,6 +74,7 @@ export const Offices = (props) => {
                     }
                 })
                 setWhiseOfficesList(finalArrayToSet);
+                window.localStorage.setItem("whiseOffices", JSON.stringify(finalArrayToSet));
                 if (warningCount == 0) {
                     document.getElementById("client_" + clientId).parentElement.classList.add("d-none");
                 }
@@ -79,11 +82,36 @@ export const Offices = (props) => {
                     document.getElementById("client_" + clientId).parentElement.classList.remove("d-none");
                     document.getElementById("client_" + clientId).innerHTML = warningCount;
                 }
+
+                if (searchedValue != "") {
+                    let offices = [...whiseOfficesList];
+
+                    let filteredOffices = offices.filter(d => {
+                        return d.name.toLowerCase().includes(searchedValue) || (d.id + "").toLowerCase().includes(searchedValue);
+                    })
+
+                    setWhiseOfficesList(filteredOffices);
+                }
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
             });
-    }, []);
+
+    }, [searchedValue]);
+
+    //useEffect(() => {
+
+    //    if (searchedValue != "") {
+    //        let offices = [...whiseOfficesList];
+
+    //        let filteredOffices = offices.filter(d => {
+    //            return d.name.toLowerCase().includes(searchedValue) || (d.id + "").toLowerCase().includes(searchedValue);
+    //        })
+
+    //        setWhiseOfficesList(filteredOffices);
+    //    }
+
+    //}, [searchedValue])
 
     return (
         <div className="pt-4 px-5">

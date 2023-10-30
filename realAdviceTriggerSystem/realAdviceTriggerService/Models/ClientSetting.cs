@@ -19,7 +19,10 @@ namespace TriggerService.Models
     public class AppGeneralSettings
     {
         public string LogFileName { get; set; }
+        public string ExceptionLogFileName { get; set; }
         public string OccurrenceTimeInMinutes { get; set; }
+        public string ServiceStartTime { get; set; }
         public int TimeZoneDifferenceInHours { get; set; }
+        public int[] TargetClientIds { get; set; }
     }
 } 

@@ -31,6 +31,8 @@ public partial class RealadviceTriggeringSystemContext : DbContext
 
     public virtual DbSet<RtsEmailLog> RtsEmailLogs { get; set; }
 
+    public virtual DbSet<User> Users { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseMySQL("server=localhost; port=3306; database=realadvice-triggering-system; user=pimcore_user; password=eezahtech*1;Persist Security Info=False;Connect Timeout=300;ConvertZeroDateTime=True");
@@ -378,6 +380,50 @@ public partial class RealadviceTriggeringSystemContext : DbContext
             entity.Property(e => e.WhiseOfficeid)
                 .HasColumnType("int(11)")
                 .HasColumnName("whise_officeid");
+        });
+
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.HasKey(e => e.Userid).HasName("PRIMARY");
+
+            entity.ToTable("user");
+
+            entity.Property(e => e.Userid)
+                .HasColumnType("int(11)")
+                .HasColumnName("userid");
+            entity.Property(e => e.CreatedOn)
+                .HasColumnType("datetime")
+                .HasColumnName("created_on");
+            entity.Property(e => e.Status)
+                .HasColumnType("bit(1)")
+                .HasColumnName("status");
+            entity.Property(e => e.UpdateOn)
+                .HasColumnType("datetime")
+                .HasColumnName("update_on");
+            entity.Property(e => e.UserCity)
+                .HasColumnType("text")
+                .HasColumnName("user_city");
+            entity.Property(e => e.UserCountry)
+                .HasColumnType("text")
+                .HasColumnName("user_country");
+            entity.Property(e => e.UserEmail)
+                .HasColumnType("text")
+                .HasColumnName("user_email");
+            entity.Property(e => e.UserIp)
+                .HasColumnType("text")
+                .HasColumnName("user_ip");
+            entity.Property(e => e.UserName)
+                .HasColumnType("text")
+                .HasColumnName("user_name");
+            entity.Property(e => e.UserPassword)
+                .HasColumnType("text")
+                .HasColumnName("user_password");
+            entity.Property(e => e.UserState)
+                .HasColumnType("text")
+                .HasColumnName("user_state");
+            entity.Property(e => e.UserStreet)
+                .HasColumnType("text")
+                .HasColumnName("user_street");
         });
 
         OnModelCreatingPartial(modelBuilder);

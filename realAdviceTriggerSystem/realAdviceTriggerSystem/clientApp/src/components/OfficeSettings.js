@@ -10,6 +10,7 @@ import { DraftailEditor, BLOCK_TYPE, INLINE_STYLE, ENTITY_TYPE, UNDO_ICON } from
 import moment from 'moment';
 import { useToken } from './tokenContext';
 import { variables, validEmail, EnumobjTriggerType, EnumobjDurationType, EnumobjKeyMoments, EnumobjParticipentType } from '../Variables';
+import { UseAuthContext } from '../context/AuthContext';
 
 import { Trigger } from './Trigger';
 import { PimcoreSettings } from './PimcoreSettings';
@@ -31,6 +32,12 @@ export const OfficeSettings = (props) => {
     const [showSMTPModal, setShowSMTPModal] = useState(false);
     const [smtpFormErrorMessage, setSmtpFormErrorMessage] = useState("");
     const [smptSetting, setSmptSetting] = useState({});
+    const {
+        authUser,
+        setAuthUser,
+        isLoggedIn,
+        setIsLoggedIn
+    } = UseAuthContext();
 
     let linkBuilder = "";
 
@@ -65,7 +72,16 @@ export const OfficeSettings = (props) => {
         if (_office == undefined) {
             return
         }
-        const response = await fetch(variables.API_URL + 'OfficeTrigger/GetAllTriggersByOffice?officeId=' + _office.officeid);
+        if (authUser == null) {
+            return
+        }
+        const response = await fetch(variables.API_URL + 'OfficeTrigger/GetAllTriggersByOffice?officeId=' + _office.officeid, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${authUser.tokenValue}`,
+                'Content-Type': 'application/json'
+            }
+        });
         const jsonData = await response.json();
         if (jsonData != null) {
             setTriggers(jsonData);
@@ -76,7 +92,16 @@ export const OfficeSettings = (props) => {
         if (_office == undefined) {
             return
         }
-        const response = await fetch(variables.API_URL + 'Client/GetSMTPDetail?officeid=' + _office.officeid);
+        if (authUser == null) {
+            return
+        }
+        const response = await fetch(variables.API_URL + 'Client/GetSMTPDetail?officeid=' + _office.officeid, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${authUser.tokenValue}`,
+                'Content-Type': 'application/json'
+            }
+        });
         const jsonData = await response.json();
         if (jsonData != null) {
             setSmptSetting(jsonData);
@@ -88,7 +113,16 @@ export const OfficeSettings = (props) => {
         if (_office == undefined) {
             return
         }
-        const response = await fetch(variables.API_URL + 'PimcoreSettings/GetPimcoreDetail?whiseOfficeId=' + _office.id);
+        if (authUser == null) {
+            return
+        }
+        const response = await fetch(variables.API_URL + 'PimcoreSettings/GetPimcoreDetail?whiseOfficeId=' + _office.id, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${authUser.tokenValue}`,
+                'Content-Type': 'application/json'
+            }
+        });
         const jsonData = await response.json();
         if (jsonData != null && jsonData.length > 0) {
             setPimcoreSettings(jsonData);
@@ -244,6 +278,7 @@ export const OfficeSettings = (props) => {
     const savePimcoreSettings = (_elementId) => {
         const jsonconfig = {
             headers: {
+                'Authorization': `Bearer ${authUser.tokenValue}`,
                 'Content-Type': 'application/json'
             }
         };
@@ -282,10 +317,18 @@ export const OfficeSettings = (props) => {
 
     const removePimcoreSettings = () => {
 
+        const jsonconfig = {
+            headers: {
+                'Authorization': `Bearer ${authUser.tokenValue}`,
+                'Content-Type': 'application/json'
+            },
+            data: settingsToBeRemoved
+        };
+
         //DeletePimcoreSetting api call
         //remove pimcore settings from database
         let url = variables.API_URL + `PimcoreSettings/DeletePimcoreSetting?`;
-        axios.delete(url, { data: settingsToBeRemoved })
+        axios.delete(url, jsonconfig)
             .then((response) => {
                 setSettingsToBeRemoved([]);
             })
@@ -330,6 +373,7 @@ export const OfficeSettings = (props) => {
         //configurations to post json data
         const jsonconfig = {
             headers: {
+                'Authorization': `Bearer ${authUser.tokenValue}`,
                 'Content-Type': 'application/json'
             }
         };
@@ -391,10 +435,17 @@ export const OfficeSettings = (props) => {
     const DeleteTrigger = (e) => {
         const trigger = JSON.parse(e.target.getAttribute("trigger"));
 
+        const jsonconfig = {
+            headers: {
+                'Authorization': `Bearer ${authUser.tokenValue}`,
+                'Content-Type': 'application/json'
+            }
+        };
+
         //DeleteTrigger api call
         //remove office trigger from database
         let url = variables.API_URL + `OfficeTrigger/DeleteTrigger?triggerId=${trigger.officeTriggerid}`;
-        axios.delete(url)
+        axios.delete(url, jsonconfig)
             .then((response) => {
                 let triggersList = [...triggers];
 
@@ -504,6 +555,7 @@ export const OfficeSettings = (props) => {
         //configurations to post json data
         const jsonconfig = {
             headers: {
+                'Authorization': `Bearer ${authUser.tokenValue}`,
                 'Content-Type': 'application/json'
             }
         };

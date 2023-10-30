@@ -4,12 +4,19 @@ import { Row, Col, Nav, Form, Image, Button, Navbar, Dropdown, Container, ListGr
 import { NavMenu } from './NavMenu';
 import SunEditor, { buttonList, height } from 'suneditor-react';
 import { variables, editorButtons } from '../Variables';
+import { UseAuthContext } from '../context/AuthContext';
 
 export const EmailLayoutModal = (props) => {
     const { showModal, modalTitle, modalType, officeId, clientId, hideLayoutModal, layoutId, reloadLayoutsList } = props;
 
     const [layoutHtml, setLayoutHtml] = useState("");
     const [emailLayout, setEmailLayout] = useState("");
+    const {
+        authUser,
+        setAuthUser,
+        isLoggedIn,
+        setIsLoggedIn
+    } = UseAuthContext();
     //let emailLayout = "";
 
     const saveLayoutForOffice = async (e) => {
@@ -35,6 +42,7 @@ export const EmailLayoutModal = (props) => {
 
         const config = {
             headers: {
+                'Authorization': `Bearer ${authUser.tokenValue}`,
                 'Content-Type': 'application/json'
             }
         };
@@ -53,7 +61,16 @@ export const EmailLayoutModal = (props) => {
 
     const getLayoutById = async () => {
 
-        const response = await fetch(variables.API_URL + 'Layout/GetLayoutById?layoutId=' + layoutId);
+        let url = variables.API_URL + 'Layout/GetLayoutById?layoutId=' + layoutId;
+
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${authUser.tokenValue}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
         const jsonData = await response.json();
         if (jsonData != null) {
             setLayoutHtml(jsonData);
