@@ -417,14 +417,36 @@ export const OfficeSettings = (props) => {
                     removePimcoreSettings();
                 }
                 savePimcoreSettings(e.target.id);
-                if (e.target.id == "addTrigger") {
-                    showTriggerForm(response.data);
-                }
+                updateStateAndNavigate(response.data, e.target.id)
             })
             .catch(error => {
                 alert('Error fetching data:', error);
             });
         //use the token to make further calls
+    }
+
+    const updateStateAndNavigate = (l_office, id) => {
+
+        const stateBuilder = {
+            WhiseOffice: whiseOffice,
+            AllWhiseOffices: whiseOffices,
+            CurrentClient: currentClient
+        }
+
+        if (l_office != undefined) {
+            stateBuilder.LocalOffice = l_office;
+            stateBuilder.LocalOfficesList = clientLocalOffices;
+        }
+
+        const url = "/officesettings/" + whiseOffice.id;
+
+        navigate(url, {
+            state: stateBuilder
+        })
+
+        if (id == "addTrigger") {
+            showTriggerForm(l_office);
+        }
     }
 
     const EditTrigger = (e) => {
@@ -592,7 +614,7 @@ export const OfficeSettings = (props) => {
         if (location.state != null) {
             getListOfOfficesFromStateBuilder();
         }
-    }, [])
+    }, [authUser])
 
     return (
         <section className="client-setting">

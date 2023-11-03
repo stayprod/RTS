@@ -9,8 +9,8 @@ import { faExclamationTriangle, faFilter } from '@fortawesome/free-solid-svg-ico
 
 
 export const Offices = (props) => {
-    const { clientId, client, isUserLoggedIn, searchedValue } = props;
-    const [whiseOfficesList, setWhiseOfficesList] = useState([]);
+    const { clientId, client, whiseOfficesList } = props;
+    const [whiseOffices, setWhiseOffices] = useState([]);
     const navigate = useNavigate();
 
 
@@ -44,74 +44,80 @@ export const Offices = (props) => {
     const token = useToken();
     let warningCount = 0;
 
-    useEffect(() => {
-        //const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImlhdCI6MTY5MzI5MTY4OH0.eyJzZXJ2aWNlQ29uc3VtZXJJZCI6MTMzNywidHlwZUlkIjo0LCJjbGllbnRJZCI6MTAyNjN9.1-9mYean_qX58r6ykhP545Y3r8IGK53PgDOoyIja8YM';
-        // Replace with your actual token
+    //useEffect(() => {
+    //    //const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImlhdCI6MTY5MzI5MTY4OH0.eyJzZXJ2aWNlQ29uc3VtZXJJZCI6MTMzNywidHlwZUlkIjo0LCJjbGllbnRJZCI6MTAyNjN9.1-9mYean_qX58r6ykhP545Y3r8IGK53PgDOoyIja8YM';
+    //    // Replace with your actual token
 
-        const config = {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-        };
-        axios.post('https://api.whise.eu/v1/admin/offices/list', { "clientId": clientId }, config) // ASP.NET Core API endpoint with header
-            .then(response => {
-                let finalArrayToSet = [];
-                response.data.offices.forEach(item => {
-                    let existedTriggerInDb = client.localclient?.triggers.filter(_off => {
-                        return _off.whiseOfficeid == item.id
-                    })
-                    if (existedTriggerInDb && existedTriggerInDb.length > 0) {
-                        item.warning = false;
-                    }
-                    else {
-                        warningCount++;
-                        item.warning = true;
-                    }
-                    let isAlreadyPushed = finalArrayToSet.includes(item, 0);
-                    if (isAlreadyPushed == false) {
-                        finalArrayToSet.push(item);
-                    }
-                })
-                setWhiseOfficesList(finalArrayToSet);
-                window.localStorage.setItem("whiseOffices", JSON.stringify(finalArrayToSet));
-                if (warningCount == 0) {
-                    document.getElementById("client_" + clientId).parentElement.classList.add("d-none");
-                }
-                else {
-                    document.getElementById("client_" + clientId).parentElement.classList.remove("d-none");
-                    document.getElementById("client_" + clientId).innerHTML = warningCount;
-                }
+    //    const config = {
+    //        headers: {
+    //            'Authorization': `Bearer ${token}`,
+    //            'Content-Type': 'application/json'
+    //        },
+    //    };
+    //    axios.post('https://api.whise.eu/v1/admin/offices/list', { "clientId": clientId }, config) // ASP.NET Core API endpoint with header
+    //        .then(response => {
+    //            let finalArrayToSet = [];
+    //            response.data.offices.forEach(item => {
+    //                let existedTriggerInDb = client.localclient?.triggers.filter(_off => {
+    //                    return _off.whiseOfficeid == item.id
+    //                })
+    //                if (existedTriggerInDb && existedTriggerInDb.length > 0) {
+    //                    item.warning = false;
+    //                }
+    //                else {
+    //                    warningCount++;
+    //                    item.warning = true;
+    //                }
+    //                let isAlreadyPushed = finalArrayToSet.includes(item, 0);
+    //                if (isAlreadyPushed == false) {
+    //                    finalArrayToSet.push(item);
+    //                }
+    //            })
+    //            setWhiseOfficesList(finalArrayToSet);
+    //            window.localStorage.setItem("whiseOffices", JSON.stringify(finalArrayToSet));
+    //            if (warningCount == 0) {
+    //                document.getElementById("client_" + clientId).parentElement.classList.add("d-none");
+    //            }
+    //            else {
+    //                document.getElementById("client_" + clientId).parentElement.classList.remove("d-none");
+    //                document.getElementById("client_" + clientId).innerHTML = warningCount;
+    //            }
+    //        })
+    //        .catch(error => {
+    //            console.error('Error fetching data:', error);
+    //        });
 
-                if (searchedValue != "") {
-                    let offices = [...whiseOfficesList];
-
-                    let filteredOffices = offices.filter(d => {
-                        return d.name.toLowerCase().includes(searchedValue) || (d.id + "").toLowerCase().includes(searchedValue);
-                    })
-
-                    setWhiseOfficesList(filteredOffices);
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
-
-    }, [searchedValue]);
+    //}, [searchedValue]);
 
     //useEffect(() => {
-
-    //    if (searchedValue != "") {
-    //        let offices = [...whiseOfficesList];
-
-    //        let filteredOffices = offices.filter(d => {
-    //            return d.name.toLowerCase().includes(searchedValue) || (d.id + "").toLowerCase().includes(searchedValue);
+    //    if (whiseOfficesList != null && clientId) {
+    //        let finalArrayToSet = [];
+    //        whiseOfficesList.forEach(item => {
+    //            let existedTriggerInDb = client.localclient?.triggers.filter(_off => {
+    //                return _off.whiseOfficeid == item.id
+    //            })
+    //            if (existedTriggerInDb && existedTriggerInDb.length > 0) {
+    //                item.warning = false;
+    //            }
+    //            else {
+    //                warningCount++;
+    //                item.warning = true;
+    //            }
+    //            let isAlreadyPushed = finalArrayToSet.includes(item, 0);
+    //            if (isAlreadyPushed == false) {
+    //                finalArrayToSet.push(item);
+    //            }
     //        })
-
-    //        setWhiseOfficesList(filteredOffices);
+    //        setWhiseOffices(finalArrayToSet);
+    //        if (warningCount == 0) {
+    //            document.getElementById("client_" + clientId).parentElement.classList.add("d-none");
+    //        }
+    //        else {
+    //            document.getElementById("client_" + clientId).parentElement.classList.remove("d-none");
+    //            document.getElementById("client_" + clientId).innerHTML = warningCount;
+    //        }
     //    }
-
-    //}, [searchedValue])
+    //}, [])
 
     return (
         <div className="pt-4 px-5">

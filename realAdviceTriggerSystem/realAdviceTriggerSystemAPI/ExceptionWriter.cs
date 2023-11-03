@@ -4,7 +4,7 @@
     {
         public void WriteException(Exception exp)
         {
-            string filePath = @"/LogFile.txt";
+            string filePath = @"LogFile.txt";
 
             using (StreamWriter writer = new StreamWriter(filePath, true))
             {

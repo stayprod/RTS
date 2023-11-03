@@ -85,7 +85,7 @@ export const ClientSettings = (props) => {
     const setStateBuilders = () => {
         if (location.state != null) {
             setClientDetail(location.state);
-            getClientDetail(location.state.id)
+            getClientDetail(location.state.id);
         }
     }
 
@@ -114,7 +114,7 @@ export const ClientSettings = (props) => {
     }
 
     const getOfficesList = () => {
-        if (location.state != null) {
+        if (location.state != null && token != null) {
             readStateElements();
 
             //get client offices and pass to setting screen
@@ -125,7 +125,7 @@ export const ClientSettings = (props) => {
                     'Content-Type': 'application/json'
                 },
             };
-            axios.post('https://api.whise.eu/v1/admin/offices/list', { "clientId": clientid }, config) // ASP.NET Core API endpoint with header
+            axios.post('https://api.whise.eu/v1/admin/offices/list', { "clientId": location.state.id }, config) // ASP.NET Core API endpoint with header
                 .then(response => {
                     setWhiseOffices(response.data.offices);
                 })
@@ -175,6 +175,7 @@ export const ClientSettings = (props) => {
                 setClientDetailFromDB(location.state.localclient.client)
             }
 
+            _admin.adminid = adminDetail.adminid == 0 ? 0 : adminDetail.adminid;
             _admin.clientid = clientId;
             _admin.legalName = document.getElementById("legalName").value;
             _admin.vatNumber = document.getElementById("vatNumber").value;
@@ -195,16 +196,31 @@ export const ClientSettings = (props) => {
             const adminJsonData = await adminResponse.json();
 
             if (adminJsonData.adminid > 0) {
-                alert("Client settings successfully saved.")
+                alert("Client settings successfully saved.");
+                updateClientStateuOnClientSaving(jsonData, adminJsonData);
             }
         }
 
     }
 
+    const updateClientStateuOnClientSaving = (clientData, adminData) => {
+        var client = clientDetail;
+        client.localclient.client = clientData;
+        client.localclient.admin[0] = adminData;
+
+        let url = "/clientsettings/" + client.id;
+        navigate(url, {
+            state: client
+        })
+    }
+
     useEffect(() => {
         setStateBuilders();
-        getOfficesList();
     }, [])
+
+    useEffect(() => {
+        getOfficesList();
+    }, [token])
 
     return (
         <section className="client-setting">

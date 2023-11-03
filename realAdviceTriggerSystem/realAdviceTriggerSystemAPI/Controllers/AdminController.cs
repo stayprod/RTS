@@ -52,7 +52,12 @@ namespace realAdviceTriggerSystemAPI.Controllers
                     AdminDetail? _admin = con.AdminDetails.Where(a => a.Clientid == admin.Clientid).FirstOrDefault();
                     if(_admin != null)
                     {
-                        admin.Adminid = _admin.Adminid;
+                        _admin.LegalName = admin.LegalName;
+                        _admin.VatNumber = admin.VatNumber;
+                        _admin.BankName = admin.BankName;
+                        _admin.AccountNumber = admin.AccountNumber;
+                        _admin.Bic = admin.Bic;
+                        _admin.Iban = admin.Iban;
                         con.SaveChanges();
                     }
                     else

@@ -110,3 +110,9 @@ code {
 textarea {
     resize: none;
 }
+
+.btn-search-cross {
+    top: 12px;
+    cursor: pointer;
+    right: 10px;
+}

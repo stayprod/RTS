@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, createContext } from 'react';
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import moment from 'moment';
 
 const AuthContext = createContext();
@@ -35,16 +35,22 @@ export function AuthProvider(props) {
                 navigate("/login");
             }
         }
-    }, []);
-
-    useEffect(() => {
-        if (authUser) {
-            localStorage.setItem("token", JSON.stringify(authUser)); // so you get it later
-            navigate("/");
-        }
         else {
             navigate("/login");
         }
+    }, []);
+
+    useEffect(() => {
+        if (authUser == null) {
+            return;
+        }
+        if (authUser != null && location.pathname.indexOf("login") > 0 ) {
+            localStorage.setItem("token", JSON.stringify(authUser)); // so you get it later
+            navigate("/");
+        }
+        //else {
+        //    navigate("/login");
+        //}
     }, [authUser]);
 
     return (
