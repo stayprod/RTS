@@ -638,6 +638,7 @@ export const Trigger = (props) => {
         const englishSubject = document.getElementById("texteEngSubject");
         const frenchSubject = document.getElementById("texteFrSubject");
         const dutchSubject = document.getElementById("texteDuSubject");
+        const targetParticipent = document.getElementById("participent1");
 
         if (keymomentDropdown.value == "") {
             keymomentDropdown.style.borderColor = "red";
@@ -653,6 +654,10 @@ export const Trigger = (props) => {
         }
         if (durationValue.value == "") {
             durationValue.style.borderColor = "red";
+            isFRequiredFieldsEmpty = true;
+        }
+        if (targetParticipent.value == "") {
+            targetParticipent.style.borderColor = "red";
             isFRequiredFieldsEmpty = true;
         }
         if (whiseOptions.value == "") {
@@ -708,7 +713,7 @@ export const Trigger = (props) => {
             TriggerType: triggerTypeDropdown.value,
             DurationType: durationtypeDropdown.value,
             DurationValue: +durationValue.value,
-            TargetParticipant1: document.getElementById("participent1").value,
+            TargetParticipant1: targetParticipent.value,
             CTarget1: JSON.stringify(selectedTarget), //document.getElementById("ctarget1").value,
             TargetParticipant2: "",
             CTarget2: "",
@@ -803,6 +808,10 @@ export const Trigger = (props) => {
             document.getElementById("layoutDropdown").value = location.state.TriggerDetail.layoutid;
         }
     }, [officeLayout])
+
+    useEffect(() => {
+        document.title = 'Trigger - Real Advice Trigger System';
+    }, []);
 
     return (
         <>

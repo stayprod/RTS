@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using realAdviceTriggerSystemAPI.Models;
 using realAdviceTriggerSystemAPI.Repository;
@@ -35,14 +36,21 @@ namespace realAdviceTriggerSystemAPI.Controllers
             {
                 using (var con = new RealadviceTriggeringSystemContext())
                 {
-                    User? userByEmail = con.Users.Where(u => u.UserEmail == usersdata.UserEmail).FirstOrDefault(); //
+                    User? userByEmail = con.Users.Where(u => u.UserEmail == Convert.ToString(usersdata.UserEmail)).FirstOrDefault(); //
+                   /*
+                    var myFoo = con.Users.FirstOrDefault(u => u.UserEmail == Convert.ToString(usersdata.UserEmail));
+                    if (myFoo == null)
+                    {
+                        //do something.
+                    }*/
 
-                    if (userByEmail == null)
+
+                    if (myFoo == null)
                     {
                         return Content("Account doesn't exist with this email"); /*"Invalid email";*/
                     }
 
-                    User? userByPassword = con.Users.Where(u => u.UserEmail == usersdata.UserEmail && u.UserPassword == usersdata.UserPassword).FirstOrDefault(); //
+                    User? userByPassword = con.Users.Where(u => u.UserEmail == Convert.ToString(usersdata.UserEmail) && u.UserPassword == Encrypt(Convert.ToString(usersdata.UserPassword), "sblw-3hn8-sqoy19")).FirstOrDefault(); //
 
                     if (userByPassword == null)
                     {

@@ -124,8 +124,8 @@ export const Login = (props) => {
                             className="img-fluid" alt="Sample image" />
                     </div>
                     <div className="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
-                        <h3 className="mb-5">Hello! Welcome Back</h3>
-                        <div className="text-danger mt-2" id="errorMessage"></div>
+                        <h3 className="mb-4 pb-3">Hello! Welcome Back</h3>
+                        <div className="text-danger" id="errorMessage"></div>
                         <div className="form-outline mb-4 position-relative">
                             <input type="email" id="userEmail" className="form-control"
                                 placeholder="Enter a valid email address" onFocus={resetErrorFieldStyle} />

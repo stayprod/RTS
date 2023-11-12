@@ -609,6 +609,9 @@ export const OfficeSettings = (props) => {
                 alert('Error fetching data:', error);
             });
     }
+    useEffect(() => {
+        document.title = 'Office Settings - Real Advice Trigger System';
+    }, []);
 
     useEffect(() => {
         if (location.state != null) {
@@ -670,7 +673,7 @@ export const OfficeSettings = (props) => {
                     </div>
                     <div className="col-sm-4 mb-3 mb-md-0">
                         <label>Office ID</label>
-                        <input type="text" className="form-control" defaultValue={whiseOffice.id} />
+                        <input type="text" className="form-control" defaultValue={whiseOffice.id} disabled />
                     </div>
                     <div className="col-sm-4 mb-3 mb-md-0">
                         <label>Unique Key</label>
@@ -721,7 +724,7 @@ export const OfficeSettings = (props) => {
                                     </div>
                                     <div className="col-sm-12">
                                         <div className="form-check form-check-inline">
-                                            <input className="form-check-input" type="checkbox" name="sslCheckbox" id="sslSetting" defaultValue={smptSetting.sslSetting} />
+                                            <input className="form-check-input" type="checkbox" name="sslCheckbox" id="sslSetting" defaultChecked={smptSetting.sslSetting == 1 ? true : false} />
                                             <label className="form-check-label mb-0" htmlFor="sslSetting" >SSL</label>
                                         </div>
                                     </div>

@@ -161,6 +161,10 @@ export const Clients = (props) => {
         }
     }, [token]);
 
+    useEffect(() => {
+        document.title = 'Clients - Real Advice Trigger System';
+    }, [])
+
     return (
         <div>
             <div className="row py-3">
@@ -179,24 +183,24 @@ export const Clients = (props) => {
                             <FontAwesomeIcon icon={faFilter} className="ms-2" />
                         </Dropdown.Toggle>
                         <Dropdown.Menu className="px-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="" id="flexCheckLastCreated" />
-                                <label class="form-check-label" for="flexCheckLastCreated">
-                                    Last created
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="" id="flexCheckLastUpdated" />
-                                <label class="form-check-label" for="flexCheckLastUpdated">
-                                    Last updated
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="" id="flexCheckSort" />
-                                <label class="form-check-label" for="flexCheckSort">
-                                    Sort by name
-                                </label>
-                            </div>
+                            {/*<div className="form-check">*/}
+                            {/*    <input className="form-check-input" type="checkbox" value="" id="flexCheckLastCreated" />*/}
+                            {/*    <label className="form-check-label" htmlFor="flexCheckLastCreated">*/}
+                            {/*        Last created*/}
+                            {/*    </label>*/}
+                            {/*</div>*/}
+                            {/*<div className="form-check">*/}
+                            {/*    <input className="form-check-input" type="checkbox" value="" id="flexCheckLastUpdated" />*/}
+                            {/*    <label className="form-check-label" htmlFor="flexCheckLastUpdated">*/}
+                            {/*        Last updated*/}
+                            {/*    </label>*/}
+                            {/*</div>*/}
+                            {/*<div className="form-check">*/}
+                            {/*    <input className="form-check-input" type="checkbox" value="" id="flexCheckSort" />*/}
+                            {/*    <label className="form-check-label" htmlFor="flexCheckSort">*/}
+                            {/*        Sort by name*/}
+                            {/*    </label>*/}
+                            {/*</div>*/}
                         </Dropdown.Menu>
                     </Dropdown>
                 </div>

@@ -215,6 +215,7 @@ export const ClientSettings = (props) => {
     }
 
     useEffect(() => {
+        document.title = 'Client Settings - Real Advice Trigger System';
         setStateBuilders();
     }, [])
 

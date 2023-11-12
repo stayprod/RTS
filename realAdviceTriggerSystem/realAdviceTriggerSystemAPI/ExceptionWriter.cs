@@ -12,7 +12,7 @@
                 writer.WriteLine("Date : " + DateTime.Now.ToString());
                 writer.WriteLine();
 
-                while (exp != null)
+                if (exp != null)
                 {
                     writer.WriteLine(exp.GetType().FullName);
                     writer.WriteLine("Message : " + exp.Message);

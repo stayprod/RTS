@@ -39,6 +39,8 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+//app.Urls.Add("http://localhost:8082/");
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
