@@ -45,7 +45,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
                     }*/
 
 
-                    if (myFoo == null)
+                    if (userByEmail == null)
                     {
                         return Content("Account doesn't exist with this email"); /*"Invalid email";*/
                     }
