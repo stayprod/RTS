@@ -181,3 +181,139 @@
 2023-11-14 16:22:16 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
  office id is : 12789 and time durtion that is in min,hours or days
 2023-11-14 16:22:16 - control pass from Transaction checks with whise office id :12789and whsie client id10263
+2023-11-14 16:36:12 -  RTS Service has been started 
+2023-11-14 16:36:12 - ---------------------RTS Service processing is in iterations------------------
+2023-11-14 16:36:22 - Control passed from Activation Status(client(10263  RealAdvice_Developer_Test) is not deactivated)
+2023-11-14 16:36:22 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:36:22 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:36:22 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:36:22 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:36:22 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:36:22 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:36:22 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:36:22 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:36:22 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:36:22 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:36:22 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:36:22 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:36:22 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:36:22 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:36:22 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:36:22 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:36:22 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:36:22 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:36:22 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 12789 and time durtion that is in min, hours or days
+2023-11-14 16:36:22 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:36:22 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:36:22 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:36:22 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:36:22 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:36:22 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:36:22 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:36:22 - control pass from Transaction checks with whise office id :12789and whsie client id10263
+2023-11-14 16:36:50 - email send successfully from mandrill using business email to  itraakram12@gmail.com
+2023-11-14 16:36:50 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:36:50 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:36:50 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:36:50 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:36:50 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:36:50 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:36:50 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:36:50 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:36:50 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:36:50 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:36:50 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:36:50 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:36:50 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:36:50 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:36:50 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:36:50 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:36:50 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:36:50 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:36:50 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:36:50 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:36:50 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 12789 and time durtion that is in min, hours or days
+2023-11-14 16:36:50 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:36:50 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:36:50 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:36:50 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:36:50 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:36:50 - control pass from Transaction checks with whise office id :12789and whsie client id10263
+2023-11-14 16:49:09 -  RTS Service has been started 
+2023-11-14 16:49:09 - ---------------------RTS Service processing is in iterations------------------
+2023-11-14 16:49:19 - Control passed from Activation Status(client(10263  RealAdvice_Developer_Test) is not deactivated)
+2023-11-14 16:49:19 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:49:19 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:49:19 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:49:19 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:49:19 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:49:19 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:49:19 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:49:19 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:49:19 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:49:19 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:49:19 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:49:19 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:49:19 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:49:19 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:49:19 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:49:19 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:49:19 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:49:19 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:49:19 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 12789 and time durtion that is in min, hours or days
+2023-11-14 16:49:19 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:49:19 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:49:19 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:49:19 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:49:19 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:49:19 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:49:19 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:49:19 - control pass from Transaction checks with whise office id :12789and whsie client id10263
+2023-11-14 18:01:25 -  RTS Service has been started 
+2023-11-14 18:01:25 - ---------------------RTS Service processing is in iterations------------------
+2023-11-14 18:01:37 - Control passed from Activation Status(client(10263  RealAdvice_Developer_Test) is not deactivated)
+2023-11-14 18:02:59 -  RTS Service has been started 
+2023-11-14 18:02:59 - ---------------------RTS Service processing is in iterations------------------
+2023-11-14 18:03:08 - Control passed from Activation Status(client(10263  RealAdvice_Developer_Test) is not deactivated)

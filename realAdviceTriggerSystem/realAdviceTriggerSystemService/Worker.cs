@@ -290,7 +290,7 @@ namespace realAdviceTriggerSystemService
         }
         public static void insertLog(int OffTriggerid, string toEmail, int WhiseOffid, int WhiseClntid, int ContId, int appointmentObjID, int appointmentObjEstateID)
         {
-            using (var con = new RealadviceTriggeringSystemContext())
+            using (var con = new realadvicetriggeringsystemContext())
             {
                 var t = new RtsEmailLog //Make sure you have a table called test in DB
                 {
@@ -299,7 +299,7 @@ namespace realAdviceTriggerSystemService
                     WhiseOfficeid = WhiseOffid,
                     WhiseClientid = WhiseClntid,
                     ContactId = ContId,
-                    CalenderActonId = appointmentObjID,
+                    CalenderActionId = appointmentObjID,
                     EstateId = appointmentObjEstateID
                 };
 
@@ -324,7 +324,7 @@ namespace realAdviceTriggerSystemService
                     var appointments = await GetTodaysAppointmentsAsync(whiseToken);// for all clients
                     var EstateList = await GetEstateListAsync(whiseToken);
                     var countryList = await GetCountryList(whiseToken);
-                    using (var con = new RealadviceTriggeringSystemContext())
+                    using (var con = new realadvicetriggeringsystemContext())
                     {
                         //con.OfficeSmtpsettings.Where(t => t.WhiseOfficeid == trigger.WhiseOfficeid)
                         List<Client> clients = con.Clients.ToList();
@@ -378,7 +378,7 @@ namespace realAdviceTriggerSystemService
                                         //3-if estate associate => you collect the information about the office link to that estate
                                         //WITH THIS OFFICE ID you know now which trigger rules you need to follow
                                         // TriggerType == "1" mean email and 2 mean sms
-                                        DateTime createdOn = appointmentObj.CreateDateTime;
+                                        DateTime createdOn = appointmentObj.EndDateTime;
                                         DateTime appointmentTime = createdOn.AddHours(Worker.appGeneralSettings.TimeZoneDifferenceInHours);
                                         DateTime currentTime = DateTime.Now;
                                         TimeSpan timeDifference = currentTime - appointmentTime;
@@ -512,7 +512,7 @@ namespace realAdviceTriggerSystemService
                                                                 // If no replacement is found, keep the original placeholder
                                                                 return match.Value;
                                                             });
-                                                            var logdetailsforcurrentClientOffice = con.RtsEmailLogs.Where(l => l.CalenderActonId == appointmentObj.Id && l.ContactId == contact.ContactId).FirstOrDefault();
+                                                            var logdetailsforcurrentClientOffice = con.RtsEmailLogs.Where(l => l.CalenderActionId == appointmentObj.Id && l.ContactId == contact.ContactId).FirstOrDefault();
                                                             //string emailbody = string.Format(etext, contact.FirstName, outputString);
                                                             string emailbody = layoutAfterAddingPlaceholders;
 

@@ -17,7 +17,7 @@ public partial class RtsEmailLog
 
     public int? ContactId { get; set; }
 
-    public int? CalenderActonId { get; set; }
+    public int? CalenderActionId { get; set; }
 
     public int? EstateId { get; set; }
 }

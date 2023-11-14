@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace realAdviceTriggerSystemService.Models;
 
-public partial class RealadviceTriggeringSystemContext : DbContext
+public partial class realadvicetriggeringsystemContext : DbContext
 {
-    public RealadviceTriggeringSystemContext()
+    public realadvicetriggeringsystemContext()
     {
     }
 
-    public RealadviceTriggeringSystemContext(DbContextOptions<RealadviceTriggeringSystemContext> options)
+    public realadvicetriggeringsystemContext(DbContextOptions<realadvicetriggeringsystemContext> options)
         : base(options)
     {
     }
@@ -35,7 +35,7 @@ public partial class RealadviceTriggeringSystemContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseMySql("server=172.20.1.96; port=3306; database=realadvice-triggering-system; user=admin; password=75X+LD7q8XsJ;Persist Security Info=true;Connect Timeout=6000;ConvertZeroDateTime=True", Microsoft.EntityFrameworkCore.ServerVersion.Parse("5.6.51-mysql"));
+        => optionsBuilder.UseMySql("server=172.20.1.96;port=3306;database=realadvice-triggering-system;user=admin;password=75X+LD7q8XsJ;persist security info=true;connect timeout=6000;convertzerodatetime=True", Microsoft.EntityFrameworkCore.ServerVersion.Parse("10.11.4-mariadb"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -375,9 +375,9 @@ public partial class RealadviceTriggeringSystemContext : DbContext
             entity.Property(e => e.EmailLogid)
                 .HasColumnType("int(11)")
                 .HasColumnName("email_logid");
-            entity.Property(e => e.CalenderActonId)
+            entity.Property(e => e.CalenderActionId)
                 .HasColumnType("int(11)")
-                .HasColumnName("calender_acton_id");
+                .HasColumnName("calender_action_id");
             entity.Property(e => e.ContactId)
                 .HasColumnType("int(11)")
                 .HasColumnName("contact_id");
