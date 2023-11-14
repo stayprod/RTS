@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TriggerService.Models
+namespace realAdviceTriggerSystemService.Models
 {
    public class ClientSetting
     {

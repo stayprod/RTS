@@ -6,19 +6,19 @@ namespace realAdviceTriggerSystemService.Models
 {
     public class CustomClients
     {
-        public List<clients> clients { get; set; }
+        public List<WhiseClients> clients { get; set; }
     }
-    public class clients
+    public class WhiseClients
     {
         public int Id { get; set; }
-        public List<Office> Offices { get; set; }
+        public List<WhiseOffice> Offices { get; set; }
     }
-    public class Office
+    public class WhiseOffice
     {
         public int Id { get; set; } 
-        public OfficeSettings OfficeSettings { get; set; }
+        public WhiseOfficeSettings OfficeSettings { get; set; }
     }
-    public class OfficeSettings
+    public class WhiseOfficeSettings
     {
         public int Id { get; set; }
         public string appointmentType { get; set; }

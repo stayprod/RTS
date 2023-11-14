@@ -1,35 +1,11 @@
-using TriggerService.Models;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc;
-using System.Linq;
-using System.Net.Http;
+using realAdviceTriggerSystemService.Models;
 using System.Net.Http.Headers;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using System.IO;
-using realAdviceTriggerSystemService.Models;
-using System.Runtime.Intrinsics.X86;
-using static System.Net.Mime.MediaTypeNames;
-using System.Diagnostics;
-using System.Security.Policy;
 using System.Text.RegularExpressions;
-using Microsoft.CodeAnalysis.Operations;
-using System.Collections;
-using static TriggerService.Worker;
-using System.ComponentModel;
-using System.Xml.Linq;
-using System.Timers;
-//using Newtonsoft.Json;
-//using JSON.Net;
 
-namespace TriggerService
+namespace realAdviceTriggerSystemService
 {
     public class Worker : BackgroundService
     {
@@ -72,8 +48,8 @@ namespace TriggerService
         };
         string currentCountry = "";
 
-        List<Clients> clients = new List<Clients>();
-        Clients cli = new Clients();
+        List<Client> clients = new List<Client>();
+        Client cli = new Client();
         EmailSend SendEmailobj = new EmailSend();
 
         private readonly ILogger<Worker> _logger;
@@ -314,7 +290,7 @@ namespace TriggerService
         }
         public static void insertLog(int OffTriggerid, string toEmail, int WhiseOffid, int WhiseClntid, int ContId, int appointmentObjID, int appointmentObjEstateID)
         {
-            using (var con = new realadvicetriggeringsystemContext())
+            using (var con = new RealadviceTriggeringSystemContext())
             {
                 var t = new RtsEmailLog //Make sure you have a table called test in DB
                 {
@@ -327,7 +303,7 @@ namespace TriggerService
                     EstateId = appointmentObjEstateID
                 };
 
-                con.RtsEmailLog.Add(t);
+                con.RtsEmailLogs.Add(t);
                 con.SaveChanges();
             }
 
@@ -348,19 +324,19 @@ namespace TriggerService
                     var appointments = await GetTodaysAppointmentsAsync(whiseToken);// for all clients
                     var EstateList = await GetEstateListAsync(whiseToken);
                     var countryList = await GetCountryList(whiseToken);
-                    using (var con = new realadvicetriggeringsystemContext())
+                    using (var con = new RealadviceTriggeringSystemContext())
                     {
                         //con.OfficeSmtpsettings.Where(t => t.WhiseOfficeid == trigger.WhiseOfficeid)
-                        List<Clients> clients = con.Clients.ToList();
-                        if (Worker.appGeneralSettings.TargetClientIds != null && clients.Count>0)
+                        List<Client> clients = con.Clients.ToList();
+                        if (Worker.appGeneralSettings.TargetClientIds != null && clients.Count > 0)
                         {
                             clients = clients.Where(item => Worker.appGeneralSettings.TargetClientIds.Contains(item.WhiseClientid)).ToList();
                         }
 
 
-                        List<AdminDetail> admindetails = con.AdminDetail.ToList();
-                        List<Offices> offices = con.Offices.ToList();
-                        List<OfficeTriggers> triggers = con.OfficeTriggers.ToList();
+                        List<AdminDetail> admindetails = con.AdminDetails.ToList();
+                        List<Office> offices = con.Offices.ToList();
+                        List<OfficeTrigger> triggers = con.OfficeTriggers.ToList();
 
                         var _clients = from c in clients
                                        join ad in admindetails on c.Clientid equals ad.Clientid into cl_ad
@@ -452,7 +428,7 @@ namespace TriggerService
 
                                                             var smtp_settings = con.OfficeSmtpsettings.Where(t => t.WhiseOfficeid == trigger.WhiseOfficeid).FirstOrDefault();
                                                             var office_settings = con.Offices.Where(t => t.WhiseOfficeid == trigger.WhiseOfficeid).FirstOrDefault();
-                                                            Layouts layout = con.Layouts.Where(t => t.Layoutid == trigger.Layoutid).FirstOrDefault();
+                                                            Layout layout = con.Layouts.Where(t => t.Layoutid == trigger.Layoutid).FirstOrDefault();
 
                                                             // survey link
                                                             string link = trigger.SurveyLink;
@@ -536,7 +512,7 @@ namespace TriggerService
                                                                 // If no replacement is found, keep the original placeholder
                                                                 return match.Value;
                                                             });
-                                                            var logdetailsforcurrentClientOffice = con.RtsEmailLog.Where(l => l.CalenderActonId == appointmentObj.Id && l.ContactId == contact.ContactId).FirstOrDefault();
+                                                            var logdetailsforcurrentClientOffice = con.RtsEmailLogs.Where(l => l.CalenderActonId == appointmentObj.Id && l.ContactId == contact.ContactId).FirstOrDefault();
                                                             //string emailbody = string.Format(etext, contact.FirstName, outputString);
                                                             string emailbody = layoutAfterAddingPlaceholders;
 
@@ -654,7 +630,7 @@ namespace TriggerService
                                                                             Worker.LogMessage("Email send successfully from mandrill to " + recipientEmail);
                                                                         }
                                                                     }
-                                                                    else if(prefrences != "all")
+                                                                    else if (prefrences != "all")
                                                                     {
                                                                         Worker.LogMessage($"Client( {clientObj.client.CommercialName}) prefrence email does not exist whise client id is : {trigger.WhiseClientid} whise office id is :{trigger.WhiseOfficeid}");
                                                                     }
@@ -664,7 +640,7 @@ namespace TriggerService
                                                     }
                                                     else
                                                     {
-                                                        Worker.LogMessage($"Client({clientObj.client.CommercialName }) control cannot pass from Transaction checks and its whise client id is : {trigger.WhiseClientid} whise office id is :{trigger.WhiseOfficeid}");
+                                                        Worker.LogMessage($"Client({clientObj.client.CommercialName}) control cannot pass from Transaction checks and its whise client id is : {trigger.WhiseClientid} whise office id is :{trigger.WhiseOfficeid}");
                                                     }
                                                 }
 

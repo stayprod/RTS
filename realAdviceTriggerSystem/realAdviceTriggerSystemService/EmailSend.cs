@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using realAdviceTriggerSystemService;
 //using realAdviceTriggerSystemAPI.Models;
 using realAdviceTriggerSystemService.Models;
 using System;
@@ -8,14 +9,13 @@ using System.IO;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
-using TriggerService.Models;
 
-namespace TriggerService
+namespace realAdviceTriggerSystemService
 {
     public class EmailSend
     {
 
-        public bool emailSend(string ToEmail, string Subject, string Message, OfficeSmtpsettings settings, bool IsBodyHtml = true)
+        public bool emailSend(string ToEmail, string Subject, string Message, OfficeSmtpsetting settings, bool IsBodyHtml = true)
         {
             bool status = false;
             try

@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
-using TriggerService;
-using TriggerService.Models;
+using realAdviceTriggerSystemService;
+using realAdviceTriggerSystemService.Models;
 
 public class MandrillEmailService
 {

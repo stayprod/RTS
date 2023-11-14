@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TriggerService.Models
+namespace realAdviceTriggerSystemService.Models
 {
     public partial class History
     {

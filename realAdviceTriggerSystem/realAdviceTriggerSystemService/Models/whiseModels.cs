@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using TriggerService.Models;
+using realAdviceTriggerSystemService.Models;
 
 namespace realAdviceTriggerSystemService.Models
 {
@@ -45,7 +45,7 @@ namespace realAdviceTriggerSystemService.Models
         public string Description1 { get; set; }
         public DateTime CreateDateTime { get; set; }
         public DateTime UpdateDateTime { get; set; }
-        public List<User> Users { get; set; }
+        public List<WhiseUser> Users { get; set; }
         public List<Contact> Contacts { get; set; }
         public List<c_estate> estates { get; set; }
     }
@@ -108,7 +108,7 @@ namespace realAdviceTriggerSystemService.Models
         public int Id { get; set; }
     }
 
-    public class User
+    public class WhiseUser
     {
         public int UserId { get; set; }
         public string DirectLine { get; set; }

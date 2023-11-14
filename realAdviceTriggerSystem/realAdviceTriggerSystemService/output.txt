@@ -1,0 +1,183 @@
+2023-11-10 16:38:20 -  RTS Service has been started 
+2023-11-10 16:38:20 - ---------------------RTS Service processing is in iterations------------------
+2023-11-10 16:54:38 -  RTS Service has been started 
+2023-11-10 16:54:38 - ---------------------RTS Service processing is in iterations------------------
+2023-11-10 16:59:43 -  RTS Service has been started 
+2023-11-10 16:59:43 - ---------------------RTS Service processing is in iterations------------------
+2023-11-10 17:13:45 -  RTS Service has been started 
+2023-11-10 17:13:45 - ---------------------RTS Service processing is in iterations------------------
+2023-11-10 17:14:34 - Control passed from Activation Status(client(2729  Real Advice SPRL) is not deactivated)
+2023-11-10 17:14:34 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:14:34 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:14:34 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:14:34 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:14:34 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:14:34 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:14:34 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:14:34 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:14:34 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:14:34 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:14:34 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:14:34 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:14:34 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:14:34 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:14:34 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:14:34 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:14:34 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:14:34 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:14:34 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:14:34 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:14:34 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:14:34 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:14:34 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:14:34 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:14:34 - Control passed from Activation Status(client(2729  Real Advice SPRL) is not deactivated)
+2023-11-10 17:14:34 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 11240 and time durtion that is in min, hours or days
+2023-11-10 17:14:34 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 11240 and time durtion that is in min, hours or days
+2023-11-10 17:14:34 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 11240 and time durtion that is in min, hours or days
+2023-11-10 17:14:34 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 11240 and time durtion that is in min, hours or days
+2023-11-10 17:14:34 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 11240 and time durtion that is in min, hours or days
+2023-11-10 17:14:34 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 11240 and time durtion that is in min, hours or days
+2023-11-10 17:14:34 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 11240 and time durtion that is in min, hours or days
+2023-11-10 17:14:34 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 11240 and time durtion that is in min, hours or days
+2023-11-10 17:17:42 -  RTS Service has been started 
+2023-11-10 17:17:42 - ---------------------RTS Service processing is in iterations------------------
+2023-11-10 17:17:53 - Control passed from Activation Status(client(2729  Real Advice SPRL) is not deactivated)
+2023-11-10 17:17:53 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:17:53 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:17:53 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:17:53 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:17:53 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:17:53 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:17:53 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:17:53 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:17:53 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:17:53 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:17:53 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:17:53 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:17:53 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:17:53 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:17:53 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:17:53 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:17:53 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:17:53 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:17:53 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:17:53 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:17:53 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:17:53 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:17:53 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:17:53 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 4579 and time durtion that is in min, hours or days
+2023-11-10 17:17:53 - Control passed from Activation Status(client(2729  Real Advice SPRL) is not deactivated)
+2023-11-10 17:17:53 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 11240 and time durtion that is in min, hours or days
+2023-11-10 17:17:53 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 11240 and time durtion that is in min, hours or days
+2023-11-10 17:17:53 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 11240 and time durtion that is in min, hours or days
+2023-11-10 17:17:53 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 11240 and time durtion that is in min, hours or days
+2023-11-10 17:17:53 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 11240 and time durtion that is in min, hours or days
+2023-11-10 17:17:53 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 11240 and time durtion that is in min, hours or days
+2023-11-10 17:17:53 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 11240 and time durtion that is in min, hours or days
+2023-11-10 17:17:53 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 11240 and time durtion that is in min, hours or days
+2023-11-14 16:22:00 -  RTS Service has been started 
+2023-11-14 16:22:00 - ---------------------RTS Service processing is in iterations------------------
+2023-11-14 16:22:16 - Control passed from Activation Status(client(10263  RealAdvice_Developer_Test) is not deactivated)
+2023-11-14 16:22:16 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:22:16 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:22:16 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:22:16 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:22:16 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:22:16 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:22:16 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:22:16 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:22:16 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:22:16 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:22:16 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:22:16 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:22:16 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:22:16 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:22:16 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:22:16 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:22:16 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:22:16 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:22:16 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 12789 and time durtion that is in min, hours or days
+2023-11-14 16:22:16 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:22:16 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:22:16 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:22:16 - Client(RealAdvice_Developer_Test) control cannot pass from Transaction checks and its whise client id is : 10263 whise office id is :12789
+2023-11-14 16:22:16 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-11-14 16:22:16 - control pass from Transaction checks with whise office id :12789and whsie client id10263

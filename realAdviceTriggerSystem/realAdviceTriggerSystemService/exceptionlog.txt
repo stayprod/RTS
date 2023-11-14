@@ -1,0 +1,30 @@
+2023-11-10 16:39:17 - An error occurred while retrieving data from APISystem.IO.FileNotFoundException: Could not load file or assembly 'MySql.Data, Version=8.2.0.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d'. The system cannot find the file specified.
+File name: 'MySql.Data, Version=8.2.0.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d'
+   at MySql.EntityFrameworkCore.Infrastructure.Internal.MySQLOptionsExtension..ctor(MySQLOptionsExtension copyFrom)
+   at MySql.EntityFrameworkCore.Infrastructure.Internal.MySQLOptionsExtension.Clone()
+   at Microsoft.EntityFrameworkCore.Infrastructure.RelationalOptionsExtension.WithConnectionString(String connectionString)
+   at Microsoft.EntityFrameworkCore.MySQLDbContextOptionsExtensions.UseMySQL(DbContextOptionsBuilder optionsBuilder, String connectionString, Action`1 mySqlOptionsAction)
+   at realAdviceTriggerSystemService.Models.RealadviceTriggeringSystemContext.OnConfiguring(DbContextOptionsBuilder optionsBuilder) in F:\realAdviceTrigerSystem\realAdviceTriggerSystemService\Models\RealadviceTriggeringSystemContext.cs:line 47
+   at Microsoft.EntityFrameworkCore.DbContext.get_ContextServices()
+   at Microsoft.EntityFrameworkCore.DbContext.get_Model()
+   at Microsoft.EntityFrameworkCore.Internal.InternalDbSet`1.get_EntityType()
+   at Microsoft.EntityFrameworkCore.Internal.InternalDbSet`1.get_EntityQueryable()
+   at Microsoft.EntityFrameworkCore.Internal.InternalDbSet`1.System.Collections.Generic.IEnumerable<TEntity>.GetEnumerator()
+   at System.Collections.Generic.List`1..ctor(IEnumerable`1 collection)
+   at System.Linq.Enumerable.ToList[TSource](IEnumerable`1 source)
+   at realAdviceTriggerSystemService.Worker.ExecuteAsync(CancellationToken stoppingToken) in F:\realAdviceTrigerSystem\realAdviceTriggerSystemService\Worker.cs:line 330
+2023-11-10 16:54:43 - An error occurred while retrieving data from APISystem.IO.FileNotFoundException: Could not load file or assembly 'MySql.Data, Version=8.2.0.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d'. The system cannot find the file specified.
+File name: 'MySql.Data, Version=8.2.0.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d'
+   at MySql.EntityFrameworkCore.Infrastructure.Internal.MySQLOptionsExtension..ctor(MySQLOptionsExtension copyFrom)
+   at MySql.EntityFrameworkCore.Infrastructure.Internal.MySQLOptionsExtension.Clone()
+   at Microsoft.EntityFrameworkCore.Infrastructure.RelationalOptionsExtension.WithConnectionString(String connectionString)
+   at Microsoft.EntityFrameworkCore.MySQLDbContextOptionsExtensions.UseMySQL(DbContextOptionsBuilder optionsBuilder, String connectionString, Action`1 mySqlOptionsAction)
+   at realAdviceTriggerSystemService.Models.RealadviceTriggeringSystemContext.OnConfiguring(DbContextOptionsBuilder optionsBuilder) in F:\realAdviceTrigerSystem\realAdviceTriggerSystemService\Models\RealadviceTriggeringSystemContext.cs:line 47
+   at Microsoft.EntityFrameworkCore.DbContext.get_ContextServices()
+   at Microsoft.EntityFrameworkCore.DbContext.get_Model()
+   at Microsoft.EntityFrameworkCore.Internal.InternalDbSet`1.get_EntityType()
+   at Microsoft.EntityFrameworkCore.Internal.InternalDbSet`1.get_EntityQueryable()
+   at Microsoft.EntityFrameworkCore.Internal.InternalDbSet`1.System.Collections.Generic.IEnumerable<TEntity>.GetEnumerator()
+   at System.Collections.Generic.List`1..ctor(IEnumerable`1 collection)
+   at System.Linq.Enumerable.ToList[TSource](IEnumerable`1 source)
+   at realAdviceTriggerSystemService.Worker.ExecuteAsync(CancellationToken stoppingToken) in F:\realAdviceTrigerSystem\realAdviceTriggerSystemService\Worker.cs:line 330

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
+using Pomelo.EntityFrameworkCore.MySql;
 using realAdviceTriggerSystemAPI.Repository;
 using System.Configuration;
 using System.Text;

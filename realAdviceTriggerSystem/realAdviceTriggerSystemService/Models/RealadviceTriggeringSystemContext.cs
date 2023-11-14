@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
-namespace realAdviceTriggerSystemAPI.Models;
+namespace realAdviceTriggerSystemService.Models;
 
 public partial class RealadviceTriggeringSystemContext : DbContext
 {
@@ -35,7 +35,7 @@ public partial class RealadviceTriggeringSystemContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseMySql("server=172.20.1.96;port=3306;database=realadvice-triggering-system;user=admin;password=75X+LD7q8XsJ;persist security info=true;connect timeout=6000;convertzerodatetime=True", Microsoft.EntityFrameworkCore.ServerVersion.Parse("10.11.4-mariadb"));
+        => optionsBuilder.UseMySql("server=172.20.1.96; port=3306; database=realadvice-triggering-system; user=admin; password=75X+LD7q8XsJ;Persist Security Info=true;Connect Timeout=6000;ConvertZeroDateTime=True", Microsoft.EntityFrameworkCore.ServerVersion.Parse("5.6.51-mysql"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -368,17 +368,28 @@ public partial class RealadviceTriggeringSystemContext : DbContext
 
         modelBuilder.Entity<RtsEmailLog>(entity =>
         {
-            entity.HasKey(e => e.OfficeTriggerid).HasName("PRIMARY");
+            entity.HasKey(e => e.EmailLogid).HasName("PRIMARY");
 
             entity.ToTable("rts_email_log");
 
-            entity.Property(e => e.OfficeTriggerid)
-                .ValueGeneratedNever()
+            entity.Property(e => e.EmailLogid)
                 .HasColumnType("int(11)")
-                .HasColumnName("office_triggerid");
+                .HasColumnName("email_logid");
+            entity.Property(e => e.CalenderActonId)
+                .HasColumnType("int(11)")
+                .HasColumnName("calender_acton_id");
+            entity.Property(e => e.ContactId)
+                .HasColumnType("int(11)")
+                .HasColumnName("contact_id");
             entity.Property(e => e.Email)
                 .HasMaxLength(45)
                 .HasColumnName("email");
+            entity.Property(e => e.EstateId)
+                .HasColumnType("int(11)")
+                .HasColumnName("estate_id");
+            entity.Property(e => e.OfficeTriggerid)
+                .HasColumnType("int(11)")
+                .HasColumnName("office_triggerid");
             entity.Property(e => e.WhiseClientid)
                 .HasColumnType("int(11)")
                 .HasColumnName("whise_clientid");
