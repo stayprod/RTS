@@ -40,14 +40,14 @@ namespace realAdviceTriggerSystemAPI.Controllers
         }
 
         [HttpGet]
-        [Route("GetLayoutsByOffice")]
-        public JsonResult GetLayoutsByOffice(int officeId)
+        [Route("GetLayoutsByClients")]
+        public JsonResult GetLayoutsByClients(int clientId)
         {
             try
             {
                 using (var con = new RealadviceTriggeringSystemContext())
                 {
-                    List<Layout>? _layouts = con.Layouts.Where(c => c.Officeid == officeId).ToList();
+                    List<Layout>? _layouts = con.Layouts.Where(c => c.Clientid == clientId).ToList();
                     return new JsonResult(_layouts);
                 }
             }
