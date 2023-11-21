@@ -26,6 +26,8 @@ export const Login = (props) => {
 
 
     const authenticateUser = async (e) => {
+        e.target.setAttribute("disabled", true);
+        document.querySelector("body").style.cursor = "progress";
         let email = document.getElementById("userEmail");
         let pass = document.getElementById("userPassword");
         let isFieldEmpty = false;
@@ -64,6 +66,8 @@ export const Login = (props) => {
             errorMessage.forEach(e => {
                 document.getElementById("errorMessage").innerHTML += e;
             })
+            e.target.removeAttribute("disabled");
+            document.querySelector("body").style.cursor = "default";
             return;
         }
 
@@ -86,6 +90,8 @@ export const Login = (props) => {
                 else {
                     document.getElementById("errorMessage").innerHTML = "<div class='red'>" + response.data + "</div>";
                 }
+                e.target.removeAttribute("disabled");
+                document.querySelector("body").style.cursor = "default";
             })
             .catch(error => {
                 console.error('Error fetching data:', error);

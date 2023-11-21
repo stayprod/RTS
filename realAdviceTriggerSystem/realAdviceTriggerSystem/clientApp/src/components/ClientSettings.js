@@ -85,6 +85,9 @@ export const ClientSettings = (props) => {
     const setStateBuilders = () => {
         if (location.state != null) {
             setClientDetail(location.state);
+            if (location.state.localclient != undefined) {
+                setClientDetailFromDB(location.state.localclient.client);
+            }
             getClientDetail(location.state.id);
         }
     }
@@ -131,12 +134,14 @@ export const ClientSettings = (props) => {
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);
-                }); 
+                });
         }
 
     }
 
     const saveClientDetail = async (e) => {
+        e.target.setAttribute("disabled", true);
+        document.querySelector("body").style.cursor = "progress";
         _client.clientid = clientDetailFromDB.clientid != undefined ? clientDetailFromDB.clientid : 0;
         _client.whiseClientid = clientDetail.id
         _client.commercialName = document.getElementById("commercialName").value;
@@ -197,6 +202,8 @@ export const ClientSettings = (props) => {
 
             if (adminJsonData.adminid > 0) {
                 alert("Client settings successfully saved.");
+                e.target.removeAttribute("disabled");
+                document.querySelector("body").style.cursor = "default";
                 updateClientStateuOnClientSaving(jsonData, adminJsonData);
             }
         }
@@ -205,8 +212,16 @@ export const ClientSettings = (props) => {
 
     const updateClientStateuOnClientSaving = (clientData, adminData) => {
         var client = clientDetail;
-        client.localclient.client = clientData;
-        client.localclient.admin[0] = adminData;
+        if (client.localclient != undefined) {
+            client.localclient.client = clientData;
+            if (client.localclient.admin != undefined) {
+                client.localclient.admin[0] = adminData;
+            }
+            else {
+                client.localclient.admin = [];
+                client.localclient.admin.push(adminData)
+            }
+        }
 
         let url = "/clientsettings/" + client.id;
         navigate(url, {
@@ -239,8 +254,8 @@ export const ClientSettings = (props) => {
                             }</button>
                         )
                     })
-                    :
-                    <></>
+                        :
+                        <></>
                 }
             </div>
             <div className="card">

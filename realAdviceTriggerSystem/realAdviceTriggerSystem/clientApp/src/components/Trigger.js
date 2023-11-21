@@ -65,7 +65,7 @@ export const Trigger = (props) => {
         setLocalOfficeDetail(location.state.LocalOfficeDetail);
         setClientDetail(location.state.ClientDetail)
         setWhiseOfficesList(location.state.AllWhiseOffices)
-        getListOfLayoutsByOffice(location.state.LocalOfficeDetail);
+        getListOfLayoutsByOffice(location.state.ClientDetail.localclient.client);
 
         if (location.state.TriggerDetail != undefined) {
             loadTriggerDetailInEdit(location.state.TriggerDetail);
@@ -88,11 +88,11 @@ export const Trigger = (props) => {
 
     }
 
-    const getListOfLayoutsByOffice = async (_localoffice) => {
-        if (_localoffice == undefined) {
-            _localoffice = location.state.LocalOfficeDetail;
+    const getListOfLayoutsByOffice = async (_localclient) => {
+        if (_localclient == undefined) {
+            _localclient = location.state.ClientDetail.localclient.client;
         }
-        const response = await fetch(variables.API_URL + 'Layout/GetLayoutsByOffice?officeId=' + _localoffice.officeid, {
+        const response = await fetch(variables.API_URL + 'Layout/GetLayoutsByClients?clientId=' + _localclient.clientid, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${authUser.tokenValue}`,
@@ -620,7 +620,9 @@ export const Trigger = (props) => {
 
     //}
 
-    const saveTrigger = () => {
+    const saveTrigger = (e) => {
+        e.target.setAttribute("disabled", true);
+        document.querySelector("body").style.cursor = "progress";
         let isFRequiredFieldsEmpty = false;
         const keymomentDropdown = document.getElementById("keymomentDropdown");
         const triggerTypeDropdown = document.getElementById("triggertypeDropdown");
@@ -681,6 +683,8 @@ export const Trigger = (props) => {
 
         if (isFRequiredFieldsEmpty == true) {
             alert("Please fill the required fields");
+            e.target.removeAttribute("disabled");
+            document.querySelector("body").style.cursor = "default";
             return
         }
 
@@ -728,6 +732,8 @@ export const Trigger = (props) => {
         return axios.post(triggerurl, JSON.stringify(objOfficeTrigger), jsonconfig)
             .then((response) => {
                 alert("Trigger successfully saved.");
+                e.target.removeAttribute("disabled");
+                document.querySelector("body").style.cursor = "default";
                 moveBackToOfficeScreen();
             })
             .catch(error => {

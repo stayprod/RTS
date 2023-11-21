@@ -20,14 +20,20 @@ export const EmailLayoutModal = (props) => {
     //let emailLayout = "";
 
     const saveLayoutForOffice = async (e) => {
+        e.target.setAttribute("disabled", true);
+        document.querySelector("body").style.cursor = "progress";
         let layoutName = document.getElementById("newLayoutName").value;
 
         if (layoutName == "") {
             alert("Enter layout name");
+            e.target.removeAttribute("disabled");
+            document.querySelector("body").style.cursor = "default";
             return;
         }
         if (emailLayout == "") {
             alert("Layout shouldn't be empty");
+            e.target.removeAttribute("disabled");
+            document.querySelector("body").style.cursor = "default";
             return;
         }
         let _layout = {
@@ -50,7 +56,9 @@ export const EmailLayoutModal = (props) => {
         // ASP.NET Core API endpoint with headers
         axios.post(url, JSON.stringify(_layout), config) 
             .then(response => {
-                alert("Layout successfully saved.")
+                alert("Layout successfully saved.");
+                e.target.removeAttribute("disabled");
+                document.querySelector("body").style.cursor = "default";
                 reloadLayoutsList();
                 hideLayoutModal();
             })

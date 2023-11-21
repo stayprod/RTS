@@ -271,7 +271,7 @@ export const OfficeSettings = (props) => {
         })
     }
 
-    const savePimcoreSettings = (_elementId) => {
+    const savePimcoreSettings = (_elementId, e, office_detail) => {
         const jsonconfig = {
             headers: {
                 'Authorization': `Bearer ${authUser.tokenValue}`,
@@ -285,7 +285,7 @@ export const OfficeSettings = (props) => {
             let settingId = pimcoreSettings[i] != undefined ? pimcoreSettings[i].pimcoreSettingid : 0;
             let objPimcoreSettings = {
                 PimcoreSettingid: settingId,
-                Officeid: +localOffice.officeid,
+                Officeid: +office_detail.officeid,
                 WhiseOfficeid: +whiseOffice.id,
                 FirstName: document.getElementById("pimcoreFName" + i).value,
                 LastName: document.getElementById("pimcoreLName" + i).value,
@@ -304,9 +304,13 @@ export const OfficeSettings = (props) => {
                 if (_elementId == "saveOfficeSettings") {
                     alert("Office settings successfully saved.");
                 }
+                e.target.removeAttribute("disabled");
+                document.querySelector("body").style.cursor = "default";
             })
             .catch(error => {
                 alert('Error fetching data:', error);
+                e.target.removeAttribute("disabled");
+                document.querySelector("body").style.cursor = "default";
             });
         //use the token to make further calls
     }
@@ -334,10 +338,14 @@ export const OfficeSettings = (props) => {
     }
 
     const saveOfficeSettings = (e) => {
+        e.target.setAttribute("disabled", true);
+        document.querySelector("body").style.cursor = "progress";
         let isRequiredFieldsEmpty = false; 
 
         if (currentClient.localclient == undefined) {
             alert("Please save client settings first");
+            e.target.removeAttribute("disabled");
+            document.querySelector("body").style.cursor = "default";
             return;
         }
 
@@ -363,6 +371,8 @@ export const OfficeSettings = (props) => {
 
         if (isRequiredFieldsEmpty == true) {
             alert("Please filled the required fields");
+            e.target.removeAttribute("disabled");
+            document.querySelector("body").style.cursor = "default";
             return;
         }
 
@@ -396,6 +406,7 @@ export const OfficeSettings = (props) => {
                 location.state.LocalOffice = response.data;
                 if (location.state.LocalOfficesList == undefined) {
                     location.state.LocalOfficesList = [];
+                    //location.state.LocalOfficesList.push(response.data);
                 }
                 const existingOfficeInDb = location.state.LocalOfficesList.filter(item => {
                     return item.officeid == response.data.officeid;
@@ -407,21 +418,23 @@ export const OfficeSettings = (props) => {
                     const indexOfExistedOffice = location.state.LocalOfficesList.indexOf(existingOfficeInDb[0]);
                     location.state.LocalOfficesList[indexOfExistedOffice] = response.data;
                 }
-
-                setClientLocalOffices(location.state.LocalOfficesList);
                 if (settingsToBeRemoved.length > 0) {
                     removePimcoreSettings();
                 }
-                savePimcoreSettings(e.target.id);
-                updateStateAndNavigate(response.data, e.target.id)
+                savePimcoreSettings(e.target.id, e, response.data);
+                updateStateAndNavigate(response.data, e.target.id, location.state.LocalOfficesList)
             })
             .catch(error => {
                 alert('Error fetching data:', error);
+                e.target.removeAttribute("disabled");
+                document.querySelector("body").style.cursor = "default";
             });
         //use the token to make further calls
     }
 
-    const updateStateAndNavigate = (l_office, id) => {
+    const updateStateAndNavigate = (l_office, id, localOfficesList) => {
+
+        setClientLocalOffices(localOfficesList);
 
         const stateBuilder = {
             WhiseOffice: whiseOffice,
@@ -431,7 +444,7 @@ export const OfficeSettings = (props) => {
 
         if (l_office != undefined) {
             stateBuilder.LocalOffice = l_office;
-            stateBuilder.LocalOfficesList = clientLocalOffices;
+            stateBuilder.LocalOfficesList = localOfficesList;
         }
 
         const url = "/officesettings/" + whiseOffice.id;
@@ -451,6 +464,8 @@ export const OfficeSettings = (props) => {
     }
 
     const DeleteTrigger = (e) => {
+        e.target.setAttribute("disabled", true);
+        document.querySelector("body").style.cursor = "progress";
         const trigger = JSON.parse(e.target.getAttribute("trigger"));
 
         const jsonconfig = {
@@ -476,9 +491,13 @@ export const OfficeSettings = (props) => {
                 setTriggers(current => triggersList);
 
                 alert("Trigger deleted successfully.");
+                e.target.removeAttribute("disabled");
+                document.querySelector("body").style.cursor = "default";
             })
             .catch(error => {
                 alert('Error fetching data:', error);
+                e.target.removeAttribute("disabled");
+                document.querySelector("body").style.cursor = "default";
             });
     }
 
@@ -527,6 +546,8 @@ export const OfficeSettings = (props) => {
             alert("Please save office settings first");
             return;
         }
+        e.target.setAttribute("disabled", true);
+        document.querySelector("body").style.cursor = "progress";
         let isFRequiredFieldsEmpty = false;
         const emailProvider = document.getElementById("emailProviders");
         //const smtpUserName = document.getElementById("smtpUserName");
@@ -558,6 +579,8 @@ export const OfficeSettings = (props) => {
 
         if (isFRequiredFieldsEmpty == true) {
             setSmtpFormErrorMessage("Please fill the required fields");
+            e.target.removeAttribute("disabled");
+            document.querySelector("body").style.cursor = "default";
             return
         }
 
@@ -567,6 +590,8 @@ export const OfficeSettings = (props) => {
         if (isValidEmail == false) {
             emailProvider.style.borderColor = "red";
             setSmtpFormErrorMessage("Please enter a valid email");
+            e.target.removeAttribute("disabled");
+            document.querySelector("body").style.cursor = "default";
             return
         }
 
@@ -598,11 +623,15 @@ export const OfficeSettings = (props) => {
             .then((response) => {
                 setSmptSetting(response.data);
                 alert("SMTP settings successfully saved.");
+                e.target.removeAttribute("disabled");
+                document.querySelector("body").style.cursor = "default";
                 setShowSMTPModal(false);
                 document.getElementById("smtpSettings").removeAttribute("disabled");
             })
             .catch(error => {
                 alert('Error fetching data:', error);
+                e.target.removeAttribute("disabled");
+                document.querySelector("body").style.cursor = "default";
             });
     }
     useEffect(() => {
@@ -745,7 +774,7 @@ export const OfficeSettings = (props) => {
                                     <th>Trigger Name</th>
                                     <th>Trigger Type</th>
                                     <th>Trigger Duration</th>
-                                    <th>Target Participent</th>
+                                    <th>Target Participant</th>
                                     {/*<th>Target 1</th>*/}
                                     <th>Created On</th>
                                     <th>Action</th>
@@ -773,7 +802,7 @@ export const OfficeSettings = (props) => {
                                                 {/*}</td>*/}
                                                 <td className="border-end border-bottom p-2 justify-content-center">{createdOn}</td>
                                                 <td className="border-end border-bottom p-2 justify-content-center">
-                                                    <button className="btn-site btn-edit-trigger mb-1" onClick={EditTrigger} trigger={JSON.stringify(item)}>Edit</button>
+                                                    <button className="btn-site btn-edit-trigger mb-1 me-1" onClick={EditTrigger} trigger={JSON.stringify(item)}>Edit</button>
                                                     <button className="btn-site btn-delete-trigger" onClick={DeleteTrigger} trigger={JSON.stringify(item)}>Delete</button>
                                                 </td>
                                             </tr>
