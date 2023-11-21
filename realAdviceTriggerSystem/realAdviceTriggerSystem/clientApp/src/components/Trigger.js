@@ -9,12 +9,6 @@ import SunEditor, { buttonList, height } from 'suneditor-react';
 import 'suneditor/dist/css/suneditor.min.css';
 import { UseAuthContext } from '../context/AuthContext';
 
-import {
-    DraftailEditor, BLOCK_TYPE, INLINE_STYLE, ENTITY_TYPE, UNDO_ICON,
-    createEditorStateFromRaw,
-    serialiseEditorStateToRaw 
-} from "draftail";
-
 import { useToken } from './tokenContext';
 import { variables, editorButtons } from '../Variables';
 
