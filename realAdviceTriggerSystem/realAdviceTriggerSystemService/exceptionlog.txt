@@ -28,3 +28,5 @@ File name: 'MySql.Data, Version=8.2.0.0, Culture=neutral, PublicKeyToken=c5687fc
    at System.Collections.Generic.List`1..ctor(IEnumerable`1 collection)
    at System.Linq.Enumerable.ToList[TSource](IEnumerable`1 source)
    at realAdviceTriggerSystemService.Worker.ExecuteAsync(CancellationToken stoppingToken) in F:\realAdviceTrigerSystem\realAdviceTriggerSystemService\Worker.cs:line 330
+2023-11-27 16:27:00 - Error while sending email using SMTP setting contact email address is:umarfarooq3540@gmail.com  and the exception is The parameter 'address' cannot be an empty string. (Parameter 'address')
+2023-11-27 16:28:59 - Error while sending email using SMTP setting contact email address is:umarfarooq3540@gmail.com  and the exception is The parameter 'address' cannot be an empty string. (Parameter 'address')

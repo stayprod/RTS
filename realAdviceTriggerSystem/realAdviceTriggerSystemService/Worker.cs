@@ -105,6 +105,49 @@ namespace realAdviceTriggerSystemService
                 throw;
             }
         }
+
+        private async Task<string> GetClientTokenAsync(string token, int whiseClientId)
+        {
+            try
+            {
+                // Prepare the request headers
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                // Build the request URL
+                var apiUrl = "https://api.whise.eu/v1/admin/clients/token";
+
+                var data = new
+                {
+                    ClientId = whiseClientId
+                };
+                string jsonData = JsonConvert.SerializeObject(data);
+                var requestContent = new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+                // Send the POST request to retrieve today's appointments
+                var response = await _httpClient.PostAsync(apiUrl, requestContent);
+
+                // Ensure a successful response
+                response.EnsureSuccessStatusCode();
+                // Read the response content
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                // Extract the token from the response JSON
+                var clientToken = JObject.Parse(responseContent)["token"].ToString();
+                return clientToken;
+
+            }
+            catch (Exception exp)
+            {
+                ExceptionsLog("Error while calling method GetClientTokenAsync (whise) " + exp.Message);
+                Worker.LogMessage("Error while calling method GetClientTokenAsync (whise) " + exp.Message);
+                throw;
+            }
+
+        }
+
+
+
         private async Task<AppointmentResponse> GetTodaysAppointmentsAsync(string token)
         {
             try
@@ -313,6 +356,7 @@ namespace realAdviceTriggerSystemService
             try
             {
                 var whiseToken = await GetTokenAsync();
+
                 Worker.LogMessage(" RTS Service has been started ");
                 _emailService = new MandrillEmailService();
 
@@ -320,9 +364,7 @@ namespace realAdviceTriggerSystemService
                 {
                     Worker.LogMessage("---------------------RTS Service processing is in iterations------------------");
 
-                    //1 - you collect all calendar event
-                    var appointments = await GetTodaysAppointmentsAsync(whiseToken);// for all clients
-                    var EstateList = await GetEstateListAsync(whiseToken);
+
                     var countryList = await GetCountryList(whiseToken);
                     using (var con = new realadvicetriggeringsystemContext())
                     {
@@ -332,7 +374,6 @@ namespace realAdviceTriggerSystemService
                         {
                             clients = clients.Where(item => Worker.appGeneralSettings.TargetClientIds.Contains(item.WhiseClientid)).ToList();
                         }
-
 
                         List<AdminDetail> admindetails = con.AdminDetails.ToList();
                         List<Office> offices = con.Offices.ToList();
@@ -357,6 +398,11 @@ namespace realAdviceTriggerSystemService
                             {
                                 continue;
                             }
+                            var clientToken = await GetClientTokenAsync(whiseToken, clientObj.client.WhiseClientid);
+                            //1 - you collect all calendar event
+                            var appointments = await GetTodaysAppointmentsAsync(clientToken);// for all clients
+                            var EstateList = await GetEstateListAsync(clientToken);
+
                             // five options in list 
                             //1=pending
                             // 2=demo
@@ -388,7 +434,7 @@ namespace realAdviceTriggerSystemService
                                             trigger.WhiseOfficeid == appointmentObj.Users[0].OfficeId &&
                                             timeDifference >= triggerSettingTimeSpan)
                                         {
-                                            Worker.LogMessage("control passed from condition of same whise office ids of both trigger settings and appointment onject.\n office id is : " + trigger.WhiseOfficeid + " and time durtion that is in min,hours or days");
+                                            Worker.LogMessage("control passed from condition of same whise office ids of both trigger settings and appointment object.\n office id is : " + trigger.WhiseOfficeid + " and time durtion that is in min,hours or days");
                                             foreach (var estateListObj in EstateList.estates)
                                             {
                                                 // point-2 condtion
@@ -494,6 +540,7 @@ namespace realAdviceTriggerSystemService
                                                             {
                                                                 htmlBuilder.Append($"<a href=\"{outputString}\"><button>{i}</button></a>");
                                                             }
+                                                            htmlBuilder.Append($"<br/><a href=\"{outputString}\">{outputString}</a><br/>");
                                                             prefrences = trigger.ContactPreference;
                                                             Dictionary<string, string> emailBodyLayout = new Dictionary<string, string>
                                                             {
@@ -642,6 +689,10 @@ namespace realAdviceTriggerSystemService
                                                     {
                                                         Worker.LogMessage($"Client({clientObj.client.CommercialName}) control cannot pass from Transaction checks and its whise client id is : {trigger.WhiseClientid} whise office id is :{trigger.WhiseOfficeid}");
                                                     }
+                                                }
+                                                else
+                                                {
+                                                    Worker.LogMessage($"Client({clientObj.client.CommercialName}) control cannot pass from estateID check and its whise client id is : {trigger.WhiseClientid} whise office id is :{trigger.WhiseOfficeid}");
                                                 }
 
                                             }

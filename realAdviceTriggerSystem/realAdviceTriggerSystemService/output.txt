@@ -317,3 +317,41 @@
 2023-11-14 18:02:59 -  RTS Service has been started 
 2023-11-14 18:02:59 - ---------------------RTS Service processing is in iterations------------------
 2023-11-14 18:03:08 - Control passed from Activation Status(client(10263  RealAdvice_Developer_Test) is not deactivated)
+2023-11-27 15:56:00 -  RTS Service has been started 
+2023-11-27 15:56:00 - ---------------------RTS Service processing is in iterations------------------
+2023-11-27 15:56:57 - Control passed from Activation Status(client(2236  ) is not deactivated)
+2023-11-27 15:56:57 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 3919 and time durtion that is in min,hours or days
+2023-11-27 15:56:57 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 3919 and time durtion that is in min,hours or days
+2023-11-27 15:56:57 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 3919 and time durtion that is in min,hours or days
+2023-11-27 15:56:57 - control passed from condition of same whise office ids of both trigger settings and appointment onject.
+ office id is : 3919 and time durtion that is in min,hours or days
+2023-11-27 16:00:06 -  RTS Service has been started 
+2023-11-27 16:00:06 - ---------------------RTS Service processing is in iterations------------------
+2023-11-27 16:00:22 - Control passed from Activation Status(client(2236  ) is not deactivated)
+2023-11-27 16:00:22 - control passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 3919 and time durtion that is in min,hours or days
+2023-11-27 16:03:00 -  RTS Service has been started 
+2023-11-27 16:03:00 - ---------------------RTS Service processing is in iterations------------------
+2023-11-27 16:03:20 - Control passed from Activation Status(client(2236  ) is not deactivated)
+2023-11-27 16:03:20 - control passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 3919 and time durtion that is in min,hours or days
+2023-11-27 16:24:00 -  RTS Service has been started 
+2023-11-27 16:24:00 - ---------------------RTS Service processing is in iterations------------------
+2023-11-27 16:24:11 - Control passed from Activation Status(client(2236  ) is not deactivated)
+2023-11-27 16:24:11 - control passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 3919 and time durtion that is in min,hours or days
+2023-11-27 16:26:57 - control pass from Transaction checks with whise office id :3919and whsie client id2236
+2023-11-27 16:27:00 - Error while sending email using SMTP setting contact email address is:umarfarooq3540@gmail.com  and the exception is The parameter 'address' cannot be an empty string. (Parameter 'address')
+2023-11-27 16:28:15 - control passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 3919 and time durtion that is in min,hours or days
+2023-11-27 16:28:27 - Client() control cannot pass from Transaction checks and its whise client id is : 2236 whise office id is :3919
+2023-11-27 16:28:27 - control passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 3919 and time durtion that is in min,hours or days
+2023-11-27 16:28:51 - Client() control cannot pass from Transaction checks and its whise client id is : 2236 whise office id is :3919
+2023-11-27 16:28:51 - control passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 3919 and time durtion that is in min,hours or days
+2023-11-27 16:28:57 - control pass from Transaction checks with whise office id :3919and whsie client id2236
+2023-11-27 16:28:59 - Error while sending email using SMTP setting contact email address is:umarfarooq3540@gmail.com  and the exception is The parameter 'address' cannot be an empty string. (Parameter 'address')
