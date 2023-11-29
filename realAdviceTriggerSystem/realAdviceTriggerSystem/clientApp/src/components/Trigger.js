@@ -27,9 +27,12 @@ export const Trigger = (props) => {
     const [finalTriggerName, setFinalTriggerName] = useState("Trigger:");
     const [whiseOfficeDetail, setWhiseOfficeDetail] = useState({});
     const [localOfficeDetail, setLocalOfficeDetail] = useState({});
+    const [clientTokken, setClientTokken] = useState("");
     const [clientDetail, setClientDetail] = useState({});
     const [whiseOfficesList, setWhiseOfficesList] = useState({});
     const [data, setData] = useState([]);
+    const [datafr, setDatafr] = useState([]);
+    const [datanl, setDatanl] = useState([]);
     const [selectedOption, setSelectedOption] = useState('');
     const [selected, setSelected] = useState([]);
     const [selectedTarget, setSelectedTarget] = useState([]);
@@ -779,6 +782,79 @@ export const Trigger = (props) => {
             getNavigateState();
         }
 
+        if (clientTokken == "" || clientTokken == undefined) {
+            return
+        }
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${clientTokken}`,
+                'Content-Type': 'application/json'
+            },
+        };
+        let enData = [], frData = [], nlData = [];
+        axios.post('https://api.whise.eu/v1/calendars/actions/list', { "LanguageId": "en-GB" }, config) // ASP.NET Core API endpoint with headers
+            .then(response => {
+                //  setData(response.data.calendarActions);
+                enData = response.data.calendarActions;
+
+                axios.post('https://api.whise.eu/v1/calendars/actions/list', { "LanguageId": "fr-BE" }, config) // ASP.NET Core API endpoint with headers
+                    .then(response => {
+                        //setDatafr(response.data.calendarActions);
+                        frData = response.data.calendarActions;
+
+                        axios.post('https://api.whise.eu/v1/calendars/actions/list', { "LanguageId": "nl-BE" }, config) // ASP.NET Core API endpoint with headers
+                            .then(response => {
+                                //setDatanl(response.data.calendarActions);
+                                nlData = response.data.calendarActions;
+
+                                //merge data into one 
+                                let mergedData = [];
+                                let empty = " ";
+                                for (let index = 0; index < enData.length + 1; index++) {
+                                    if (enData[index] != undefined) {
+                                        if (frData[index].name == undefined) {
+                                            frData[index].name = empty;
+                                        }
+                                        if (enData[index].name == undefined) {
+                                            enData[index].name = empty;
+                                        }
+                                        if (nlData[index].name == undefined) {
+                                            nlData[index].name = empty;
+                                        }
+                                        //  data[index].name = data[index].name, datafr[index].name, datanl[index].name
+                                        let newAction = enData[index];
+                                        newAction.name = enData[index].name + ", " + frData[index].name + "," + nlData[index].name
+                                        mergedData.push(newAction);
+                                    }
+                                }
+                                setData(mergedData);
+                            })
+                            .catch(error => {
+                                console.error('Error fetching data:', error);
+                            });
+
+                    })
+                    .catch(error => {
+                        console.error('Error fetching data:', error);
+                    });
+
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+
+
+    }, [clientTokken])
+
+
+
+
+    useEffect(() => {
+
+        if (location.state != null) {
+            getNavigateState();
+        }
+
         if (token == undefined) {
             return
         }
@@ -788,15 +864,14 @@ export const Trigger = (props) => {
                 'Content-Type': 'application/json'
             },
         };
-        axios.post('https://api.whise.eu/v1/calendars/actions/list', {}, config) // ASP.NET Core API endpoint with headers
+        axios.post('https://api.whise.eu/v1/admin/clients/token', { "clientId": location.state.ClientDetail.id }, config) // ASP.NET Core API endpoint with headers
             .then(response => {
-                setData(response.data.calendarActions);
+                setClientTokken(response.data.token);
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
             });
     }, [token])
-
     useEffect(() => {
         if (location.state.TriggerDetail != undefined)
             document.getElementById("whiseAppointmentType").value = location.state.TriggerDetail.appointmentType;
@@ -933,7 +1008,7 @@ export const Trigger = (props) => {
                         <div className="col-sm-12 col-md-4 mb-3">
                             <label>WHISE</label>
                             <select className="form-select" id="whiseAppointmentType" onChange={resetConditionDropdowns}>
-                                <option value="">Select an option</option>
+                                <option value="">Select an option (en,fr,nl)</option>
                                 {data?.map((option) => (
                                     <option key={option.id} value={option.id}>
                                         {option.name}({option.id})

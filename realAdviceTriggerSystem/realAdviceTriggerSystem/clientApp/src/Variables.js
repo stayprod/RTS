@@ -1,8 +1,8 @@
 ﻿export const variables = {
     //API_URL: "http://localhost:8082/api/"
-    API_URL: "https://localhost:7139/api/"
-    //API_URL: "http://localhost:54372/api/"
-    //API_URL: "https://ray-api.net7.be/api/"
+    //API_URL: "https://localhost:7139/api/" // for local
+    //API_URL: "http://localhost:54372/api/" // for itra
+    API_URL: "https://ray-api.net7.be/api/" // for live server
 };
 
 export const validEmail = new RegExp(

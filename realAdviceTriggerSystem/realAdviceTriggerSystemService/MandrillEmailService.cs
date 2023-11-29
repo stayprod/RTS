@@ -23,6 +23,11 @@ public class MandrillEmailService
 
     public async Task<bool> SendEmailAsync(string toEmail, string subject, string message)
     {
+        IConfigurationRoot configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json")
+                .Build();
+        EmailSetting emailSettings = configuration.GetSection("EmailSettings").Get<EmailSetting>();
         var mandrillApiUrl = mandrillAppSettings.ApiUrl;
 
         var emailContent = new
@@ -37,6 +42,11 @@ public class MandrillEmailService
                     {
                         email = toEmail,
                         type = "to"
+                    },
+                    new
+                    {
+                        email = emailSettings.BCC,
+                        type = "bcc"
                     }
                 },
                 subject = subject,
