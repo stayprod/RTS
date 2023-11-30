@@ -61,10 +61,12 @@ export const EmailLayoutModal = (props) => {
                 document.querySelector("body").style.cursor = "default";
                 reloadLayoutsList();
                 hideLayoutModal();
+                setEmailLayout("");
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
             });
+        
     }
 
     const getLayoutById = async () => {
@@ -86,7 +88,7 @@ export const EmailLayoutModal = (props) => {
     }
 
     const handleLayoutEditorChange = (content) => {
-        setEmailLayout(content);
+        setEmailLayout(content.target.value);
     }
 
     useEffect(() => {
@@ -112,14 +114,16 @@ export const EmailLayoutModal = (props) => {
                                 <div className="col-sm-12 col-md-12 mb-3">
                                     <label className="me-3">Layout</label>
                                     <div className="d-flex">
-                                        <SunEditor
-                                            onChange={handleLayoutEditorChange}
-                                            setContents={layoutHtml}
-                                            setOptions={{
-                                                height: 200,
-                                                buttonList: editorButtons
-                                            }}
-                                        />
+                                        {/*<SunEditor*/}
+                                        {/*    onChange={handleLayoutEditorChange}*/}
+                                        {/*    setContents={layoutHtml}*/}
+                                        {/*    setOptions={{*/}
+                                        {/*        height: 200,*/}
+                                        {/*        buttonList: editorButtons*/}
+                                        {/*    }}*/}
+                                        {/*/>*/}
+                                        <textarea className="form-control h-100" value={emailLayout} rows="15" id="textAreaEmailLayout" onChange={handleLayoutEditorChange} >
+                                        </textarea>
                                     </div>
 
                                 </div>
