@@ -4,6 +4,7 @@ import { ClientSettings } from "./components/ClientSettings";
 import { OfficeSettings } from "./components/OfficeSettings";
 import { Trigger } from "./components/Trigger";
 import { Login } from "./components/Login";
+import { Log } from "./components/Log";
 
 const AppRoutes = [
     {
@@ -25,6 +26,10 @@ const AppRoutes = [
     {
         path: "/trigger/:whiseofficeid",
         element: <Trigger />
+    },
+    {
+        path: "/log",
+        element: <Log />
     }
 
 ];

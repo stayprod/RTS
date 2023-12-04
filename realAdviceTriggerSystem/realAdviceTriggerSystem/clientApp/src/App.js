@@ -11,6 +11,7 @@ import { Offices } from "./components/Offices";
 import { ClientSettings } from "./components/ClientSettings";
 import { OfficeSettings } from "./components/OfficeSettings";
 import { Trigger } from "./components/Trigger";
+import { Log } from './components/Log';
 
 const App = () => {
 
@@ -25,6 +26,7 @@ const App = () => {
                         <Route path="/clientsettings/:clientid" element={<ClientSettings />} />
                         <Route path="/officesettings/:whiseofficeid" element={<OfficeSettings />} />
                         <Route path="/trigger/:whiseofficeid" element={<Trigger />} />
+                        <Route path="/log" element={<Log/> } />
                     </Routes>
                 </Layout>
             </AuthProvider>

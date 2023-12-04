@@ -39,6 +39,24 @@ namespace realAdviceTriggerSystemAPI.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("GetAllEmailsTransactionLog")]
+        public JsonResult GetAllEmailsTransactionLog()
+        {
+            try
+            {
+                using (var con = new RealadviceTriggeringSystemContext())
+                {
+                    List<RtsEmailLog>? _rtsEmailsTransactionLog = con.RtsEmailLogs.ToList();
+                    return new JsonResult(_rtsEmailsTransactionLog);
+                }
+            }
+            catch (Exception exp)
+            {
+                _exceptionWriter.WriteException(exp);
+                return new JsonResult(exp.Message);
+            }
+        }
 
         [HttpGet]
         [Route("GetAllTriggersByOffice")]
