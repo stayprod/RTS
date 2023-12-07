@@ -428,6 +428,23 @@ namespace realAdviceTriggerSystemService
                                         DateTime appointmentTime = createdOn.AddHours(Worker.appGeneralSettings.TimeZoneDifferenceInHours);
                                         DateTime currentTime = DateTime.Now;
                                         TimeSpan timeDifference = currentTime - appointmentTime;
+                                        TriggerEmailTransactionLog transactionLogObj = new TriggerEmailTransactionLog();
+                                        transactionLogObj.TriggerType = Convert.ToInt32(trigger.TriggerType);
+
+                                        transactionLogObj.CalendarEventId = appointmentObj.Id;
+
+                                        transactionLogObj.EmailOpened = 0;
+                                        transactionLogObj.LinkClicked = 0;
+                                        transactionLogObj.ClientName = "";
+                                        transactionLogObj.ClientId = (int)trigger.WhiseClientid;
+                                        transactionLogObj.OfficeName = "";
+                                        transactionLogObj.OfficeId = (int)trigger.WhiseOfficeid;
+                                        transactionLogObj.UserId = 0;
+                                        transactionLogObj.AppointmentStartDate = (DateTime)appointmentObj.StartDateTime;
+                                        transactionLogObj.AppointmentEndDate = (DateTime)appointmentObj.EndDateTime;
+                                        
+                                        
+
                                         if (appointmentObj.estates != null &&
                                             trigger.TriggerType == "1" && // 1 means email and 2 means sms
                                             trigger.TargetParticipant1 == "1" && // 1 means there are some partipents and 2 means no partipents
@@ -440,6 +457,8 @@ namespace realAdviceTriggerSystemService
                                                 // point-2 condtion
                                                 if (appointmentObj.estates[0].estateId == estateListObj.Id)
                                                 {
+                                                    transactionLogObj.EstateId = appointmentObj.estates[0].estateId;
+
                                                     //4-THEN back to the calendar event you look to the action ID and you compare if this actionid is mapped to any of the triggers of this office
                                                     // here action id is AppointmentType
                                                     //5-THEN you will check if there is condition related to the estate transaction type and or transaction status
@@ -462,6 +481,7 @@ namespace realAdviceTriggerSystemService
                                                         Worker.LogMessage("control pass from Transaction checks with whise office id :" + trigger.WhiseOfficeid + "and whsie client id" + trigger.WhiseClientid);
                                                         foreach (var contact in appointmentObj.Contacts)
                                                         {
+                                                            transactionLogObj.ContactId = contact.ContactId;
                                                             var toEmail = "";
                                                             if (contact.PrivateEmail != null)
                                                             {
@@ -589,6 +609,11 @@ namespace realAdviceTriggerSystemService
                                                                                 {
                                                                                     insertLog(trigger.OfficeTriggerid, contact.PrivateEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
 
+                                                                                    transactionLogObj.TransactionDate = DateTime.Now;
+                                                                                    transactionLogObj.Error = "No";
+                                                                                    transactionLogObj.Status = "Sent";
+
+                                                                                    insertInTriggerTransactionLog(transactionLogObj);
                                                                                     Worker.LogMessage("email send successfully using private email to " + contact.PrivateEmail);
                                                                                 }
 
@@ -599,7 +624,10 @@ namespace realAdviceTriggerSystemService
                                                                                 if (isSecondEmailSend)
                                                                                 {
                                                                                     insertLog(trigger.OfficeTriggerid, contact.businessEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
-
+                                                                                    transactionLogObj.TransactionDate = DateTime.Now;
+                                                                                    transactionLogObj.Error = "No";
+                                                                                    transactionLogObj.Status = "Sent";
+                                                                                    insertInTriggerTransactionLog(transactionLogObj);
                                                                                     Worker.LogMessage("email send successfully to " + contact.businessEmail);
                                                                                 }
                                                                             }
@@ -622,7 +650,10 @@ namespace realAdviceTriggerSystemService
                                                                         if (isEmailSend)
                                                                         {
                                                                             insertLog(trigger.OfficeTriggerid, recipientEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
-
+                                                                            transactionLogObj.TransactionDate = DateTime.Now;
+                                                                            transactionLogObj.Error = "No";
+                                                                            transactionLogObj.Status = "Sent";
+                                                                            insertInTriggerTransactionLog(transactionLogObj);
                                                                             Worker.LogMessage("email send successfully to " + recipientEmail);
                                                                         }
                                                                     }
@@ -642,6 +673,10 @@ namespace realAdviceTriggerSystemService
                                                                                 if (response)
                                                                                 {
                                                                                     insertLog(trigger.OfficeTriggerid, contact.PrivateEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
+                                                                                    transactionLogObj.TransactionDate = DateTime.Now;
+                                                                                    transactionLogObj.Error = "No";
+                                                                                    transactionLogObj.Status = "Sent";
+                                                                                    insertInTriggerTransactionLog(transactionLogObj);
                                                                                     Worker.LogMessage("email send successfully from mandrill using private email to " + contact.PrivateEmail);
                                                                                 }
                                                                             }
@@ -651,6 +686,10 @@ namespace realAdviceTriggerSystemService
                                                                                 if (secondresponse)
                                                                                 {
                                                                                     insertLog(trigger.OfficeTriggerid, contact.businessEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
+                                                                                    transactionLogObj.TransactionDate = DateTime.Now;
+                                                                                    transactionLogObj.Error = "No";
+                                                                                    transactionLogObj.Status = "Sent";
+                                                                                    insertInTriggerTransactionLog(transactionLogObj);
                                                                                     Worker.LogMessage("email send successfully from mandrill using business email to  " + contact.businessEmail);
                                                                                 }
                                                                             }
@@ -674,6 +713,10 @@ namespace realAdviceTriggerSystemService
                                                                         if (response)
                                                                         {
                                                                             insertLog(trigger.OfficeTriggerid, recipientEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
+                                                                            transactionLogObj.TransactionDate = DateTime.Now;
+                                                                            transactionLogObj.Error = "No";
+                                                                            transactionLogObj.Status = "Sent";
+                                                                            insertInTriggerTransactionLog(transactionLogObj);
                                                                             Worker.LogMessage("Email send successfully from mandrill to " + recipientEmail);
                                                                         }
                                                                     }
@@ -699,6 +742,10 @@ namespace realAdviceTriggerSystemService
                                         }
                                         else
                                         {
+                                            transactionLogObj.TransactionDate = DateTime.Now;
+                                            transactionLogObj.Error = "No";
+                                            transactionLogObj.Status = "Planned / To be processed";
+                                            insertInTriggerTransactionLog(transactionLogObj);
                                             Worker.LogMessage("control cannot passed from condition of same whise office ids of both trigger settings and appointment object.\n office id is : " + trigger.WhiseOfficeid + " and time durtion that is in min, hours or days");
                                         }
                                     }
@@ -720,6 +767,37 @@ namespace realAdviceTriggerSystemService
             {
                 ExceptionsLog("An error occurred while retrieving data from API" + ex);
                 _logger.LogError(ex, "An error occurred while retrieving data from API");
+            }
+        }
+
+//        public static void insertInTriggerTransactionLog(int triggerType, int calendarEventId,string error,string status,ulong emailOpened, ulong linkClicked,string clientName,
+//          int WhiseClntid,string whiseOffName,int WhiseOffid,int userId, int ContId,DateTime appointmentStartDate,DateTime appointmentEndDate, int appointmentObjID, int appointmentObjEstateID)
+        public static void insertInTriggerTransactionLog(TriggerEmailTransactionLog t)
+        {
+            using (var con = new realadvicetriggeringsystemContext())
+            {/*
+                var t = new TriggerEmailTransactionLog //Make sure you have a table called test in DB
+                {
+                    TriggerType = triggerType,
+                    CalendarEventId = calendarEventId,
+                    TransactionDate = DateTime.Now,
+                    Error= error,
+                    Status= status,
+                    EmailOpened= emailOpened,
+                    LinkClicked= linkClicked,
+                    ClientName= clientName,
+                    ClientId = WhiseClntid,
+                    OfficeName= whiseOffName,
+                    OfficeId= WhiseOffid,
+                    UserId= userId,
+                    AppointmentStartDate= appointmentStartDate,
+                    AppointmentEndDate= appointmentEndDate,
+                    ContactId = ContId,
+                    EstateId = appointmentObjEstateID
+                };
+                */
+                con.TriggerEmailTransactionLogs.Add(t);
+                con.SaveChanges();
             }
         }
     }

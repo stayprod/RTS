@@ -31,11 +31,13 @@ public partial class realadvicetriggeringsystemContext : DbContext
 
     public virtual DbSet<RtsEmailLog> RtsEmailLogs { get; set; }
 
+    public virtual DbSet<TriggerEmailTransactionLog> TriggerEmailTransactionLogs { get; set; }
+
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseMySql("server=172.20.1.96;port=3306;database=realadvice-triggering-system;user=admin;password=75X+LD7q8XsJ;persist security info=true;connect timeout=6000;convertzerodatetime=True", Microsoft.EntityFrameworkCore.ServerVersion.Parse("10.11.4-mariadb"));
+        => optionsBuilder.UseMySql("server=localhost;port=3306;database=realadvice-triggering-system;user=pimcore_user;password=eezahtech*1;persist security info=False;connect timeout=300;convertzerodatetime=True", Microsoft.EntityFrameworkCore.ServerVersion.Parse("10.4.6-mariadb"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -396,6 +398,65 @@ public partial class realadvicetriggeringsystemContext : DbContext
             entity.Property(e => e.WhiseOfficeid)
                 .HasColumnType("int(11)")
                 .HasColumnName("whise_officeid");
+        });
+
+        modelBuilder.Entity<TriggerEmailTransactionLog>(entity =>
+        {
+            entity.HasKey(e => e.EmailTransactionLogId).HasName("PRIMARY");
+
+            entity.ToTable("trigger_email_transaction_log");
+
+            entity.Property(e => e.EmailTransactionLogId)
+                .HasColumnType("int(11)")
+                .HasColumnName("email_transaction_log_id");
+            entity.Property(e => e.AppointmentEndDate)
+                .HasColumnType("datetime")
+                .HasColumnName("appointment_end_date");
+            entity.Property(e => e.AppointmentStartDate)
+                .HasColumnType("datetime")
+                .HasColumnName("appointment_start_date");
+            entity.Property(e => e.CalendarEventId)
+                .HasColumnType("int(11)")
+                .HasColumnName("calendar_event_id");
+            entity.Property(e => e.ClientId)
+                .HasColumnType("int(11)")
+                .HasColumnName("client_id");
+            entity.Property(e => e.ClientName)
+                .HasColumnType("text")
+                .HasColumnName("client_name");
+            entity.Property(e => e.ContactId)
+                .HasColumnType("int(11)")
+                .HasColumnName("contact_id");
+            entity.Property(e => e.EmailOpened)
+                .HasColumnType("bit(1)")
+                .HasColumnName("email_opened");
+            entity.Property(e => e.Error)
+                .HasColumnType("text")
+                .HasColumnName("error");
+            entity.Property(e => e.EstateId)
+                .HasColumnType("int(11)")
+                .HasColumnName("estate_id");
+            entity.Property(e => e.LinkClicked)
+                .HasColumnType("bit(1)")
+                .HasColumnName("link_clicked");
+            entity.Property(e => e.OfficeId)
+                .HasColumnType("int(11)")
+                .HasColumnName("office_id");
+            entity.Property(e => e.OfficeName)
+                .HasColumnType("text")
+                .HasColumnName("office_name");
+            entity.Property(e => e.Status)
+                .HasColumnType("text")
+                .HasColumnName("status");
+            entity.Property(e => e.TransactionDate)
+                .HasColumnType("datetime")
+                .HasColumnName("transaction_date");
+            entity.Property(e => e.TriggerType)
+                .HasColumnType("int(11)")
+                .HasColumnName("trigger_type");
+            entity.Property(e => e.UserId)
+                .HasColumnType("int(11)")
+                .HasColumnName("user_id");
         });
 
         modelBuilder.Entity<User>(entity =>

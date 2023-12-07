@@ -59,6 +59,25 @@ namespace realAdviceTriggerSystemAPI.Controllers
         }
 
         [HttpGet]
+        [Route("GetAllTriggersEmailsTransactionLog")]
+        public JsonResult GetAllTriggersEmailsTransactionLog()
+        {
+            try
+            {
+                using (var con = new RealadviceTriggeringSystemContext())
+                {
+                    List<TriggerEmailTransactionLog>? _rtsEmailsTransactionLog = con.TriggerEmailTransactionLogs.ToList();
+                    return new JsonResult(_rtsEmailsTransactionLog);
+                }
+            }
+            catch (Exception exp)
+            {
+                _exceptionWriter.WriteException(exp);
+                return new JsonResult(exp.Message);
+            }
+        }
+
+        [HttpGet]
         [Route("GetAllTriggersByOffice")]
         public JsonResult GetAllTriggersByOffice(int officeId)
         {
@@ -133,6 +152,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
                         _trigger.EnglishSubject = officeTrigger.EnglishSubject;
                         _trigger.FrenchSubject = officeTrigger.FrenchSubject;
                         _trigger.DutchSubject = officeTrigger.DutchSubject;
+                        _trigger.TexteTemplateId = officeTrigger.TexteTemplateId;
                         con.SaveChanges();
                     }
                     else

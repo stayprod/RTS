@@ -621,12 +621,18 @@ export const OfficeSettings = (props) => {
         let url = variables.API_URL + `Client/SaveSMTPSettings?`;
         return axios.post(url, JSON.stringify(objSMTPClient), jsonconfig)
             .then((response) => {
-                setSmptSetting(response.data);
-                alert("SMTP settings successfully saved.");
                 e.target.removeAttribute("disabled");
                 document.querySelector("body").style.cursor = "default";
-                setShowSMTPModal(false);
-                document.getElementById("smtpSettings").removeAttribute("disabled");
+                if (response.data != undefined && response.data == "SMTP Settings invalid") {
+                    alert("SMTP settings are not valid, provide valid settings and then save it");
+                }
+                else { 
+                    setSmptSetting(response.data);
+                    alert("SMTP settings successfully saved.");
+                    
+                    setShowSMTPModal(false);
+                    document.getElementById("smtpSettings").removeAttribute("disabled");
+                }
             })
             .catch(error => {
                 alert('Error fetching data:', error);

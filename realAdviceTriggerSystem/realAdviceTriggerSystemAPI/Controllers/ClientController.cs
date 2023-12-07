@@ -5,8 +5,11 @@ using Microsoft.IdentityModel.Tokens;
 using realAdviceTriggerSystemAPI.Models;
 using realAdviceTriggerSystemAPI.Repository;
 using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+using System.Net.Mail;
 using System.Reflection;
 using System.Security.Claims;
 using System.Text;
@@ -132,32 +135,40 @@ namespace realAdviceTriggerSystemAPI.Controllers
             {
                 using (var con = new RealadviceTriggeringSystemContext())
                 {
-                    OfficeSmtpsetting? _smtpSetting = con.OfficeSmtpsettings.Where(c => c.Settingid == smtpObj.Settingid).FirstOrDefault();
-
-                    if (_smtpSetting != null)
+                    if (ValidateNewSMTPSettings("abid.mahmood8@gmail.com", "Validate new client SMTP Settings", "Validate new client SMTP Settings", smtpObj, true))
                     {
-                        _smtpSetting.Clientid = smtpObj.Clientid;
-                        _smtpSetting.Officeid = smtpObj.Officeid;
-                        _smtpSetting.WhiseClientid = smtpObj.WhiseClientid;
-                        _smtpSetting.WhiseOfficeid = smtpObj.WhiseOfficeid;
-                        _smtpSetting.EmailProvider = smtpObj.EmailProvider;
-                        _smtpSetting.UserName = smtpObj.UserName;
-                        _smtpSetting.Password = smtpObj.Password;
-                        _smtpSetting.ImapServer = smtpObj.ImapServer;
-                        _smtpSetting.Port = smtpObj.Port;
-                        _smtpSetting.SslSetting = smtpObj.SslSetting;
-                        _smtpSetting.UpdatedOn = DateTime.Now;
-                        con.SaveChanges();
+
+                        OfficeSmtpsetting? _smtpSetting = con.OfficeSmtpsettings.Where(c => c.Settingid == smtpObj.Settingid).FirstOrDefault();
+
+                        if (_smtpSetting != null)
+                        {
+                            _smtpSetting.Clientid = smtpObj.Clientid;
+                            _smtpSetting.Officeid = smtpObj.Officeid;
+                            _smtpSetting.WhiseClientid = smtpObj.WhiseClientid;
+                            _smtpSetting.WhiseOfficeid = smtpObj.WhiseOfficeid;
+                            _smtpSetting.EmailProvider = smtpObj.EmailProvider;
+                            _smtpSetting.UserName = smtpObj.UserName;
+                            _smtpSetting.Password = smtpObj.Password;
+                            _smtpSetting.ImapServer = smtpObj.ImapServer;
+                            _smtpSetting.Port = smtpObj.Port;
+                            _smtpSetting.SslSetting = smtpObj.SslSetting;
+                            _smtpSetting.UpdatedOn = DateTime.Now;
+                            con.SaveChanges();
+                        }
+                        else
+                        {
+                            smtpObj.CreatedOn = DateTime.Now;
+                            smtpObj.UpdatedOn = DateTime.Now;
+                            con.OfficeSmtpsettings.Add(smtpObj);
+                            con.SaveChanges();
+                        }
+
+                        return new JsonResult(smtpObj);
                     }
                     else
                     {
-                        smtpObj.CreatedOn = DateTime.Now;
-                        smtpObj.UpdatedOn = DateTime.Now;
-                        con.OfficeSmtpsettings.Add(smtpObj);
-                        con.SaveChanges();
+                        return new JsonResult("SMTP Settings invalid");
                     }
-
-                    return new JsonResult(smtpObj);
                 }
             }
             catch (Exception exp)
@@ -165,6 +176,90 @@ namespace realAdviceTriggerSystemAPI.Controllers
                 _exceptionWriter.WriteException(exp);
                 return new JsonResult(exp.Message);
             }
+        }
+
+        private bool ValidateNewSMTPSettings(string ToEmail, string Subject, string Message, OfficeSmtpsetting settings, bool IsBodyHtml = true)
+        {
+            bool status = false;
+            try
+            {
+                string HostAddress = settings.ImapServer;
+                string FormEmailId = settings.EmailProvider;
+                string Password = settings.Password;
+                string Port = settings.Port.ToString();
+                MailMessage mailMessage = new MailMessage();
+                mailMessage.From = new MailAddress(FormEmailId);
+                mailMessage.Subject = Subject;
+                mailMessage.Body = Message;
+                mailMessage.IsBodyHtml = IsBodyHtml;
+                mailMessage.To.Add(new MailAddress(ToEmail));// (SenderEmail));
+                
+                SmtpClient smtp = new SmtpClient();
+                smtp.Host = HostAddress;
+                smtp.EnableSsl = Convert.ToBoolean(settings.SslSetting);
+                NetworkCredential networkCredential = new NetworkCredential();
+                networkCredential.UserName = mailMessage.From.Address;
+                networkCredential.Password = Password;
+                smtp.UseDefaultCredentials = false;  // Enter seders User name and password  
+                smtp.Credentials = networkCredential;
+                smtp.Port = Convert.ToInt32(Port);
+                smtp.Send(mailMessage);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                //Worker.ExceptionsLog("Error while sending email using SMTP setting contact email address is:" + ToEmail + "  and the exception is " + ex.Message);
+                //Worker.LogMessage("Error while sending email using SMTP setting contact email address is:" + ToEmail + "  and the exception is " + ex.Message);
+                return status;
+            }
+            /*
+            try
+            {
+                using (var con = new RealadviceTriggeringSystemContext())
+                {
+                    OfficeSmtpsetting? _client = con.OfficeSmtpsettings.Where(c => c.Officeid == officeid).FirstOrDefault();
+                    return new JsonResult(_client);
+                }
+            }
+            catch (Exception exp)
+            {
+                _exceptionWriter.WriteException(exp);
+                return new JsonResult(exp.Message);
+            }*/
+            /*
+            try
+            {
+                MailMessage mailMessage = new MailMessage();
+                mailMessage.From = new MailAddress(FormEmailId);
+                mailMessage.Subject = "Validate new client SMTP Settings";
+                mailMessage.Body = "Validate new client SMTP Settings";
+                mailMessage.IsBodyHtml = true;// IsBodyHtml;
+                mailMessage.To.Add(new MailAddress(ToEmail));// (SenderEmail));
+                
+                SmtpClient smtp = new SmtpClient();
+                smtp.Host = HostAddress; // take from user
+                smtp.EnableSsl = false; // take from user
+                NetworkCredential networkCredential = new NetworkCredential();
+                networkCredential.UserName = mailMessage.From.Address; // take from user
+                networkCredential.Password = Password; // take from user
+                smtp.UseDefaultCredentials = false;  // Enter seders User name and password  
+                smtp.Credentials = networkCredential;
+                smtp.Port = Convert.ToInt32(Port);  // take from user
+                smtp.Send(mailMessage);
+                return true;
+                //smtpClient.Send(new mailmessage("test@test.com", "test@test.com", "test", "test"));
+
+                //return string.Empty;
+            }
+            catch (SmtpFailedRecipientException)
+            {
+                return string.Empty;
+            }
+            catch (Exception ex)
+            {
+                return string.Format("SMTP server connection test failed: {0}", ex.InnerException != null ? ex.InnerException.Message : ex.Message);
+            }
+            return true;*/
         }
 
         [HttpGet]

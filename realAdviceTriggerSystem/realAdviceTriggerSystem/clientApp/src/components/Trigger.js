@@ -13,6 +13,7 @@ import { useToken } from './tokenContext';
 import { variables, editorButtons } from '../Variables';
 
 import { EmailLayoutModal } from './EmailLayout';
+import { EamilTexte } from "./EmailTexte"
 
 const targetOptions = [
     { label: "Vendor", value: "1" },
@@ -69,6 +70,7 @@ export const Trigger = (props) => {
         setClientDetail(location.state.ClientDetail)
         setWhiseOfficesList(location.state.AllWhiseOffices)
         getListOfLayoutsByOffice(location.state.ClientDetail.localclient.client);
+        getListOfTexteEmailLayout();
 
         if (location.state.TriggerDetail != undefined) {
             loadTriggerDetailInEdit(location.state.TriggerDetail);
@@ -156,9 +158,9 @@ export const Trigger = (props) => {
         setEmailTexteFrench(trigger.texteFrench);
         setEmailTexteDutch(trigger.texteDutch);
 
-        document.getElementById("texteEngSubject").value = trigger.englishSubject;
-        document.getElementById("texteFrSubject").value = trigger.frenchSubject;
-        document.getElementById("texteDuSubject").value = trigger.dutchSubject;
+        //document.getElementById("texteEngSubject").value = trigger.englishSubject;
+        //document.getElementById("texteFrSubject").value = trigger.frenchSubject;
+        //document.getElementById("texteDuSubject").value = trigger.dutchSubject;
 
         if (trigger.contactPreference != '') {
             setContactPreference(trigger.contactPreference);
@@ -252,7 +254,6 @@ export const Trigger = (props) => {
                 nameString += triggerNameBuilder[item] + " ";
             })
             setFinalTriggerName(nameString);
-
 
 
             //unchecked survey link checkboxes dynamically when keymoment dropdown get changed
@@ -567,6 +568,73 @@ export const Trigger = (props) => {
         }
     }
 
+/*   Start New code from Abdul Saboor */
+
+    const [showLayoutModalTextePop, setShowLayoutModalTextePop] = useState(false)
+    const [texteTemplateData, setTexteTemplateData] = useState([])
+    const [layoutModalTitleTexte, setLayoutModalTitleTexte] = useState("")
+    const [layoutModalTypeTexte, setLayoutModalTypeTexte] = useState("")
+    const [selectedLaytOutTexteId, setSelectedLaytOutTexteId] = useState(0);
+    const [selectedLaytNameTexte, setSelectedLaytNameTexte] = useState("");
+
+    const getListOfTexteEmailLayout = async () => {
+
+        const response = await fetch(variables.API_URL + 'TexteTemplate/GetAllTexteTemplates', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${authUser.tokenValue}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const jsonData = await response.json();
+        if (jsonData != null) {
+            setTexteTemplateData(jsonData);
+        }
+    }
+    console.log(texteTemplateData)
+
+    const setSelectedEmailLayoutTexte = (e) => {
+        let value = e.target.value;
+        if (value != "") {
+            setSelectedLaytOutTexteId(value);
+            var index = e.target.selectedIndex;
+            setSelectedLaytNameTexte(e.target[index].text);
+        }
+        else {
+            setSelectedLaytNameTexte("");
+        }
+    }
+    console.log(selectedLaytNameTexte)
+
+    const openLayoutModalTexte = (e) => {
+        if (e.target.innerText == "New") {
+            setShowLayoutModalTextePop(true)
+            setLayoutModalTitleTexte("New Texte Template");
+            setLayoutModalTypeTexte("new");
+            setOfficeId(localOfficeDetail.officeid);
+            setClientId(clientDetail.localclient.client.clientid);
+        }
+        else {
+            if (document.getElementById("layoutDropdowntexte").value == "") {
+                alert("No texte selected for preview");
+                return
+            }
+            setShowLayoutModalTextePop(true);
+            setLayoutModalTitleTexte(selectedLaytNameTexte + " Preview");
+            setLayoutModalTypeTexte("preview");
+            setOfficeId(localOfficeDetail.officeid);
+            setClientId(clientDetail.localclient.client.clientid);
+        }
+    }
+    console.log(selectedLaytNameTexte)
+ 
+    const hideLayoutModalTexte = (e) => {
+        setShowLayoutModalTextePop(false)
+    }
+
+    /*   End New code from Abdul Saboor */
+
     const handleTabSelect = (e) => {
         setSelectedTab(e);
     }
@@ -634,10 +702,11 @@ export const Trigger = (props) => {
         const whiseOptions = document.getElementById("whiseAppointmentType");
         const transactionType = document.getElementById("transactionType");
         const transactionStatus = document.getElementById("transactionStatus");
-        const englishSubject = document.getElementById("texteEngSubject");
-        const frenchSubject = document.getElementById("texteFrSubject");
-        const dutchSubject = document.getElementById("texteDuSubject");
+        const englishSubject = "";// document.getElementById("texteEngSubject");
+        const frenchSubject = "";// document.getElementById("texteFrSubject");
+        const dutchSubject = "";// document.getElementById("texteDuSubject");
         const targetParticipent = document.getElementById("participent1");
+        const selectedTexteOption = document.getElementById("layoutDropdowntexte");
 
         if (keymomentDropdown.value == "") {
             keymomentDropdown.style.borderColor = "red";
@@ -663,6 +732,12 @@ export const Trigger = (props) => {
             whiseOptions.style.borderColor = "red";
             isFRequiredFieldsEmpty = true;
         }
+        //if (selectedTexteOption.value == "") {
+        //    selectedTexteLayout.style.borderColor = "red";
+        //    isFRequiredFieldsEmpty = true;
+        //}
+
+
         //if (transactionType.value == "") {
         //    transactionType.style.borderColor = "red";
         //    isFRequiredFieldsEmpty = true;
@@ -700,7 +775,7 @@ export const Trigger = (props) => {
         };
 
         //SaveOfficeTriggerDetail api call
-        //Api call to save trigger for an office
+        //Api call to save trigger for an office 
         let language = selectedTab;
         let trigger = {};
         let objOfficeTrigger = {
@@ -719,17 +794,18 @@ export const Trigger = (props) => {
             TargetParticipant2: "",
             CTarget2: "",
             Language: language,
-            EnglishSubject: englishSubject.value,
-            TexteEnglish: emailTexteEnglish,
-            FrenchSubject: frenchSubject.value,
-            TexteFrench: emailTexteFrench,
-            DutchSubject: dutchSubject.value,
-            TexteDutch: emailTexteDutch,
+            EnglishSubject: "",//englishSubject.value,
+            TexteEnglish: "",//emailTexteEnglish,
+            FrenchSubject: "",//frenchSubject.value,
+            TexteFrench: "",//emailTexteFrench,
+            DutchSubject: "",//dutchSubject.value,
+            TexteDutch: "",//emailTexteDutch,
             AppointmentType: whiseOptions.value,
             TransactionType: transactionType.value,
             TransactionStatus: transactionStatus.value,
             SurveyLink: document.getElementById("inputSurveyLink").value,
-            ContactPreference: contactPreference
+            ContactPreference: contactPreference,
+            texteTemplateId: +selectedLaytOutTexteId
         }
         let triggerurl = variables.API_URL + `OfficeTrigger/SaveOfficeTriggerDetail?`;
         return axios.post(triggerurl, JSON.stringify(objOfficeTrigger), jsonconfig)
@@ -846,9 +922,6 @@ export const Trigger = (props) => {
 
     }, [clientTokken])
 
-
-
-
     useEffect(() => {
 
         if (location.state != null) {
@@ -883,6 +956,14 @@ export const Trigger = (props) => {
             document.getElementById("layoutDropdown").value = location.state.TriggerDetail.layoutid;
         }
     }, [officeLayout])
+
+    useEffect(() => {
+        //console.log("tempalge id" + JSON.stringify(location.state.TriggerDetail));//.TexteTemplateId);
+        if (location.state.TriggerDetail != undefined) {
+            setSelectedLaytOutTexteId(location.state.TriggerDetail.texteTemplateId);
+            document.getElementById("layoutDropdowntexte").value = location.state.TriggerDetail.texteTemplateId;
+        }
+    }, [texteTemplateData])
 
     useEffect(() => {
         document.title = 'Trigger - Real Advice Trigger System';
@@ -1018,7 +1099,7 @@ export const Trigger = (props) => {
                         </div>
                         <div className="col-sm-12 col-md-4 mb-3">
                             <label>Property Transaction Type</label>
-                            <select className="form-select" id="transactionType" onChange={resetConditionDropdowns}>
+                            <select className="form-select" id="transactionType" onChange={resetConditionDropdowns} >
                                 <option value="">Select an option</option>
                                 <option value="1">To sale</option>
                                 <option value="2">To rent</option>
@@ -1066,6 +1147,9 @@ export const Trigger = (props) => {
                             <label className="me-3 mb-0 fw-bold">Survey Email:</label>
                         </div>
                     </div>
+
+                    {/*Email Layout */}
+
                     <div className="row">
                         <div className="col-sm-12 col-md-4 mb-3">
                             <label className="me-3">Layout</label>
@@ -1101,73 +1185,118 @@ export const Trigger = (props) => {
                             </div>
                         </div>
                     </div>
-                    <Tabs
-                        defaultActiveKey={selectedTab}
-                        id="texte-tabs"
-                        className="mb-3"
-                        onSelect={handleTabSelect}
-                    >
-                        <Tab eventKey="english" title="English">
-                            <div className="row">
-                                <div className="col-sm-12 col-md-4 mb-3">
-                                    <label>Subject</label>
-                                    <input type="text" className="form-control" id="texteEngSubject" onInput={resetConditionDropdowns} />
-                                </div>
-                                <div className="col-sm-12 col-md-12 mb-3">
-                                    <label>Texte</label>
-                                    <SunEditor
-                                        onChange={handleEditorChangeEnglish}
-                                        setContents={emailTexteEnglish}
-                                        setOptions={{
-                                            height: 200,
-                                            buttonList: editorButtons
-                                        }}
-                                    />
-                                    {/*<button className="btn-site mt-3">View</button>*/}
-                                </div>
+
+
+                    {/* Texte Layout*/}
+
+                    <div className="row">
+                        <div className="col-sm-12 col-md-4 mb-3">
+                            <label className="me-3">Texte Template</label>
+                            <div className="d-flex">
+                                <select className="form-select" id="layoutDropdowntexte" onChange={setSelectedEmailLayoutTexte}>
+                                    <option value="">--Select Texte Template--</option>
+                                    {
+                                        texteTemplateData.length > 0 ? texteTemplateData.map((item) => {
+                                            return (
+                                                <option value={item.templateId}>{item.templateName}</option>
+                                            )
+                                        })
+                                            :
+                                            ""
+                                    }
+                                </select>
+                                <button className="btn-site ms-1" onClick={openLayoutModalTexte}>
+                                    New
+                                </button>
+                                <button className="btn-site ms-1" onClick={openLayoutModalTexte}>
+                                    View
+                                </button>
+                                <EamilTexte
+                                    showModalTexte={showLayoutModalTextePop}
+                                    modalTitleTexte={layoutModalTitleTexte}
+                                    modalType={layoutModalTypeTexte}
+                                    officeId={officeId}
+                                    clientId={clientId}
+                                    hideLayoutModalTexte={hideLayoutModalTexte}
+                                    TexteLayoutId={selectedLaytOutTexteId}
+                                    reloadLayoutsList={getListOfTexteEmailLayout}
+                                />
+                             
                             </div>
-                        </Tab>
-                        <Tab eventKey="french" title="French">
-                            <div className="row">
-                                <div className="col-sm-12 col-md-4 mb-3">
-                                    <label>Subject</label>
-                                    <input type="text" className="form-control" id="texteFrSubject" onInput={resetConditionDropdowns} />
-                                </div>
-                                <div className="col-sm-12 col-md-12 mb-3">
-                                    <label>Texte</label>
-                                    <SunEditor
-                                        onChange={handleEditorChangeFrench}
-                                        setContents={emailTexteFrench}
-                                        setOptions={{
-                                            height: 200,
-                                            buttonList: editorButtons
-                                        }}
-                                    />
-                                    <button className="btn-site mt-3">View</button>
-                                </div>
-                            </div>
-                        </Tab>
-                        <Tab eventKey="dutch" title="Dutch">
-                            <div className="row">
-                                <div className="col-sm-12 col-md-4 mb-3">
-                                    <label>Subject</label>
-                                    <input type="text" className="form-control" id="texteDuSubject" onInput={resetConditionDropdowns} />
-                                </div>
-                                <div className="col-sm-12 col-md-12 mb-3">
-                                    <label>Texte</label>
-                                    <SunEditor
-                                        onChange={handleEditorChangeDutch}
-                                        setContents={emailTexteDutch}
-                                        setOptions={{
-                                            height: 200,
-                                            buttonList: editorButtons
-                                        }}
-                                    />
-                                    <button className="btn-site mt-3">View</button>
-                                </div>
-                            </div>
-                        </Tab>
-                    </Tabs>
+                        </div>
+                    </div>
+
+
+                    {/*<Tabs*/}
+                    {/*    defaultActiveKey={selectedTab}*/}
+                    {/*    id="texte-tabs"*/}
+                    {/*    className="mb-3"*/}
+                    {/*    onSelect={handleTabSelect}*/}
+                    {/*>*/}
+                    {/*    <Tab eventKey="english" title="English">*/}
+                    {/*        <div className="row">*/}
+                    {/*            <div className="col-sm-12 col-md-4 mb-3">*/}
+                    {/*                <label>Subject</label>*/}
+                    {/*                <input type="text" className="form-control" id="texteEngSubject" onInput={resetConditionDropdowns} />*/}
+                    {/*            </div>*/}
+                    {/*            <div className="col-sm-12 col-md-12 mb-3">*/}
+                    {/*                <label>Texte</label>*/}
+                    {/*                <SunEditor*/}
+                    {/*                    onChange={handleEditorChangeEnglish}*/}
+                    {/*                    setContents={emailTexteEnglish}*/}
+                    {/*                    setOptions={{*/}
+                    {/*                        height: 200,*/}
+                    {/*                        buttonList: editorButtons*/}
+                    {/*                    }}*/}
+                    {/*                />*/}
+                    {/*                */}{/*<button className="btn-site mt-3">View</button>*/}
+                    {/*            </div>*/}
+                    {/*        </div>*/}
+                    {/*    </Tab>*/}
+                    {/*    <Tab eventKey="french" title="French">*/}
+                    {/*        <div className="row">*/}
+                    {/*            <div className="col-sm-12 col-md-4 mb-3">*/}
+                    {/*                <label>Subject</label>*/}
+                    {/*                <input type="text" className="form-control" id="texteFrSubject" onInput={resetConditionDropdowns} />*/}
+                    {/*            </div>*/}
+                    {/*            <div className="col-sm-12 col-md-12 mb-3">*/}
+                    {/*                <label>Texte</label>*/}
+                    {/*                <SunEditor*/}
+                    {/*                    onChange={handleEditorChangeFrench}*/}
+                    {/*                    setContents={emailTexteFrench}*/}
+                    {/*                    setOptions={{*/}
+                    {/*                        height: 200,*/}
+                    {/*                        buttonList: editorButtons*/}
+                    {/*                    }}*/}
+                    {/*                />*/}
+                    {/*                <button className="btn-site mt-3">View</button>*/}
+                    {/*            </div>*/}
+                    {/*        </div>*/}
+                    {/*    </Tab>*/}
+                    {/*    <Tab eventKey="dutch" title="Dutch">*/}
+                    {/*        <div className="row">*/}
+                    {/*            <div className="col-sm-12 col-md-4 mb-3">*/}
+                    {/*                <label>Subject</label>*/}
+                    {/*                <input type="text" className="form-control" id="texteDuSubject" onInput={resetConditionDropdowns} />*/}
+                    {/*            </div>*/}
+                    {/*            <div className="col-sm-12 col-md-12 mb-3">*/}
+                    {/*                <label>Texte</label>*/}
+                    {/*                <SunEditor*/}
+                    {/*                    onChange={handleEditorChangeDutch}*/}
+                    {/*                    setContents={emailTexteDutch}*/}
+                    {/*                    setOptions={{*/}
+                    {/*                        height: 200,*/}
+                    {/*                        buttonList: editorButtons*/}
+                    {/*                    }}*/}
+                    {/*                />*/}
+                    {/*                <button className="btn-site mt-3">View</button>*/}
+                    {/*            </div>*/}
+                    {/*        </div>*/}
+                    {/*    </Tab>*/}
+                    {/*</Tabs>*/}
+
+
+
                     <div className="row">
                         <div className="col-sm-12 col-md-12 mb-3">
                             <label className="me-3">Link</label>
