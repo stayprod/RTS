@@ -31,6 +31,8 @@ public partial class realadvicetriggeringsystemContext : DbContext
 
     public virtual DbSet<RtsEmailLog> RtsEmailLogs { get; set; }
 
+    public virtual DbSet<TexteTemplate> TexteTemplates { get; set; }
+
     public virtual DbSet<TriggerEmailTransactionLog> TriggerEmailTransactionLogs { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
@@ -316,6 +318,9 @@ public partial class realadvicetriggeringsystemContext : DbContext
             entity.Property(e => e.TexteFrench)
                 .HasColumnType("text")
                 .HasColumnName("texte_french");
+            entity.Property(e => e.TexteTemplateId)
+                .HasColumnType("int(11)")
+                .HasColumnName("texte_template_id");
             entity.Property(e => e.TransactionStatus)
                 .HasMaxLength(45)
                 .HasColumnName("transaction_status");
@@ -398,6 +403,51 @@ public partial class realadvicetriggeringsystemContext : DbContext
             entity.Property(e => e.WhiseOfficeid)
                 .HasColumnType("int(11)")
                 .HasColumnName("whise_officeid");
+        });
+
+        modelBuilder.Entity<TexteTemplate>(entity =>
+        {
+            entity.HasKey(e => e.TemplateId).HasName("PRIMARY");
+
+            entity.ToTable("texte_templates");
+
+            entity.Property(e => e.TemplateId)
+                .HasColumnType("int(11)")
+                .HasColumnName("template_id");
+            entity.Property(e => e.Active)
+                .HasDefaultValueSql("b'1'")
+                .HasColumnType("bit(1)")
+                .HasColumnName("active");
+            entity.Property(e => e.CreatedOn)
+                .HasColumnType("datetime")
+                .HasColumnName("created_on");
+            entity.Property(e => e.CreatedbyClientId)
+                .HasColumnType("int(11)")
+                .HasColumnName("createdby_client_id");
+            entity.Property(e => e.CreatedbyOfficeId)
+                .HasColumnType("int(11)")
+                .HasColumnName("createdby_office_id");
+            entity.Property(e => e.DutchSubject)
+                .HasColumnType("text")
+                .HasColumnName("dutch_subject");
+            entity.Property(e => e.DutchTexte)
+                .HasColumnType("text")
+                .HasColumnName("dutch_texte");
+            entity.Property(e => e.EnglishSubject)
+                .HasColumnType("text")
+                .HasColumnName("english_subject");
+            entity.Property(e => e.EnglishTexte)
+                .HasColumnType("text")
+                .HasColumnName("english_texte");
+            entity.Property(e => e.FrenchSubject)
+                .HasColumnType("text")
+                .HasColumnName("french_subject");
+            entity.Property(e => e.FrenchTexte)
+                .HasColumnType("text")
+                .HasColumnName("french_texte");
+            entity.Property(e => e.TemplateName)
+                .HasColumnType("text")
+                .HasColumnName("template_name");
         });
 
         modelBuilder.Entity<TriggerEmailTransactionLog>(entity =>

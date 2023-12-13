@@ -6,7 +6,7 @@ import SunEditor, { buttonList, height } from 'suneditor-react';
 import { variables, editorButtons } from '../Variables';
 import { UseAuthContext } from '../context/AuthContext';
 
-export const EamilTexte = (props) => {
+export const EamilTexteModal = (props) => {
     const { showModalTexte, modalTitleTexte, modalType, officeId, clientId, hideLayoutModalTexte, TexteLayoutId, reloadLayoutsList } = props;
 
     const [layoutHtml, setLayoutHtml] = useState("");
@@ -117,7 +117,6 @@ export const EamilTexte = (props) => {
             setLayoutHtml(jsonData);
         }
     }
-    console.log(layoutHtml)
 
     const handleLayoutEditorChange = (content) => {
         setEmailLayout(content.target.value);

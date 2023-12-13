@@ -13,7 +13,12 @@ import { useToken } from './tokenContext';
 import { variables, editorButtons } from '../Variables';
 
 import { EmailLayoutModal } from './EmailLayout';
-import { EamilTexte } from "./EmailTexte"
+import { EamilTexteModal } from "./EmailTexte"
+
+//import 'primereact/resources/themes/saga-blue/theme.css';
+//import 'primereact/resources/primereact.min.css';
+/*import { MultiSelect } from 'primereact/multiselect';*/
+
 
 const targetOptions = [
     { label: "Vendor", value: "1" },
@@ -53,6 +58,7 @@ export const Trigger = (props) => {
     const [triggerDetail, setTriggerDetail] = useState({});
     const [suveryLinkForEmail, setSuveryLinkForEmail] = useState(["https://survey.realadvice.be/", "", "/?"]);
     const [contactPreference, setContactPreference] = useState("all");
+    const [selectedProperty, setSelectedProperty] = useState([]);
     const {
         authUser,
         setAuthUser,
@@ -139,6 +145,12 @@ export const Trigger = (props) => {
         let participantIndex = document.getElementById("participent1").selectedIndex;
         let participantText = document.getElementById("participent1")[participantIndex].text;
         triggerNameBuilder["participent1"] = participantText;
+        //console.log("transaction type=" + trigger.transactionType);
+
+         /*get multi select values from database */
+        const fetchMultiSelectResult = trigger.transactionType.split(",")
+        const filterData = optionMultiSelect.filter(el => fetchMultiSelectResult.includes(el.value))
+        setSelectedProperty(filterData)
 
         populateSurveyLinkInEditMode(trigger.surveyLink)
 
@@ -148,19 +160,18 @@ export const Trigger = (props) => {
         //setSelectedTarget(targets);
         setSelectedTab(trigger.language);
 
-        const transactionType = document.getElementById("transactionType");
         const transactionStatus = document.getElementById("transactionStatus");
 
-        transactionType.value = trigger.transactionType;
+        
+       /* transactionType.value = trigger.transactionType;*/
         transactionStatus.value = trigger.transactionStatus;
+
 
         setEmailTexteEnglish(trigger.texteEnglish);
         setEmailTexteFrench(trigger.texteFrench);
         setEmailTexteDutch(trigger.texteDutch);
 
-        //document.getElementById("texteEngSubject").value = trigger.englishSubject;
-        //document.getElementById("texteFrSubject").value = trigger.frenchSubject;
-        //document.getElementById("texteDuSubject").value = trigger.dutchSubject;
+        document.getElementById("addTrigger").innerHTML = "Edit Trigger";
 
         if (trigger.contactPreference != '') {
             setContactPreference(trigger.contactPreference);
@@ -396,9 +407,6 @@ export const Trigger = (props) => {
             })
             setFinalTriggerName(nameString);
         }
-
-
-
     }
 
     //push selected checkbox value in survey link parameter array and return updated array
@@ -576,7 +584,20 @@ export const Trigger = (props) => {
     const [layoutModalTypeTexte, setLayoutModalTypeTexte] = useState("")
     const [selectedLaytOutTexteId, setSelectedLaytOutTexteId] = useState(0);
     const [selectedLaytNameTexte, setSelectedLaytNameTexte] = useState("");
+    
 
+    const optionMultiSelect = [
+        { label: 'To sale', value: '1' },
+        { label: 'To rent', value: '2' },
+        { label: 'Annuity sale', value: '3' },    
+    ];
+
+    const handleChangeSelected = (item) => { 
+
+        setSelectedProperty(item)
+   
+    }
+ 
     const getListOfTexteEmailLayout = async () => {
 
         const response = await fetch(variables.API_URL + 'TexteTemplate/GetAllTexteTemplates', {
@@ -690,7 +711,6 @@ export const Trigger = (props) => {
     //const createNewSurveyEmail = (e) => {
 
     //}
-
     const saveTrigger = (e) => {
         e.target.setAttribute("disabled", true);
         document.querySelector("body").style.cursor = "progress";
@@ -766,6 +786,21 @@ export const Trigger = (props) => {
             return
         }
 
+        //array convert into string and store in database 
+        const getMultiValue = selectedProperty;
+        let getFinalMultiSelectValue = "";
+        const loopLength = (getMultiValue.length)-1;
+        if (getMultiValue != "") {
+            for (let i = 0; i < getMultiValue.length; i++) {
+                if (i == loopLength) {
+                    getFinalMultiSelectValue += getMultiValue[i].value;
+                } else {
+                    getFinalMultiSelectValue += getMultiValue[i].value + ","; 
+                }
+                
+            }
+        }
+
         //configurations to post json data
         const jsonconfig = {
             headers: {
@@ -773,7 +808,6 @@ export const Trigger = (props) => {
                 'Content-Type': 'application/json'
             }
         };
-
         //SaveOfficeTriggerDetail api call
         //Api call to save trigger for an office 
         let language = selectedTab;
@@ -801,7 +835,7 @@ export const Trigger = (props) => {
             DutchSubject: "",//dutchSubject.value,
             TexteDutch: "",//emailTexteDutch,
             AppointmentType: whiseOptions.value,
-            TransactionType: transactionType.value,
+            TransactionType: getFinalMultiSelectValue,//transactionType.value, 
             TransactionStatus: transactionStatus.value,
             SurveyLink: document.getElementById("inputSurveyLink").value,
             ContactPreference: contactPreference,
@@ -826,7 +860,7 @@ export const Trigger = (props) => {
             WhiseOffice: whiseOfficeDetail,
             CurrentClient: clientDetail,
             LocalOffice: localOfficeDetail,
-            LocalOfficesList: location.state.LocalOfficesList
+            LocalOfficesList: location.state.LocalOfficesList,
         }
 
         const url = "/officesettings/" + whiseOfficeDetail.id;
@@ -958,7 +992,6 @@ export const Trigger = (props) => {
     }, [officeLayout])
 
     useEffect(() => {
-        //console.log("tempalge id" + JSON.stringify(location.state.TriggerDetail));//.TexteTemplateId);
         if (location.state.TriggerDetail != undefined) {
             setSelectedLaytOutTexteId(location.state.TriggerDetail.texteTemplateId);
             document.getElementById("layoutDropdowntexte").value = location.state.TriggerDetail.texteTemplateId;
@@ -974,11 +1007,12 @@ export const Trigger = (props) => {
             <section className="client-setting">
                 <div className="row py-3">
                     <div className="col-sm-12">
-                        <h4 className="position-relative">
+                        <h4 className="position-relative" >
                             <span className="position-absolute back-arrow" onClick={moveBackToOfficeScreen}>
                                 <FontAwesomeIcon icon={faArrowLeft} />
                             </span>
-                            Add Trigger
+                            <span id="addTrigger">Add Trigger</span>
+                            
                         </h4>
                     </div>
                     <div className="col-sm-12">
@@ -1071,16 +1105,7 @@ export const Trigger = (props) => {
                                 <option value="2">No Participant</option>
                             </select>
                         </div>
-                        {/*<div className="col-sm-12 col-md-4 mb-3">*/}
-                        {/*    <label>C-Target</label>*/}
-                        {/*    <MultiSelect*/}
-                        {/*        className="multiselect"*/}
-                        {/*        options={targetOptions}*/}
-                        {/*        value={selectedTarget}*/}
-                        {/*        onChange={setListOfTargetType}*/}
-                        {/*        labelledBy="target"*/}
-                        {/*    />*/}
-                        {/*</div>*/}
+                      
                     </div>
                     <div>
                         <h6 className="sub-heading fw-bold mb-3">Condition:</h6>
@@ -1097,14 +1122,18 @@ export const Trigger = (props) => {
                                 ))}
                             </select>
                         </div>
+
                         <div className="col-sm-12 col-md-4 mb-3">
                             <label>Property Transaction Type</label>
-                            <select className="form-select" id="transactionType" onChange={resetConditionDropdowns} >
-                                <option value="">Select an option</option>
-                                <option value="1">To sale</option>
-                                <option value="2">To rent</option>
-                                <option value="3">Annuity sale</option>
-                            </select>
+
+                                <MultiSelect
+                                  id="transactionType"
+                                  value={selectedProperty}
+                                optionMultiSelect={optionMultiSelect}
+                                onChange={handleChangeSelected}
+                                    labelledBy="Select an option"
+                                />
+
                         </div>
                         <div className="col-sm-12 col-md-4 mb-3">
                             <label>Property Transaction Status</label>
@@ -1211,7 +1240,7 @@ export const Trigger = (props) => {
                                 <button className="btn-site ms-1" onClick={openLayoutModalTexte}>
                                     View
                                 </button>
-                                <EamilTexte
+                                <EamilTexteModal
                                     showModalTexte={showLayoutModalTextePop}
                                     modalTitleTexte={layoutModalTitleTexte}
                                     modalType={layoutModalTypeTexte}
@@ -1225,77 +1254,6 @@ export const Trigger = (props) => {
                             </div>
                         </div>
                     </div>
-
-
-                    {/*<Tabs*/}
-                    {/*    defaultActiveKey={selectedTab}*/}
-                    {/*    id="texte-tabs"*/}
-                    {/*    className="mb-3"*/}
-                    {/*    onSelect={handleTabSelect}*/}
-                    {/*>*/}
-                    {/*    <Tab eventKey="english" title="English">*/}
-                    {/*        <div className="row">*/}
-                    {/*            <div className="col-sm-12 col-md-4 mb-3">*/}
-                    {/*                <label>Subject</label>*/}
-                    {/*                <input type="text" className="form-control" id="texteEngSubject" onInput={resetConditionDropdowns} />*/}
-                    {/*            </div>*/}
-                    {/*            <div className="col-sm-12 col-md-12 mb-3">*/}
-                    {/*                <label>Texte</label>*/}
-                    {/*                <SunEditor*/}
-                    {/*                    onChange={handleEditorChangeEnglish}*/}
-                    {/*                    setContents={emailTexteEnglish}*/}
-                    {/*                    setOptions={{*/}
-                    {/*                        height: 200,*/}
-                    {/*                        buttonList: editorButtons*/}
-                    {/*                    }}*/}
-                    {/*                />*/}
-                    {/*                */}{/*<button className="btn-site mt-3">View</button>*/}
-                    {/*            </div>*/}
-                    {/*        </div>*/}
-                    {/*    </Tab>*/}
-                    {/*    <Tab eventKey="french" title="French">*/}
-                    {/*        <div className="row">*/}
-                    {/*            <div className="col-sm-12 col-md-4 mb-3">*/}
-                    {/*                <label>Subject</label>*/}
-                    {/*                <input type="text" className="form-control" id="texteFrSubject" onInput={resetConditionDropdowns} />*/}
-                    {/*            </div>*/}
-                    {/*            <div className="col-sm-12 col-md-12 mb-3">*/}
-                    {/*                <label>Texte</label>*/}
-                    {/*                <SunEditor*/}
-                    {/*                    onChange={handleEditorChangeFrench}*/}
-                    {/*                    setContents={emailTexteFrench}*/}
-                    {/*                    setOptions={{*/}
-                    {/*                        height: 200,*/}
-                    {/*                        buttonList: editorButtons*/}
-                    {/*                    }}*/}
-                    {/*                />*/}
-                    {/*                <button className="btn-site mt-3">View</button>*/}
-                    {/*            </div>*/}
-                    {/*        </div>*/}
-                    {/*    </Tab>*/}
-                    {/*    <Tab eventKey="dutch" title="Dutch">*/}
-                    {/*        <div className="row">*/}
-                    {/*            <div className="col-sm-12 col-md-4 mb-3">*/}
-                    {/*                <label>Subject</label>*/}
-                    {/*                <input type="text" className="form-control" id="texteDuSubject" onInput={resetConditionDropdowns} />*/}
-                    {/*            </div>*/}
-                    {/*            <div className="col-sm-12 col-md-12 mb-3">*/}
-                    {/*                <label>Texte</label>*/}
-                    {/*                <SunEditor*/}
-                    {/*                    onChange={handleEditorChangeDutch}*/}
-                    {/*                    setContents={emailTexteDutch}*/}
-                    {/*                    setOptions={{*/}
-                    {/*                        height: 200,*/}
-                    {/*                        buttonList: editorButtons*/}
-                    {/*                    }}*/}
-                    {/*                />*/}
-                    {/*                <button className="btn-site mt-3">View</button>*/}
-                    {/*            </div>*/}
-                    {/*        </div>*/}
-                    {/*    </Tab>*/}
-                    {/*</Tabs>*/}
-
-
 
                     <div className="row">
                         <div className="col-sm-12 col-md-12 mb-3">

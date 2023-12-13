@@ -60,4 +60,6 @@ public partial class OfficeTrigger
     public string? TexteDutch { get; set; }
 
     public string? ContactPreference { get; set; }
+
+    public int? TexteTemplateId { get; set; }
 }

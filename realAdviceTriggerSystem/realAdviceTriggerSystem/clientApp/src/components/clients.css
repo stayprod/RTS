@@ -114,3 +114,9 @@
     cursor: pointer;
     z-index: 11;
 }
+
+.modal-dialog{
+    max-width: 70% !important;
+}
+
+
