@@ -39,7 +39,7 @@ public partial class realadvicetriggeringsystemContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseMySql("server=localhost;port=3306;database=realadvice-triggering-system;user=pimcore_user;password=eezahtech*1;persist security info=False;connect timeout=300;convertzerodatetime=True", Microsoft.EntityFrameworkCore.ServerVersion.Parse("10.4.6-mariadb"));
+        => optionsBuilder.UseMySql("server=172.20.1.96;port=3306;database=realadvice-triggering-system;user=admin;password=75X+LD7q8XsJ;persist security info=False;connect timeout=300;convertzerodatetime=True", Microsoft.EntityFrameworkCore.ServerVersion.Parse("10.11.4-mariadb"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

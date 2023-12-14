@@ -13,7 +13,7 @@ import { useToken } from './tokenContext';
 import { variables, editorButtons } from '../Variables';
 
 import { EmailLayoutModal } from './EmailLayout';
-import { EamilTexteModal } from "./EmailTexte"
+import { EamilTexteModal } from './EmailTexte';
 
 //import 'primereact/resources/themes/saga-blue/theme.css';
 //import 'primereact/resources/primereact.min.css';
@@ -1129,7 +1129,7 @@ export const Trigger = (props) => {
                                 <MultiSelect
                                   id="transactionType"
                                   value={selectedProperty}
-                                optionMultiSelect={optionMultiSelect}
+                                options={optionMultiSelect}
                                 onChange={handleChangeSelected}
                                     labelledBy="Select an option"
                                 />
