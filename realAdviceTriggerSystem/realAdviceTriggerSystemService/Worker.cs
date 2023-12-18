@@ -166,15 +166,16 @@ namespace realAdviceTriggerSystemService
                 {
 
                 };
-                DateTime dateTime = DateTime.Now; // Replace this with your desired date and time
-                string formattedDateTime = dateTime.ToString("yyyy-MM-ddTHH:mm:ss");
+                DateTime todayDate = DateTime.Now; // Replace this with your desired date and time                
+                string formattedDateTimeStart = todayDate.Date.ToString("yyyy-MM-ddTHH:mm:ss");
+                string formattedDateTime = todayDate.ToString("yyyy-MM-ddTHH:mm:ss");
                 var data = new
                 {
                     Filter = new
                     {
                         DateTimeRange = new
                         {
-                            Min = appGeneralSettings.ServiceStartTime,
+                            Min = formattedDateTimeStart,
                             Max = formattedDateTime
                         }
                     }
@@ -406,8 +407,9 @@ namespace realAdviceTriggerSystemService
                                            admin = cl_ad,
                                            triggers = off_triggers,
                                        });
-
+                        // todo Add check for Clients Null check
                         var result = _clients.ToList();
+
                         foreach (var clientObj in result)
                         {
                             var triggerList = clientObj.triggers.ToList();
@@ -426,40 +428,47 @@ namespace realAdviceTriggerSystemService
                             // 3=activate
                             // 4=suspended
                             // 5=deactivate
-                            if (clientObj.client.ActivationStatus != "5")// && clientObj.client.ActivationStatus != "deactivated")
+                            if (clientObj.client.ActivationStatus != "5" && appointments.Calendars != null)// && clientObj.client.ActivationStatus != "deactivated")
                             {
                                 Worker.LogMessage("Control passed from Activation Status(client(" + clientObj.client.WhiseClientid + "  " + clientObj.client.CommercialName + ") is not deactivated)");
                                 foreach (var appointmentObj in appointments.Calendars)
                                 {
-                                    if (appointmentObj.estates == null)
-                                    {
-                                        // transactionLogObj.
-                                        TriggerEmailTransactionLog transactionLogObj1 = initializeLogObject(appointmentObj.Id, (int)clientObj.client.WhiseClientid, appointmentObj.Users[0].OfficeId, (DateTime)appointmentObj.StartDateTime, (DateTime)appointmentObj.EndDateTime);
-                                        transactionLogObj1.TransactionDate = DateTime.Now;
-                                        transactionLogObj1.Error = "Yes";
-                                        transactionLogObj1.Status = "Missing Property";
-                                        transactionLogObj1.ClientName = clientObj.client.CommercialName;
-                                        transactionLogObj1.UserId = appointmentObj.Users[0].UserId;
-                                        insertInTriggerTransactionLog(transactionLogObj1);
-                                    }
-                                    if (appointmentObj.Contacts == null)
-                                    {
-                                        TriggerEmailTransactionLog transactionLogObj2 = initializeLogObject(appointmentObj.Id, (int)clientObj.client.WhiseClientid, appointmentObj.Users[0].OfficeId, (DateTime)appointmentObj.StartDateTime, (DateTime)appointmentObj.EndDateTime);
-                                        transactionLogObj2.TransactionDate = DateTime.Now;
-                                        transactionLogObj2.Error = "Yes";
-                                        transactionLogObj2.Status = "Missing contact";
-                                        transactionLogObj2.ClientName = clientObj.client.CommercialName;
-                                        transactionLogObj2.UserId = appointmentObj.Users[0].UserId;
-                                        insertInTriggerTransactionLog(transactionLogObj2);
-                                    }
-                                    if (appointmentObj.Contacts == null || appointmentObj.estates == null)
-                                    {
-                                        continue;
-                                    }
                                     bool newAppointment = true;
                                     //2 - For each calendar event you will start by looking to the estate related to this event
                                     foreach (var trigger in triggerList)
                                     {
+                                        if (appointmentObj.Action.Id != int.Parse(trigger.AppointmentType))
+                                        {
+                                            continue;
+                                        }
+                                        if (appointmentObj.estates == null)
+                                        {
+                                            // transactionLogObj.
+                                            TriggerEmailTransactionLog transactionLogObj1 = initializeLogObject(appointmentObj.Id, (int)clientObj.client.WhiseClientid, appointmentObj.Users[0].OfficeId, (DateTime)appointmentObj.StartDateTime, (DateTime)appointmentObj.EndDateTime);
+                                            transactionLogObj1.TransactionDate = DateTime.Now;
+                                            transactionLogObj1.Error = "Yes";
+                                            transactionLogObj1.Status = "Missing Property";
+                                            transactionLogObj1.ClientName = clientObj.client.CommercialName;
+                                            transactionLogObj1.UserId = appointmentObj.Users[0].UserId;
+                                            insertInTriggerTransactionLog(transactionLogObj1);
+                                        }
+                                        if (appointmentObj.Contacts == null)
+                                        {
+                                            TriggerEmailTransactionLog transactionLogObj2 = initializeLogObject(appointmentObj.Id, (int)clientObj.client.WhiseClientid, appointmentObj.Users[0].OfficeId, (DateTime)appointmentObj.StartDateTime, (DateTime)appointmentObj.EndDateTime);
+                                            transactionLogObj2.TransactionDate = DateTime.Now;
+                                            transactionLogObj2.Error = "Yes";
+                                            transactionLogObj2.Status = "Missing contact";
+                                            transactionLogObj2.ClientName = clientObj.client.CommercialName;
+                                            transactionLogObj2.UserId = appointmentObj.Users[0].UserId;
+                                            insertInTriggerTransactionLog(transactionLogObj2);
+                                        }
+                                        if (appointmentObj.Contacts == null || appointmentObj.estates == null)
+                                        {
+                                            continue;
+                                        }
+
+                                        DateTime currentTime = DateTime.Now;
+                                        //DateTime triggerUpdateTime = trigger.UpdatedOn;
                                         // get trigger duration set for current appointment
                                         TimeSpan triggerSettingTimeSpan = CreateTimeSpan(trigger.DurationType, (int)trigger.DurationValue);
                                         // check here there must be a estate object , office id should be same and time period is passed of setting like 1hour,1 day etc
@@ -468,34 +477,23 @@ namespace realAdviceTriggerSystemService
                                         // TriggerType == "1" mean email and 2 mean sms
                                         DateTime createdOn = appointmentObj.EndDateTime;
                                         DateTime appointmentTime = createdOn.AddHours(Worker.appGeneralSettings.TimeZoneDifferenceInHours);
-                                        DateTime currentTime = DateTime.Now;
+
                                         TimeSpan timeDifference = currentTime - appointmentTime;
                                         TriggerEmailTransactionLog transactionLogObj = initializeLogObject(appointmentObj.Id, (int)trigger.WhiseClientid, (int)trigger.WhiseOfficeid, (DateTime)appointmentObj.StartDateTime, (DateTime)appointmentObj.EndDateTime);
 
                                         //TriggerEmailTransactionLog transactionLogObj = new TriggerEmailTransactionLog();
                                         //transactionLogObj.TriggerType = Convert.ToInt32(trigger.TriggerType);
 
-                                        //transactionLogObj.CalendarEventId = appointmentObj.Id;
 
-                                        //transactionLogObj.EmailOpened = 0;
-                                        //transactionLogObj.LinkClicked = 0;
-                                        //transactionLogObj.ClientName = "";
-                                        //transactionLogObj.ClientId = (int)trigger.WhiseClientid;
-                                        //transactionLogObj.OfficeName = "";
-                                        //transactionLogObj.OfficeId = (int)trigger.WhiseOfficeid;
-                                        //transactionLogObj.UserId = 0;
-                                        //transactionLogObj.AppointmentStartDate = (DateTime)appointmentObj.StartDateTime;
-                                        //transactionLogObj.AppointmentEndDate = (DateTime)appointmentObj.EndDateTime;
-                                        if(appointmentObj.Action.Id != int.Parse(trigger.AppointmentType))
+                                        if (trigger.TriggerType == "1" && // 1 means email and 2 means sms
+                                    trigger.TargetParticipant1 == "1" && // 1 means there are some partipents and 2 means no partipents
+                                    trigger.WhiseOfficeid == appointmentObj.Users[0].OfficeId &&
+                                    timeDifference >= triggerSettingTimeSpan)
                                         {
-                                            continue;
-                                        }
-                                            if (trigger.TriggerType == "1" && // 1 means email and 2 means sms
-                                        trigger.TargetParticipant1 == "1" && // 1 means there are some partipents and 2 means no partipents
-                                        trigger.WhiseOfficeid == appointmentObj.Users[0].OfficeId &&
-                                        timeDifference >= triggerSettingTimeSpan)
-                                        {
-
+                                            if (EstateList.estates == null)
+                                            {
+                                                continue;
+                                            }
                                             Worker.LogMessage("control passed from condition of same whise office ids of both trigger settings and appointment object.\n office id is : " + trigger.WhiseOfficeid + " and time durtion that is in min,hours or days");
                                             foreach (var estateListObj in EstateList.estates)
                                             {
@@ -522,8 +520,8 @@ namespace realAdviceTriggerSystemService
                                                     {
                                                         values = trigger.TransactionType.Split(',').Select(int.Parse).ToArray();
                                                     }
-                                                    
-                                                    if (values.Contains(estateListObj.purpose.Id) || (string.IsNullOrEmpty(trigger.TransactionType) || !int.TryParse(trigger.TransactionType, out _)) 
+
+                                                    if (values.Contains(estateListObj.purpose.Id) || (string.IsNullOrEmpty(trigger.TransactionType) || !int.TryParse(trigger.TransactionType, out _))
                                                     && ((string.IsNullOrEmpty(trigger.TransactionStatus) || !int.TryParse(trigger.TransactionStatus, out _)) ||
                                                     estateListObj.purposeStatus.Id == int.Parse(trigger.TransactionStatus)))
                                                     {
@@ -689,10 +687,14 @@ namespace realAdviceTriggerSystemService
                                                                                 if (isSecondEmailSend)
                                                                                 {
                                                                                     insertLog(trigger.OfficeTriggerid, contact.businessEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
-                                                                                    transactionLogObj.TransactionDate = DateTime.Now;
-                                                                                    transactionLogObj.Error = "No";
-                                                                                    transactionLogObj.Status = "Sent";
-                                                                                    insertInTriggerTransactionLog(transactionLogObj);
+                                                                                    TriggerEmailTransactionLog transactionLogObj4 = initializeLogObject(appointmentObj.Id, (int)trigger.WhiseClientid, (int)trigger.WhiseOfficeid, (DateTime)appointmentObj.StartDateTime, (DateTime)appointmentObj.EndDateTime);
+                                                                                    transactionLogObj4.TransactionDate = DateTime.Now;
+                                                                                    transactionLogObj4.Error = "No";
+                                                                                    transactionLogObj4.Status = "Sent";
+                                                                                    transactionLogObj4.ClientName = clientObj.client.CommercialName;
+                                                                                    transactionLogObj4.OfficeName = office_settings?.CommercialName;
+                                                                                    transactionLogObj4.UserId = appointmentObj.Users[0].UserId;
+                                                                                    insertInTriggerTransactionLog(transactionLogObj4);
                                                                                     Worker.LogMessage("email send successfully to " + contact.businessEmail);
                                                                                 }
                                                                             }
@@ -729,6 +731,9 @@ namespace realAdviceTriggerSystemService
                                                                             transactionLogObj.TransactionDate = DateTime.Now;
                                                                             transactionLogObj.Error = "No";
                                                                             transactionLogObj.Status = "Sent";
+                                                                            transactionLogObj.ClientName = clientObj.client.CommercialName;
+                                                                            transactionLogObj.OfficeName = office_settings?.CommercialName;
+                                                                            transactionLogObj.UserId = appointmentObj.Users[0].UserId;
                                                                             insertInTriggerTransactionLog(transactionLogObj);
                                                                             Worker.LogMessage("email send successfully to " + recipientEmail);
                                                                         }
@@ -752,6 +757,9 @@ namespace realAdviceTriggerSystemService
                                                                                     transactionLogObj.TransactionDate = DateTime.Now;
                                                                                     transactionLogObj.Error = "No";
                                                                                     transactionLogObj.Status = "Sent";
+                                                                                    transactionLogObj.ClientName = clientObj.client.CommercialName;
+                                                                                    transactionLogObj.OfficeName = office_settings?.CommercialName;
+                                                                                    transactionLogObj.UserId = appointmentObj.Users[0].UserId;
                                                                                     insertInTriggerTransactionLog(transactionLogObj);
                                                                                     Worker.LogMessage("email send successfully from mandrill using private email to " + contact.PrivateEmail);
                                                                                 }
@@ -772,10 +780,11 @@ namespace realAdviceTriggerSystemService
                                                                                 if (secondresponse)
                                                                                 {
                                                                                     insertLog(trigger.OfficeTriggerid, contact.businessEmail, (int)trigger.WhiseOfficeid, (int)trigger.WhiseClientid, contact.ContactId, appointmentObj.Id, appointmentObj.estates[0].estateId);
-                                                                                    transactionLogObj.TransactionDate = DateTime.Now;
-                                                                                    transactionLogObj.Error = "No";
-                                                                                    transactionLogObj.Status = "Sent";
-                                                                                    insertInTriggerTransactionLog(transactionLogObj);
+                                                                                    TriggerEmailTransactionLog transactionLogObj6 = initializeLogObject(appointmentObj.Id, (int)trigger.WhiseClientid, (int)trigger.WhiseOfficeid, (DateTime)appointmentObj.StartDateTime, (DateTime)appointmentObj.EndDateTime);
+                                                                                    transactionLogObj6.TransactionDate = DateTime.Now;
+                                                                                    transactionLogObj6.Error = "No";
+                                                                                    transactionLogObj6.Status = "Sent";
+                                                                                    insertInTriggerTransactionLog(transactionLogObj6);
                                                                                     Worker.LogMessage("email send successfully from mandrill using business email to  " + contact.businessEmail);
                                                                                 }
                                                                             }
@@ -812,6 +821,9 @@ namespace realAdviceTriggerSystemService
                                                                             transactionLogObj.TransactionDate = DateTime.Now;
                                                                             transactionLogObj.Error = "No";
                                                                             transactionLogObj.Status = "Sent";
+                                                                            transactionLogObj.ClientName = clientObj.client.CommercialName;
+                                                                            transactionLogObj.OfficeName = office_settings?.CommercialName;
+                                                                            transactionLogObj.UserId = appointmentObj.Users[0].UserId;
                                                                             insertInTriggerTransactionLog(transactionLogObj);
                                                                             Worker.LogMessage("Email send successfully from mandrill to " + recipientEmail);
                                                                         }

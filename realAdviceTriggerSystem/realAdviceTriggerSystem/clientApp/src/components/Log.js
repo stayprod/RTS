@@ -2,16 +2,12 @@
 import { UseAuthContext } from '../context/AuthContext';
 import { variables } from "../Variables"
 import moment from 'moment';
-
+import { MDBDataTable } from 'mdbreact';
+import "./log.css";
 
 export const Log = () => {
 
-    const [triggers, setTriggers] = useState([]);
-    const [clientIdLog, setClientIdLog] = useState("");
-    const [officeIdLog, setOfficeIdLog] = useState("");
-    const [userIdLog, setUserIdLog] = useState("")
-    
-
+    const [triggers, setTriggers] = useState([]);    
     const {
         authUser,
         setAuthUser,
@@ -36,165 +32,145 @@ export const Log = () => {
      
         }
     }
-    console.log(triggers)
-
+   
     useEffect(() => {
         getTriggersByOffice();
     }, [])
 
-
-    const filterData = (e) => {
-        e.preventDefault();
-
-        if (officeIdLog.trim() != "" || clientIdLog.trim() != "" || userIdLog.trim() != "")
+    // Table Colummns data 
+    const columns = [
         {
+            label: 'Log Id',
+            field: 'emailTransactionLogId',
+            sort: 'asc',
+            width: 150
+        },
+        {
+            label: 'Object',
+            field: 'triggerType',
+            sort: 'asc',
+            width: 150
+        },
+        {
+            label: 'Event Id',
+            field: 'calendarEventId',
+            sort: 'asc',
+            width: 150
+        },
+        {
+            label: 'Date',
+            field: 'transactionDate',
+            sort: 'asc',
+            width: 150
+        },
+        {
+            label: 'Error',
+            field: 'error',
+            sort: 'asc',
+            width: 150
+        },
+        {
+            label: 'Status',
+            field: 'status',
+            sort: 'asc',
+            width: 150
+        },
+        {
+            label: 'Email Opened',
+            field: 'emailOpened',
+            sort: 'asc',
+            width: 150
+        },
+        {
+            label: 'Click ',
+            field: 'linkClicked',
+            sort: 'asc',
+            width: 150
+        },
+        {
+            label: 'Client Id ',
+            field: 'clientId',
+            sort: 'asc',
+            width: 150
+        },
+        {
+            label: 'Client Name ',
+            field: 'clientName',
+            sort: 'asc',
+            width: 150
+        },
+        {
+            label: 'Office Id ',
+            field: 'officeId',
+            sort: 'asc',
+            width: 150
+        },
+        {
+            label: 'Office Name ',
+            field: 'officeName',
+            sort: 'asc',
+            width: 150
+        },
+        {
+            label: 'User Id ',
+            field: 'userId',
+            sort: 'asc',
+            width: 150
+        },
+        {
+            label: 'Start Date of Appointment',
+            field: 'appointmentStartDate',
+            format: (value) => formatDate(value),
+            sort: 'asc',
+            width: 150
+        },
+        {
+            label: 'End Date of Appointment',
+            field: 'appointmentEndDate',
+            sort: 'asc',
+            width: 150
+        },
+        {
+            label: 'Contact Id',
+            field: 'contactId',
+            sort: 'asc',
+            width: 150
+        },
+        {
+            label: 'Property Id',
+            field: 'estateId',
+            sort: 'asc',
+            width: 150
+        }, 
+    ]
 
-            const result = triggers.filter(el => el.officeId == officeIdLog || el.clientId == clientIdLog || el.userId
-                == userIdLog) 
-            setTriggers(result)
-            console.log(result)
-            console.log("Record is Filter")
-        }
-    }
-
-    const clearFilterRecord = () => {
-        getTriggersByOffice();
-        setClientIdLog("")
-        setOfficeIdLog("")
-        setUserIdLog("")
-    }
-
-    console.log(officeIdLog)
-    console.log(clientIdLog)
-    console.log(userIdLog)
-
+    //It is use for some custom changing in Orginal data ( Date Format, Object Values )
+    const formattedData = triggers.map((item) => ({
+        ...item,
+        transactionDate: moment(item.transactionDate).format('MMMM Do YYYY, h:mm:ss a'),
+        appointmentEndDate: moment(item.appointmentEndDate).format('MMMM Do YYYY, h:mm:ss a'),
+        appointmentStartDate: moment(item.appointmentStartDate).format('MMMM Do YYYY, h:mm:ss a'),
+        triggerType: ((item.triggerType == 1) ? "Email" : "SMS"),
+    
+    }));
 
     return (
         
-
         <div className="row">
-
             <h2>Trigger Transaction Log</h2>
 
-            <div className= "my-4">
-
-                <div className="mb-2">
-                    <label htmlFor="officeIdInput" className="">Office Id : </label>
-                    <input type="text" className=" ms-2 w-25" id="officeIdInput" value={officeIdLog} onChange={e => setOfficeIdLog(e.target.value)} />
-                </div>
-                <div className="mb-2">
-                    <label htmlFor="clientIdInput" className="form-label">Client Id :</label>
-                    <input type="text" className=" w-25" id="clientIdInput" style={{ marginLeft: "9px" }} value={clientIdLog} onChange={e => setClientIdLog(e.target.value)} />
-                </div>
-                <div className="mb-2">
-                    <label htmlFor="userIdInput" className="form-label">User Id :</label>
-                    <input type="text" className=" w-25 " id="userIdInput" style={{ marginLeft: "17px" }} value={userIdLog} onChange={e => setUserIdLog(e.target.value)} />
-                </div>
-
-
-                <button className="btn bg-primary text-white px-4 me-2" onClick={filterData}  >Find</button>
-                <button className="btn bg-primary text-white px-4 " onClick={clearFilterRecord}  >Clear</button>
-             
-
-  
-
+            <div className="col-sm-12 mb-5 text-center log_table " style={{ overflowX: "auto" }} >
+                <MDBDataTable
+                    bordered
+                    small
+                    data={{ columns, rows: formattedData }}
+                    noBottomColumns={true}
+                    className="mdbDataTable"
+                />
             </div>
-
-            <div className="col-sm-12 mb-5" style={{ overflowX: "auto" }}>
-
-
-            <table className="w-100 text-center">
-                <thead>
-                    <tr className="bg-primary text-white ">
-                        <th className="p-2">Log Id</th>
-                        <th className=" p-2">Object</th>
-                        <th className="p-2">Event Id</th>
-                        <th className="p-2">Date</th>
-                        <th className="p-2">Error</th>
-                        <th className="p-2">Status</th>
-                        <th className="p-2">Email Open</th>
-                            <th className="p-2">Click</th>
-                            <th className="p-2">Client Id</th>
-                            <th className="p-2">Client Name</th>
-                            <th className="p-2">Office Id </th>
-                            <th className="p-2">Office Name</th>
-                            <th className="p-2">User Id</th>
-                            <th className="p-2">Start Date Of Appointment</th>
-                            <th className="p-2">End Date Of Appointment</th>
-                            <th className="p-2">Contact Id</th>
-                            <th className="p-2">Property Id</th>
-
-                    </tr>
-                </thead>
-
-                <tbody>
-
-                        {
-                            triggers.length > 0 ? 
-                                triggers.map((item) => {
-
-                                    const startDate = moment(item.appointmentStartDate).format('MMMM Do YYYY, h:mm:ss a');
-                                    const endDate = moment(item.appointmentEndDate).format('MMMM Do YYYY, h:mm:ss a');
-
-                            return (
-                                <tr className="text-center">
-                                    <td className="border-start border-end border-bottom p-2 justify-content-center">{item.emailTransactionLogId}</td>
-                                    <td className="border-end border-bottom p-2 justify-content-center">{ (item.triggerType == 1) ? "Email" : "SMS" }</td>
-                                    <td className="border-end border-bottom p-2 justify-content-center">{item.calendarEventId}</td>
-                                    <td className="border-end border-bottom p-2 justify-content-center">{item.transactionDate}</td>
-                                    <td className="border-end border-bottom p-2 justify-content-center">{item.error}</td>
-                                    <td className="border-end border-bottom p-2 justify-content-center">{item.status}</td>
-                                    <td className="border-end border-bottom p-2 justify-content-center">{item.emailOpened}</td>
-                                    <td className="border-end border-bottom p-2 justify-content-center">{item.linkClicked}</td>
-                                    <td className="border-end border-bottom p-2 justify-content-center">{item.clientId}</td>
-                                    <td className="border-end border-bottom p-2 justify-content-center">{item.clientName}</td>
-                                    <td className="border-end border-bottom p-2 justify-content-center">{item.officeId}</td>
-                                    <td className="border-end border-bottom p-2 justify-content-center">{item.officeName}</td>
-                                    <td className="border-end border-bottom p-2 justify-content-center">{item.userId}</td>
-                                    <td className="border-end border-bottom p-2 justify-content-center">{startDate}</td>
-                                    <td className="border-end border-bottom p-2 justify-content-center">{endDate}</td>
-                                    <td className="border-end border-bottom p-2 justify-content-center">{item.contactId}</td>
-                                    <td className="border-end border-bottom p-2 justify-content-center">{item.estateId}</td>
-                                </tr>
-
-
-                                ) 
-
-                            }) : 
-                                <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td rowSpan="3" >No Record Found</td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                    }
-
-                  
-                </tbody>
-
-            </table>
-
-
-            </div>
-
-
-
-
         </div>
 
     )
-
-
-
 
 }
 

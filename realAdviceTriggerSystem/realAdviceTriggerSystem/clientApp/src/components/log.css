@@ -1,0 +1,30 @@
+﻿.log_table table tr {
+    display: revert !important;
+}
+
+.log_table table thead tr {
+    background-color: #0d6efd;
+    color: white;
+}
+
+.log_table table thead tr th {
+        padding: 10px;
+    }
+
+.log_table table tbody tr {
+    background-color: white !important;
+}
+
+
+.dataTables_length{
+    padding-bottom: 15px !important;
+}
+
+
+
+
+
+
+
+
+

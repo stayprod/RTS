@@ -3752,3 +3752,231 @@
 2023-12-05 14:57:44 - control cannot passed from condition of same whise office ids of both trigger settings and appointment object.
  office id is : 13019 and time durtion that is in min, hours or days
 2023-12-05 15:02:44 - ---------------------RTS Service processing is in iterations------------------
+2023-12-13 20:12:46 -  RTS Service has been started 
+2023-12-13 20:12:49 - ---------------------RTS Service processing is in iterations------------------
+2023-12-13 20:13:59 - Control passed from Activation Status(client(10263  RealAdvice Developer) is not deactivated)
+2023-12-13 20:16:06 - control passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-12-13 20:17:25 - control pass from Transaction checks with whise office id :12789and whsie client id10263
+2023-12-13 20:20:48 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:48 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:48 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:48 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:48 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:48 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:48 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:48 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:48 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:48 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:48 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:48 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:48 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:48 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:51 - control passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-12-13 20:20:51 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:51 - control pass from Transaction checks with whise office id :12789and whsie client id10263
+2023-12-13 20:20:54 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:54 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:54 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:54 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:54 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:54 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:54 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:54 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:54 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:54 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:54 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:54 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:54 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:56 - control passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-12-13 20:20:56 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:56 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:56 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:56 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:56 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:56 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:56 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:56 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:56 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:56 - control pass from Transaction checks with whise office id :12789and whsie client id10263
+2023-12-13 20:20:59 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:59 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:59 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:59 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:20:59 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:00 - control passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-12-13 20:21:00 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:00 - control pass from Transaction checks with whise office id :12789and whsie client id10263
+2023-12-13 20:21:07 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:07 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:07 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:07 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:07 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:07 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:07 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:07 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:07 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:07 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:07 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:07 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:07 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:10 - control passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-12-13 20:21:10 - control pass from Transaction checks with whise office id :12789and whsie client id10263
+2023-12-13 20:21:13 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:13 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:13 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:13 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:13 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:13 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:13 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:13 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:13 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:13 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:13 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:13 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:13 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:13 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:14 - control passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-12-13 20:21:14 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:14 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:14 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:14 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:14 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:14 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:14 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:14 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:14 - control pass from Transaction checks with whise office id :12789and whsie client id10263
+2023-12-13 20:21:17 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:17 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:17 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:17 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:17 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:17 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:25 - control passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-12-13 20:21:25 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:25 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:25 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:25 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:25 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:25 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:25 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:25 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:25 - control pass from Transaction checks with whise office id :12789and whsie client id10263
+2023-12-13 20:21:28 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:28 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:28 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:28 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:28 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:28 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:30 - control passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 12789 and time durtion that is in min,hours or days
+2023-12-13 20:21:30 - control pass from Transaction checks with whise office id :12789and whsie client id10263
+2023-12-13 20:21:34 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:34 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:34 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:34 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:34 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:34 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:34 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:34 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:34 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:34 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:34 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:34 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:34 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:34 - Client(RealAdvice Developer) control cannot pass from estateID check and its whise client id is : 10263 whise office id is :12789
+2023-12-13 20:21:39 - Control passed from Activation Status(client(2236  ) is not deactivated)
+2023-12-13 20:21:48 - control passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 3919 and time durtion that is in min,hours or days
+2023-12-13 20:21:48 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:48 - control pass from Transaction checks with whise office id :3919and whsie client id2236
+2023-12-13 20:21:51 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:51 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:51 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:51 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:51 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:51 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:51 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:51 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:51 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:51 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:51 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:51 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:51 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:51 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:53 - control passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 3919 and time durtion that is in min,hours or days
+2023-12-13 20:21:53 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:53 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:53 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:53 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:53 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:53 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:53 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:53 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:53 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:53 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:53 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:53 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:53 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:53 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:53 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:53 - Client() control cannot pass from Transaction checks and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:55 - control passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 3919 and time durtion that is in min,hours or days
+2023-12-13 20:21:55 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:55 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:55 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:55 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:55 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:55 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:55 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:55 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:55 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:55 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:55 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:55 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:55 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:55 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:55 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:55 - Client() control cannot pass from Transaction checks and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:57 - control passed from condition of same whise office ids of both trigger settings and appointment object.
+ office id is : 3919 and time durtion that is in min,hours or days
+2023-12-13 20:21:57 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:21:57 - control pass from Transaction checks with whise office id :3919and whsie client id2236
+2023-12-13 20:22:00 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:22:00 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:22:00 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:22:00 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:22:00 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:22:00 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:22:00 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:22:00 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:22:00 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:22:00 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:22:00 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:22:00 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:22:00 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-13 20:22:00 - Client() control cannot pass from estateID check and its whise client id is : 2236 whise office id is :3919
+2023-12-14 10:27:21 - ---------------------RTS Service processing is in iterations------------------
+2023-12-18 16:11:56 -  RTS Service has been started 
+2023-12-18 16:11:56 - ---------------------RTS Service processing is in iterations------------------
+2023-12-18 16:15:20 -  RTS Service has been started 
+2023-12-18 16:15:20 - ---------------------RTS Service processing is in iterations------------------
+2023-12-18 16:22:38 -  RTS Service has been started 
+2023-12-18 16:22:38 - ---------------------RTS Service processing is in iterations------------------
+2023-12-18 16:32:29 -  RTS Service has been started 
+2023-12-18 16:32:29 - ---------------------RTS Service processing is in iterations------------------
+2023-12-18 16:32:45 - Client(RealAdvice Developer) status is deactivated
+2023-12-18 16:32:46 - Client() status is deactivated
+2023-12-18 16:33:57 -  RTS Service has been started 
+2023-12-18 16:33:57 - ---------------------RTS Service processing is in iterations------------------
+2023-12-18 16:37:30 -  RTS Service has been started 
+2023-12-18 16:37:30 - ---------------------RTS Service processing is in iterations------------------
+2023-12-18 16:38:34 - Control passed from Activation Status(client(10263  RealAdvice Developer) is not deactivated)
