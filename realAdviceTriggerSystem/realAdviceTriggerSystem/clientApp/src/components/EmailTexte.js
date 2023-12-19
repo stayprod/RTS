@@ -7,7 +7,7 @@ import { variables, editorButtons } from '../Variables';
 import { UseAuthContext } from '../context/AuthContext';
 
 export const EamilTexteModal = (props) => {
-    const { showModalTexte, modalTitleTexte, modalType, officeId, clientId, hideLayoutModalTexte, TexteLayoutId, reloadLayoutsList } = props;
+    const { showModalTexte, modalTitleTexte, modalType, officeId, clientId, hideLayoutModalTexte, TexteLayoutId, reloadLayoutsList, UpdateSelectedTextelayoutChange } = props;
 
     const [layoutHtml, setLayoutHtml] = useState("");
     const [emailLayout, setEmailLayout] = useState("");
@@ -75,6 +75,10 @@ export const EamilTexteModal = (props) => {
             DutchTexte: texteDutchArea,
         }
 
+        if (TexteLayoutId != 0 && TexteLayoutId != null) {
+            texteTemplate.TemplateId = TexteLayoutId;
+        }
+
         let url = variables.API_URL + `TexteTemplate/SaveTexteTemplate?`;
 
         const config = {
@@ -92,6 +96,8 @@ export const EamilTexteModal = (props) => {
                 document.querySelector("body").style.cursor = "default";
                 reloadLayoutsList();
                 hideLayoutModalTexte();
+                UpdateSelectedTextelayoutChange(response.data);
+                setLayoutHtml(response.data);
                 setEmailLayout("");
             })
             .catch(error => {
@@ -234,8 +240,88 @@ export const EamilTexteModal = (props) => {
                             </div>
                           
                         </>
-                        :
+                        : (modalType == "edit") ?
 
+                            <>
+                                <div className="row">
+                                    <div className="col-sm-12 col-md-12 mb-3">
+                                        <label className="me-3">Texte Name</label>
+                                        <input type="text" id="newTexteTemplateName" defaultValue={layoutHtml.templateName} className="form-control" />
+                                    </div>
+                                    <div className="col-sm-12 col-md-12 mb-3">
+                                        <label className="me-3">Texte Details</label>
+                                        <div className="">
+                     
+                                            <Tabs
+                                                defaultActiveKey={selectedTab}
+                                                id="texte-tabs"
+                                                className="mb-3"
+                                                onSelect={handleTabSelect}
+                                            >
+                                                <Tab eventKey="english" title="English">
+                                                    <div className="row">
+                                                        <div className="mb-3">
+                                                            <label htmlFor="texteEnglishSubject" className="form-label">Subject</label>
+                                                            <input type="text" className="form-control" defaultValue={layoutHtml.englishSubject} id="texteEnglishSubject" />
+                                                        </div>
+                                                        <div className="col-sm-12 col-md-12 mb-3">
+                                                            <label>Texte</label>
+                                                            <div className="d-flex">
+                                                                <textarea className="form-control h-100" rows="10" id="texteEnglishArea" onChange={handleLayoutEditorChange} defaultValue={layoutHtml.englishTexte} >
+                                                                </textarea>
+                                                            </div>
+
+                                                            <button className="btn-site mt-3" onClick={saveLayoutForOffice}>Save</button>
+                                                        </div>
+
+                                                    </div>
+                                                </Tab>
+                                                <Tab eventKey="french" title="French">
+                                                    <div className="row">
+                                                        <div className="mb-3">
+                                                            <label>Subject</label>
+                                                            <input type="text" className="form-control" id="texteFrenchSubject" onInput={resetConditionDropdowns} defaultValue={layoutHtml.frenchSubject} />
+                                                        </div>
+                                                        <div className="col-sm-12 col-md-12 mb-3">
+                                                            <label>Texte</label>
+                                                            <div className="d-flex">
+                                                                <textarea className="form-control h-100" rows="10" id="texteFrenchArea" onChange={handleLayoutEditorChange} defaultValue={layoutHtml.frenchTexte} >
+                                                                </textarea>
+                                                            </div>
+                                                            <button className="btn-site mt-3" onClick={saveLayoutForOffice}>Save</button>
+                                                        </div>
+                                                    </div>
+                                                </Tab>
+                                                <Tab eventKey="dutch" title="Dutch">
+                                                    <div className="row">
+                                                        <div className="mb-3">
+                                                            <label>Subject</label>
+                                                            <input type="text" className="form-control" id="texteDutchSubject" onInput={resetConditionDropdowns} defaultValue={layoutHtml.dutchSubject} />
+                                                        </div>
+
+                                                        <div className="col-sm-12 col-md-12 mb-3">
+                                                            <label>Texte </label>
+
+                                                            <div className="d-flex">
+                                                                <textarea className="form-control h-100" rows="10" id="texteDutchArea" onChange={handleLayoutEditorChange} defaultValue={layoutHtml.dutchTexte} >
+                                                                </textarea>
+                                                            </div>
+                                                            <button className="btn-site mt-3" onClick={saveLayoutForOffice}>Save</button>
+                                                        </div>
+
+
+                                                    </div>
+                                                </Tab>
+                                            </Tabs>
+                                          
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </>
+
+                        :
                          <div className="row">
                                 {/*<div className="col-sm-12 col-md-12 mb-3">*/}
                                 {/*    <label className="me-3">Texte Name</label>*/}

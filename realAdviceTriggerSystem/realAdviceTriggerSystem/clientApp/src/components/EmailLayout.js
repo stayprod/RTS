@@ -7,15 +7,16 @@ import { variables, editorButtons } from '../Variables';
 import { UseAuthContext } from '../context/AuthContext';
 
 export const EmailLayoutModal = (props) => {
-    const { showModal, modalTitle, modalType, officeId, clientId, hideLayoutModal, layoutId, reloadLayoutsList } = props;
+    const { showModal, modalTitle, modalType, officeId, clientId, hideLayoutModal, layoutId, reloadLayoutsList, updateSelectedLayoutStates } = props;
 
     const [layoutHtml, setLayoutHtml] = useState("");
     const [emailLayout, setEmailLayout] = useState("");
+
     const {
         authUser,
         setAuthUser,
         isLoggedIn,
-        setIsLoggedIn
+        setIsLoggedIn   
     } = UseAuthContext();
     //let emailLayout = "";
 
@@ -43,6 +44,9 @@ export const EmailLayoutModal = (props) => {
             layoutName: layoutName,
             layoutDetail: emailLayout
         }
+        if (layoutId != 0 && layoutId != null) {
+            _layout.layoutid = layoutId;
+        }
 
         let url = variables.API_URL + `Layout/SaveOfficeLayout?`;
 
@@ -60,13 +64,17 @@ export const EmailLayoutModal = (props) => {
                 e.target.removeAttribute("disabled");
                 document.querySelector("body").style.cursor = "default";
                 reloadLayoutsList();
+                updateSelectedLayoutStates(response.data);
+                setLayoutHtml(response.data);
                 hideLayoutModal();
-                setEmailLayout("");
+                if (modalType == "new") {
+                    setEmailLayout("");
+                }
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
             });
-        
+       
     }
 
     const getLayoutById = async () => {
@@ -84,12 +92,14 @@ export const EmailLayoutModal = (props) => {
         const jsonData = await response.json();
         if (jsonData != null) {
             setLayoutHtml(jsonData);
+            setEmailLayout(jsonData.layoutDetail)
         }
     }
 
     const handleLayoutEditorChange = (content) => {
         setEmailLayout(content.target.value);
     }
+
 
     useEffect(() => {
         if (layoutId != "" && layoutId != 0 && layoutId != undefined) {
@@ -122,7 +132,7 @@ export const EmailLayoutModal = (props) => {
                                         {/*        buttonList: editorButtons*/}
                                         {/*    }}*/}
                                         {/*/>*/}
-                                        <textarea className="form-control h-100" value={emailLayout} rows="15" id="textAreaEmailLayout" onChange={handleLayoutEditorChange} >
+                                        <textarea className="form-control h-100"  rows="15" id="textAreaEmailLayout" onChange={handleLayoutEditorChange} >
                                         </textarea>
                                     </div>
 
@@ -132,8 +142,31 @@ export const EmailLayoutModal = (props) => {
                                 <button className="btn-site" onClick={saveLayoutForOffice}>Save</button>
                             </div>
                         </>
-                        :
-                        <div dangerouslySetInnerHTML={{ __html: layoutHtml.layoutDetail }} />
+                        : (modalType == "edit") ?
+
+                            <>
+                                <div className="row">
+                                    <div className="col-sm-12 col-md-12 mb-3">
+                                        <label className="me-3">Layout Name</label>
+                                        <input type="text" id="newLayoutName" defaultValue={layoutHtml.layoutName} className="form-control" />
+                                    </div>
+                                    <div className="col-sm-12 col-md-12 mb-3">
+                                        <label className="me-3">Layout</label>
+                                        <div className="d-flex">
+                                            <textarea className="form-control h-100" rows="15" id="textAreaEmailLayout" defaultValue={emailLayout} 
+                                            onChange={handleLayoutEditorChange}  >
+                                            </textarea>
+                                        </div>
+                                            
+                                    </div>
+                                </div>
+                                <div>
+                                    <button className="btn-site" onClick={saveLayoutForOffice}>Save</button>
+                                </div>
+                            </>
+
+                            :
+                        <div dangerouslySetInnerHTML={{ __html: layoutHtml.layoutDetail }} /> 
                 }
             </Modal.Body>
         </Modal>

@@ -5,19 +5,15 @@ import { Row, Col, Nav, Form, Image, Button, Navbar, Dropdown, Container, ListGr
 import { MultiSelect } from "react-multi-select-component";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
-import SunEditor, { buttonList, height } from 'suneditor-react';
-import 'suneditor/dist/css/suneditor.min.css';
+//import SunEditor, { buttonList, height } from 'suneditor-react';
+//import 'suneditor/dist/css/suneditor.min.css';
 import { UseAuthContext } from '../context/AuthContext';
 
 import { useToken } from './tokenContext';
 import { variables, editorButtons } from '../Variables';
 
 import { EmailLayoutModal } from './EmailLayout';
-import { EamilTexteModal } from './EmailTexte';
-
-//import 'primereact/resources/themes/saga-blue/theme.css';
-//import 'primereact/resources/primereact.min.css';
-/*import { MultiSelect } from 'primereact/multiselect';*/
+import { EamilTexteModal } from "./EmailTexte"
 
 
 const targetOptions = [
@@ -59,6 +55,15 @@ export const Trigger = (props) => {
     const [suveryLinkForEmail, setSuveryLinkForEmail] = useState(["https://survey.realadvice.be/", "", "/?"]);
     const [contactPreference, setContactPreference] = useState("all");
     const [selectedProperty, setSelectedProperty] = useState([]);
+    /*   Start New code from Abdul Saboor */
+
+    const [showLayoutModalTextePop, setShowLayoutModalTextePop] = useState(false)
+    const [texteTemplateData, setTexteTemplateData] = useState([])
+    const [layoutModalTitleTexte, setLayoutModalTitleTexte] = useState("")
+    const [layoutModalTypeTexte, setLayoutModalTypeTexte] = useState("")
+    const [selectedLaytOutTexteId, setSelectedLaytOutTexteId] = useState(0);
+    const [selectedLaytNameTexte, setSelectedLaytNameTexte] = useState("");
+
     const {
         authUser,
         setAuthUser,
@@ -117,9 +122,13 @@ export const Trigger = (props) => {
         }
     }
 
+    const updateSelectedLayoutStates = (_layout) => {
+        setSelectedLaytOutId(_layout.layoutid)
+        setSelectedLaytName(_layout.layoutName);
+    }
+
     //set trigger detail in form while editing a trigger
     const loadTriggerDetailInEdit = (trigger) => {
-
         setTriggerDetail(trigger);
         document.getElementById("keymomentDropdown").value = trigger.keyMoment;
         let momentIndex = document.getElementById("keymomentDropdown").selectedIndex;
@@ -145,12 +154,12 @@ export const Trigger = (props) => {
         let participantIndex = document.getElementById("participent1").selectedIndex;
         let participantText = document.getElementById("participent1")[participantIndex].text;
         triggerNameBuilder["participent1"] = participantText;
-        //console.log("transaction type=" + trigger.transactionType);
+        console.log("transaction type=" + trigger.transactionType);
 
          /*get multi select values from database */
         const fetchMultiSelectResult = trigger.transactionType.split(",")
-        const filterData = optionMultiSelect.filter(el => fetchMultiSelectResult.includes(el.value))
-        setSelectedProperty(filterData)
+        const filterData = optionMultiSelect.filter(el => fetchMultiSelectResult.includes(el.value));
+        setSelectedProperty(filterData);
 
         populateSurveyLinkInEditMode(trigger.surveyLink)
 
@@ -179,7 +188,6 @@ export const Trigger = (props) => {
     }
 
     const populateSurveyLinkInEditMode = (_link) => {
-
         //splitting survey link to mark checkboxes checked when opening trigger is in edit mode
         const splittedSurveyLink = _link.split("/");
         splittedSurveyLink[1] += "//";
@@ -563,6 +571,17 @@ export const Trigger = (props) => {
             setOfficeId(localOfficeDetail.officeid);
             setClientId(clientDetail.localclient.client.clientid);
         }
+        else if (e.target.innerText == "Edit") {
+            if (document.getElementById("layoutDropdown").value == "") {
+                alert("No layout selected for edit");
+                return
+            }
+            setShowLayoutModal(true);
+            setLayoutModalTitle(selectedLaytName + "Edit Layout");
+            setLayoutModalType("edit");
+            setOfficeId(localOfficeDetail.officeid);
+            setClientId(clientDetail.localclient.client.clientid);
+        }
         else {
             if (document.getElementById("layoutDropdown").value == "") {
                 alert("No layout selected for preview");
@@ -575,17 +594,7 @@ export const Trigger = (props) => {
             setClientId(clientDetail.localclient.client.clientid);
         }
     }
-
-/*   Start New code from Abdul Saboor */
-
-    const [showLayoutModalTextePop, setShowLayoutModalTextePop] = useState(false)
-    const [texteTemplateData, setTexteTemplateData] = useState([])
-    const [layoutModalTitleTexte, setLayoutModalTitleTexte] = useState("")
-    const [layoutModalTypeTexte, setLayoutModalTypeTexte] = useState("")
-    const [selectedLaytOutTexteId, setSelectedLaytOutTexteId] = useState(0);
-    const [selectedLaytNameTexte, setSelectedLaytNameTexte] = useState("");
-    
-
+  
     const optionMultiSelect = [
         { label: 'To sale', value: '1' },
         { label: 'To rent', value: '2' },
@@ -599,7 +608,6 @@ export const Trigger = (props) => {
     }
  
     const getListOfTexteEmailLayout = async () => {
-
         const response = await fetch(variables.API_URL + 'TexteTemplate/GetAllTexteTemplates', {
             method: 'GET',
             headers: {
@@ -613,7 +621,11 @@ export const Trigger = (props) => {
             setTexteTemplateData(jsonData);
         }
     }
-    console.log(texteTemplateData)
+
+    const updateTextelayoutChange = (_texteLayout) => {
+        setSelectedLaytOutTexteId(_texteLayout.templateId);
+        setSelectedLaytNameTexte(_texteLayout.templateName);
+    }
 
     const setSelectedEmailLayoutTexte = (e) => {
         let value = e.target.value;
@@ -626,13 +638,22 @@ export const Trigger = (props) => {
             setSelectedLaytNameTexte("");
         }
     }
-    console.log(selectedLaytNameTexte)
 
     const openLayoutModalTexte = (e) => {
         if (e.target.innerText == "New") {
             setShowLayoutModalTextePop(true)
             setLayoutModalTitleTexte("New Texte Template");
             setLayoutModalTypeTexte("new");
+            setOfficeId(localOfficeDetail.officeid);
+            setClientId(clientDetail.localclient.client.clientid);
+        } else if (e.target.innerText == "Edit") {
+            if (document.getElementById("layoutDropdowntexte").value == "") {
+                alert("No texte selected for edit");
+                return
+            }
+            setShowLayoutModalTextePop(true);
+            setLayoutModalTitleTexte(selectedLaytNameTexte + " Preview");
+            setLayoutModalTypeTexte("edit");
             setOfficeId(localOfficeDetail.officeid);
             setClientId(clientDetail.localclient.client.clientid);
         }
@@ -648,7 +669,6 @@ export const Trigger = (props) => {
             setClientId(clientDetail.localclient.client.clientid);
         }
     }
-    console.log(selectedLaytNameTexte)
  
     const hideLayoutModalTexte = (e) => {
         setShowLayoutModalTextePop(false)
@@ -708,9 +728,6 @@ export const Trigger = (props) => {
         setSuveryLinkForEmail(current => link);
     }
 
-    //const createNewSurveyEmail = (e) => {
-
-    //}
     const saveTrigger = (e) => {
         e.target.setAttribute("disabled", true);
         document.querySelector("body").style.cursor = "progress";
@@ -752,6 +769,7 @@ export const Trigger = (props) => {
             whiseOptions.style.borderColor = "red";
             isFRequiredFieldsEmpty = true;
         }
+
         //if (selectedTexteOption.value == "") {
         //    selectedTexteLayout.style.borderColor = "red";
         //    isFRequiredFieldsEmpty = true;
@@ -887,7 +905,6 @@ export const Trigger = (props) => {
     }
 
     useEffect(() => {
-
         if (location.state != null) {
             getNavigateState();
         }
@@ -957,7 +974,6 @@ export const Trigger = (props) => {
     }, [clientTokken])
 
     useEffect(() => {
-
         if (location.state != null) {
             getNavigateState();
         }
@@ -979,9 +995,11 @@ export const Trigger = (props) => {
                 console.error('Error fetching data:', error);
             });
     }, [token])
+
     useEffect(() => {
-        if (location.state.TriggerDetail != undefined)
-            document.getElementById("whiseAppointmentType").value = location.state.TriggerDetail.appointmentType;
+        if (location.state.TriggerDetail != undefined) {
+            //document.getElementById("whiseAppointmentType").value = location.state.TriggerDetail.appointmentType;
+        }
     }, [data])
 
     useEffect(() => {
@@ -1129,8 +1147,8 @@ export const Trigger = (props) => {
                                 <MultiSelect
                                   id="transactionType"
                                   value={selectedProperty}
-                                options={optionMultiSelect}
-                                onChange={handleChangeSelected}
+                                    options={optionMultiSelect}
+                                    onChange={handleChangeSelected}
                                     labelledBy="Select an option"
                                 />
 
@@ -1201,7 +1219,11 @@ export const Trigger = (props) => {
                                 <button className="btn-site ms-1" onClick={openLayoutModal}>
                                     View
                                 </button>
+                                <button className="btn-site ms-1" onClick={openLayoutModal}>
+                                    Edit
+                                </button>
                                 <EmailLayoutModal
+
                                     showModal={showLayoutModal}
                                     modalTitle={layoutModalTitle}
                                     modalType={layoutModalType}
@@ -1210,6 +1232,7 @@ export const Trigger = (props) => {
                                     hideLayoutModal={hideLayoutModal}
                                     layoutId={selectedLaytOutId}
                                     reloadLayoutsList={getListOfLayoutsByOffice}
+                                    updateSelectedLayoutStates={updateSelectedLayoutStates}
                                 />
                             </div>
                         </div>
@@ -1240,6 +1263,9 @@ export const Trigger = (props) => {
                                 <button className="btn-site ms-1" onClick={openLayoutModalTexte}>
                                     View
                                 </button>
+                                <button className="btn-site ms-1" onClick={openLayoutModalTexte}>
+                                    Edit
+                                </button>
                                 <EamilTexteModal
                                     showModalTexte={showLayoutModalTextePop}
                                     modalTitleTexte={layoutModalTitleTexte}
@@ -1249,6 +1275,7 @@ export const Trigger = (props) => {
                                     hideLayoutModalTexte={hideLayoutModalTexte}
                                     TexteLayoutId={selectedLaytOutTexteId}
                                     reloadLayoutsList={getListOfTexteEmailLayout}
+                                    UpdateSelectedTextelayoutChange={updateTextelayoutChange}
                                 />
                              
                             </div>

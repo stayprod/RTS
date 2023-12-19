@@ -78,5 +78,30 @@ namespace realAdviceTriggerSystemAPI.Controllers
                 return new JsonResult(exp.Message);
             }
         }
+
+        [HttpDelete]
+        [Route("DeleteLayout")]
+        public JsonResult DeleteLayout(int layoutId)
+        {
+            try
+            {
+                using (var con = new RealadviceTriggeringSystemContext())
+                {
+
+                    Layout _layoutToRemove = con.Layouts.Where(d => d.Layoutid == layoutId).First();
+                    if (_layoutToRemove != null)
+                    {
+                        con.Layouts.Remove(_layoutToRemove);
+                        con.SaveChanges();
+                    }
+                    return new JsonResult("");
+                }
+            }
+            catch (Exception exp)
+            {
+                _exceptionWriter.WriteException(exp);
+                return new JsonResult(exp.Message);
+            }
+        }
     }
 }

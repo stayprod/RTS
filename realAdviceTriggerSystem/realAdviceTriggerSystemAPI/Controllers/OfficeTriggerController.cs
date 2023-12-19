@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using realAdviceTriggerSystemAPI.Models;
 using realAdviceTriggerSystemAPI.Repository;
 
@@ -115,6 +116,25 @@ namespace realAdviceTriggerSystemAPI.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("GetTriggersByLayout")]
+        public JsonResult GetTriggersByLayout(int layoutId)
+        {
+            try
+            {
+                using (var con = new RealadviceTriggeringSystemContext())
+                {
+                    OfficeTrigger? _triggers = con.OfficeTriggers.Where(c => c.Layoutid == layoutId).FirstOrDefault();
+                    return new JsonResult(_triggers);
+                }
+            }
+            catch (Exception exp)
+            {
+                _exceptionWriter.WriteException(exp);
+                return new JsonResult(exp.Message);
+            }
+        }
+
         [HttpPost]
         [Route("SaveOfficeTriggerDetail")]
         public JsonResult SaveOfficeTriggerDetail(OfficeTrigger officeTrigger)
@@ -152,7 +172,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
                         _trigger.EnglishSubject = officeTrigger.EnglishSubject;
                         _trigger.FrenchSubject = officeTrigger.FrenchSubject;
                         _trigger.DutchSubject = officeTrigger.DutchSubject;
-                        _trigger.TexteTemplateId = officeTrigger.TexteTemplateId;
+_trigger.TexteTemplateId = officeTrigger.TexteTemplateId;
                         con.SaveChanges();
                     }
                     else
@@ -164,6 +184,33 @@ namespace realAdviceTriggerSystemAPI.Controllers
                     }
 
                     return new JsonResult(officeTrigger);
+                }
+            }
+            catch (Exception exp)
+            {
+                _exceptionWriter.WriteException(exp);
+                return new JsonResult(exp.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("UpdateTriggersLayout")]
+        public JsonResult UpdateTriggersLayout(List<OfficeTrigger> _trigger)
+        {
+            try
+            {
+                using (var con = new RealadviceTriggeringSystemContext())
+                {
+                    foreach(var trigger in _trigger)
+                    {
+                        OfficeTrigger _triggerToUpdate = con.OfficeTriggers.Where(d => d.OfficeTriggerid == trigger.OfficeTriggerid).First();
+                        if (_triggerToUpdate != null)
+                        {
+                            _triggerToUpdate.Layoutid = trigger.Layoutid;
+                            con.SaveChanges();
+                        }
+                    }
+                    return new JsonResult("Triggers updated successfully.");
                 }
             }
             catch (Exception exp)

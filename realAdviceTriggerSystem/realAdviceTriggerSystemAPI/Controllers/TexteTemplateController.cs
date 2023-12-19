@@ -104,9 +104,27 @@ namespace realAdviceTriggerSystemAPI.Controllers
             {
                 using (var con = new RealadviceTriggeringSystemContext())
                 {
-                    texteTemplate.CreatedOn = DateTime.Now;
-                    con.TexteTemplates.Add(texteTemplate);
-                    con.SaveChanges();
+                    TexteTemplate? _texteTemplate = con.TexteTemplates.Where(t => t.TemplateId == texteTemplate.TemplateId).FirstOrDefault();
+
+                    if (_texteTemplate != null)
+                    {
+                 
+                        _texteTemplate.EnglishSubject = texteTemplate.EnglishSubject;
+                        _texteTemplate.EnglishTexte = texteTemplate.EnglishTexte;
+                        _texteTemplate.DutchSubject = texteTemplate.DutchSubject;
+                        _texteTemplate.DutchTexte = texteTemplate.DutchTexte;
+                        _texteTemplate.FrenchSubject = texteTemplate.FrenchSubject;
+                        _texteTemplate.FrenchTexte = texteTemplate.FrenchTexte;
+                        _texteTemplate.TemplateName = texteTemplate.TemplateName;
+                         con.SaveChanges();
+                    } else
+                    {
+                        texteTemplate.CreatedOn = DateTime.Now;
+                        con.TexteTemplates.Add(texteTemplate);
+                        con.SaveChanges();
+                    }
+
+                   
                     return new JsonResult(texteTemplate);
                 }
             }
