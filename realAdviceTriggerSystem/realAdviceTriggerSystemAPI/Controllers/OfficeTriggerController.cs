@@ -116,25 +116,6 @@ namespace realAdviceTriggerSystemAPI.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("GetTriggersByLayout")]
-        public JsonResult GetTriggersByLayout(int layoutId)
-        {
-            try
-            {
-                using (var con = new RealadviceTriggeringSystemContext())
-                {
-                    OfficeTrigger? _triggers = con.OfficeTriggers.Where(c => c.Layoutid == layoutId).FirstOrDefault();
-                    return new JsonResult(_triggers);
-                }
-            }
-            catch (Exception exp)
-            {
-                _exceptionWriter.WriteException(exp);
-                return new JsonResult(exp.Message);
-            }
-        }
-
         [HttpPost]
         [Route("SaveOfficeTriggerDetail")]
         public JsonResult SaveOfficeTriggerDetail(OfficeTrigger officeTrigger)
@@ -172,7 +153,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
                         _trigger.EnglishSubject = officeTrigger.EnglishSubject;
                         _trigger.FrenchSubject = officeTrigger.FrenchSubject;
                         _trigger.DutchSubject = officeTrigger.DutchSubject;
-_trigger.TexteTemplateId = officeTrigger.TexteTemplateId;
+                        _trigger.TexteTemplateId = officeTrigger.TexteTemplateId;
                         con.SaveChanges();
                     }
                     else
@@ -210,7 +191,7 @@ _trigger.TexteTemplateId = officeTrigger.TexteTemplateId;
                             con.SaveChanges();
                         }
                     }
-                    return new JsonResult("Triggers updated successfully.");
+                    return new JsonResult("Triggers layout updated successfully");
                 }
             }
             catch (Exception exp)

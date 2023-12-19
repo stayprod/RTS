@@ -134,5 +134,38 @@ namespace realAdviceTriggerSystemAPI.Controllers
                 return new JsonResult(exp.Message);
             }
         }
+
+        [HttpDelete]
+        [Route("DeleteTexteTemplate")]
+        public JsonResult DeleteTexteTemplate(int templateId)
+        {
+            try
+            {
+                using (var con = new RealadviceTriggeringSystemContext())
+                {
+                    List<OfficeTrigger>? _triggers = con.OfficeTriggers.Where(c => c.TexteTemplateId == templateId).ToList();
+                    if (_triggers == null)
+                    {
+                        TexteTemplate _templateToRemove = con.TexteTemplates.Where(d => d.TemplateId == templateId).First();
+                        if (_templateToRemove != null)
+                        {
+                            con.TexteTemplates.Remove(_templateToRemove);
+                            con.SaveChanges();
+                        }
+                        return new JsonResult("Texte template successfully deleted.");
+                    }
+                    else
+                    {
+                        return new JsonResult(_triggers);
+                    }
+
+                }
+            }
+            catch (Exception exp)
+            {
+                _exceptionWriter.WriteException(exp);
+                return new JsonResult(exp.Message);
+            }
+        }
     }
 }

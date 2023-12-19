@@ -14,6 +14,7 @@ import { variables, editorButtons } from '../Variables';
 
 import { EmailLayoutModal } from './EmailLayout';
 import { EamilTexteModal } from "./EmailTexte"
+import { DeleteConfirmationModal } from './DeleteConfirmationModal';
 
 
 const targetOptions = [
@@ -63,6 +64,18 @@ export const Trigger = (props) => {
     const [layoutModalTypeTexte, setLayoutModalTypeTexte] = useState("")
     const [selectedLaytOutTexteId, setSelectedLaytOutTexteId] = useState(0);
     const [selectedLaytNameTexte, setSelectedLaytNameTexte] = useState("");
+    const [showModalDelete, setShowModalDelete] = useState(false);
+    const [deleteModalTitle, setDeleteModalTitle] = useState("");
+    const [deleteModalType, setDeleteModalType] = useState("");
+    const [recentlySavedLayout, setRecentlySavedLayout] = useState({});
+    const [recentlySavedTexteTemplate, setRecentlySavedTexteTemplate] = useState({});
+    const [layoutsListWithoutCurrentLayout, setLayoutsListWithoutCurrentLayout] = useState([]);
+
+    const optionMultiSelect = [
+        { label: 'To sale', value: '1' },
+        { label: 'To rent', value: '2' },
+        { label: 'Annuity sale', value: '3' },
+    ];
 
     const {
         authUser,
@@ -80,7 +93,7 @@ export const Trigger = (props) => {
         setLocalOfficeDetail(location.state.LocalOfficeDetail);
         setClientDetail(location.state.ClientDetail)
         setWhiseOfficesList(location.state.AllWhiseOffices)
-        getListOfLayoutsByOffice(location.state.ClientDetail.localclient.client);
+        getListOfLayoutsByOffice(location.state.ClientDetail.localclient.client, "");
         getListOfTexteEmailLayout();
 
         if (location.state.TriggerDetail != undefined) {
@@ -104,7 +117,7 @@ export const Trigger = (props) => {
 
     }
 
-    const getListOfLayoutsByOffice = async (_localclient) => {
+    const getListOfLayoutsByOffice = async (_localclient, _savedlayout) => {
         if (_localclient == undefined) {
             _localclient = location.state.ClientDetail.localclient.client;
         }
@@ -119,12 +132,16 @@ export const Trigger = (props) => {
         const jsonData = await response.json();
         if (jsonData != null) {
             setOfficeLayout(jsonData);
+            if (_savedlayout != undefined && _savedlayout != "") {
+                setRecentlySavedLayout(_savedlayout);
+            }
         }
     }
 
     const updateSelectedLayoutStates = (_layout) => {
         setSelectedLaytOutId(_layout.layoutid)
         setSelectedLaytName(_layout.layoutName);
+        document.getElementById("layoutDropdown").value = _layout.layoutid;
     }
 
     //set trigger detail in form while editing a trigger
@@ -547,7 +564,7 @@ export const Trigger = (props) => {
     //    document.getElementById("surveyTypeCheckboxes").innerHTML += html;
     //}
 
-    const setSelectedEmailLayout = (e) => {
+    const OnChangeHandlerEmailLayout = (e) => {
         let value = e.target.value;
         if (value != "") {
             setSelectedLaytOutId(value);
@@ -565,6 +582,8 @@ export const Trigger = (props) => {
 
     const openLayoutModal = (e) => {
         if (e.target.innerText == "New") {
+            setSelectedLaytOutId('0');
+            setSelectedLaytName("");
             setShowLayoutModal(true);
             setLayoutModalTitle("New Layout");
             setLayoutModalType("new");
@@ -594,12 +613,6 @@ export const Trigger = (props) => {
             setClientId(clientDetail.localclient.client.clientid);
         }
     }
-  
-    const optionMultiSelect = [
-        { label: 'To sale', value: '1' },
-        { label: 'To rent', value: '2' },
-        { label: 'Annuity sale', value: '3' },    
-    ];
 
     const handleChangeSelected = (item) => { 
 
@@ -607,7 +620,7 @@ export const Trigger = (props) => {
    
     }
  
-    const getListOfTexteEmailLayout = async () => {
+    const getListOfTexteEmailLayout = async(_savedTexteTemplate) => {
         const response = await fetch(variables.API_URL + 'TexteTemplate/GetAllTexteTemplates', {
             method: 'GET',
             headers: {
@@ -619,12 +632,16 @@ export const Trigger = (props) => {
         const jsonData = await response.json();
         if (jsonData != null) {
             setTexteTemplateData(jsonData);
+            if (_savedTexteTemplate != undefined) {
+                setRecentlySavedTexteTemplate(_savedTexteTemplate);
+            }
         }
     }
 
-    const updateTextelayoutChange = (_texteLayout) => {
+    const updateTexteTemplateState = (_texteLayout) => {
         setSelectedLaytOutTexteId(_texteLayout.templateId);
         setSelectedLaytNameTexte(_texteLayout.templateName);
+        document.getElementById("layoutDropdowntexte").value = _texteLayout.templateId;
     }
 
     const setSelectedEmailLayoutTexte = (e) => {
@@ -641,12 +658,15 @@ export const Trigger = (props) => {
 
     const openLayoutModalTexte = (e) => {
         if (e.target.innerText == "New") {
-            setShowLayoutModalTextePop(true)
+            setSelectedLaytOutTexteId("0");
+            setSelectedLaytNameTexte("");
+            setShowLayoutModalTextePop(true);
             setLayoutModalTitleTexte("New Texte Template");
             setLayoutModalTypeTexte("new");
             setOfficeId(localOfficeDetail.officeid);
             setClientId(clientDetail.localclient.client.clientid);
-        } else if (e.target.innerText == "Edit") {
+        }
+        else if (e.target.innerText == "Edit") {
             if (document.getElementById("layoutDropdowntexte").value == "") {
                 alert("No texte selected for edit");
                 return
@@ -672,6 +692,28 @@ export const Trigger = (props) => {
  
     const hideLayoutModalTexte = (e) => {
         setShowLayoutModalTextePop(false)
+    }
+
+    const DeleteLayoutHandle = (e) => {
+        if (e.target.innerText == "Delete") {
+            if (document.getElementById("layoutDropdown").value == "") {
+                alert("No layout selected for delete");
+                return
+            }
+            setShowModalDelete(true);
+            setDeleteModalTitle("Delete Layout");
+            setDeleteModalType("deletelayout");
+            let layouts = officeLayout;
+
+            let filteredLayouts = layouts.filter(e => {
+                return e.layoutid != selectedLaytOutId;
+            })
+            setLayoutsListWithoutCurrentLayout(filteredLayouts);
+        }
+    }
+
+    const hideModalDelete = (e) => {
+        setShowModalDelete(false);
     }
 
     /*   End New code from Abdul Saboor */
@@ -1020,6 +1062,16 @@ export const Trigger = (props) => {
         document.title = 'Trigger - Real Advice Trigger System';
     }, []);
 
+    useEffect(() => {
+        if (recentlySavedLayout.layoutid != undefined) {
+            updateSelectedLayoutStates(recentlySavedLayout);
+        }
+    }, [recentlySavedLayout]);
+
+    useEffect(() => {
+        updateTexteTemplateState(recentlySavedTexteTemplate);
+    }, [recentlySavedTexteTemplate])
+
     return (
         <>
             <section className="client-setting">
@@ -1198,10 +1250,10 @@ export const Trigger = (props) => {
                     {/*Email Layout */}
 
                     <div className="row">
-                        <div className="col-sm-12 col-md-4 mb-3">
+                        <div className="col-sm-12 col-md-5 mb-3">
                             <label className="me-3">Layout</label>
                             <div className="d-flex">
-                                <select className="form-select" id="layoutDropdown" onChange={setSelectedEmailLayout}>
+                                <select className="form-select" id="layoutDropdown" onChange={OnChangeHandlerEmailLayout}>
                                     <option value="">--Select Layout--</option>
                                     {
                                         officeLayout.length > 0 ? officeLayout.map((item) => {
@@ -1222,6 +1274,10 @@ export const Trigger = (props) => {
                                 <button className="btn-site ms-1" onClick={openLayoutModal}>
                                     Edit
                                 </button>
+                                {/*<button className="btn-site ms-1" onClick={DeleteLayoutHandle}>*/}
+                                {/*    Delete*/}
+                                {/*</button>*/}
+
                                 <EmailLayoutModal
 
                                     showModal={showLayoutModal}
@@ -1234,6 +1290,15 @@ export const Trigger = (props) => {
                                     reloadLayoutsList={getListOfLayoutsByOffice}
                                     updateSelectedLayoutStates={updateSelectedLayoutStates}
                                 />
+
+                                <DeleteConfirmationModal
+                                    showModelDelete={showModalDelete}
+                                    deleteModalTitle={deleteModalTitle}
+                                    deleteModalType={deleteModalType}
+                                    hideModalDelete={hideModalDelete}
+                                    itemId={selectedLaytOutId}
+                                    layoutsList={layoutsListWithoutCurrentLayout}
+                                />
                             </div>
                         </div>
                     </div>
@@ -1242,7 +1307,7 @@ export const Trigger = (props) => {
                     {/* Texte Layout*/}
 
                     <div className="row">
-                        <div className="col-sm-12 col-md-4 mb-3">
+                        <div className="col-sm-12 col-md-5 mb-3">
                             <label className="me-3">Texte Template</label>
                             <div className="d-flex">
                                 <select className="form-select" id="layoutDropdowntexte" onChange={setSelectedEmailLayoutTexte}>
@@ -1266,6 +1331,9 @@ export const Trigger = (props) => {
                                 <button className="btn-site ms-1" onClick={openLayoutModalTexte}>
                                     Edit
                                 </button>
+                                {/*<button className="btn-site ms-1">*/}
+                                {/*    Delete*/}
+                                {/*</button>*/}
                                 <EamilTexteModal
                                     showModalTexte={showLayoutModalTextePop}
                                     modalTitleTexte={layoutModalTitleTexte}
@@ -1275,7 +1343,7 @@ export const Trigger = (props) => {
                                     hideLayoutModalTexte={hideLayoutModalTexte}
                                     TexteLayoutId={selectedLaytOutTexteId}
                                     reloadLayoutsList={getListOfTexteEmailLayout}
-                                    UpdateSelectedTextelayoutChange={updateTextelayoutChange}
+                                    UpdateSelectedTextelayoutChange={updateTexteTemplateState}
                                 />
                              
                             </div>

@@ -49,7 +49,7 @@ code {
     border-radius: 0.25rem;
     margin-right: 0.5rem;
     color: white;
-    margin-bottom:0.25rem;
+    margin-bottom: 0.25rem;
 }
 
 .office-active {
@@ -89,6 +89,10 @@ code {
 
 .new-layout-modal .modal-dialog {
     max-width: 70%;
+}
+
+.confirmation-delete-modal .modal-dialog {
+    max-width: 50%;
 }
 
 .btn-login {

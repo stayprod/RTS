@@ -66,9 +66,19 @@ namespace realAdviceTriggerSystemAPI.Controllers
             {
                 using (var con = new RealadviceTriggeringSystemContext())
                 {
-                    layout.CreatedOn = DateTime.Now;
-                    con.Layouts.Add(layout);
-                    con.SaveChanges();
+                    Layout _layout = con.Layouts.Where(l => l.Layoutid == layout.Layoutid).FirstOrDefault();
+                    if(_layout != null)
+                    {
+                        _layout.LayoutDetail = layout.LayoutDetail;
+                        _layout.LayoutName = layout.LayoutName;
+                        con.SaveChanges();
+                    }
+                    else
+                    {
+                        layout.CreatedOn = DateTime.Now;
+                        con.Layouts.Add(layout);
+                        con.SaveChanges();
+                    }
                     return new JsonResult(layout);
                 }
             }
@@ -87,14 +97,22 @@ namespace realAdviceTriggerSystemAPI.Controllers
             {
                 using (var con = new RealadviceTriggeringSystemContext())
                 {
-
-                    Layout _layoutToRemove = con.Layouts.Where(d => d.Layoutid == layoutId).First();
-                    if (_layoutToRemove != null)
+                    List<OfficeTrigger>? _triggers = con.OfficeTriggers.Where(c => c.Layoutid == layoutId).ToList();
+                    if (_triggers.Count == 0)
                     {
-                        con.Layouts.Remove(_layoutToRemove);
-                        con.SaveChanges();
+                        Layout _layoutToRemove = con.Layouts.Where(d => d.Layoutid == layoutId).First();
+                        if (_layoutToRemove != null)
+                        {
+                            con.Layouts.Remove(_layoutToRemove);
+                            con.SaveChanges();
+                        }
+                        return new JsonResult("Layout successfully deleted.");
                     }
-                    return new JsonResult("");
+                    else
+                    {
+                        return new JsonResult(_triggers);
+                    }
+
                 }
             }
             catch (Exception exp)

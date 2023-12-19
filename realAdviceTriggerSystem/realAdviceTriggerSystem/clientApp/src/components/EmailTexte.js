@@ -94,9 +94,9 @@ export const EamilTexteModal = (props) => {
                 alert("Texte Template successfully saved.");
                 e.target.removeAttribute("disabled");
                 document.querySelector("body").style.cursor = "default";
-                reloadLayoutsList();
+                reloadLayoutsList(response.data);
                 hideLayoutModalTexte();
-                UpdateSelectedTextelayoutChange(response.data);
+                //UpdateSelectedTextelayoutChange(response.data);
                 setLayoutHtml(response.data);
                 setEmailLayout("");
             })

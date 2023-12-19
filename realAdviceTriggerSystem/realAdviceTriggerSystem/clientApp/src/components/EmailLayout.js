@@ -9,8 +9,9 @@ import { UseAuthContext } from '../context/AuthContext';
 export const EmailLayoutModal = (props) => {
     const { showModal, modalTitle, modalType, officeId, clientId, hideLayoutModal, layoutId, reloadLayoutsList, updateSelectedLayoutStates } = props;
 
-    const [layoutHtml, setLayoutHtml] = useState("");
-    const [emailLayout, setEmailLayout] = useState("");
+    //const [layoutHtml, setLayoutHtml] = useState("");
+    const [layoutName, setLayoutName] = useState("");
+    const [layoutDetail, setLayoutDetail] = useState("");
 
     const {
         authUser,
@@ -23,7 +24,7 @@ export const EmailLayoutModal = (props) => {
     const saveLayoutForOffice = async (e) => {
         e.target.setAttribute("disabled", true);
         document.querySelector("body").style.cursor = "progress";
-        let layoutName = document.getElementById("newLayoutName").value;
+        //let layoutName = document.getElementById("newLayoutName").value;
 
         if (layoutName == "") {
             alert("Enter layout name");
@@ -31,7 +32,7 @@ export const EmailLayoutModal = (props) => {
             document.querySelector("body").style.cursor = "default";
             return;
         }
-        if (emailLayout == "") {
+        if (layoutDetail == "") {
             alert("Layout shouldn't be empty");
             e.target.removeAttribute("disabled");
             document.querySelector("body").style.cursor = "default";
@@ -42,7 +43,7 @@ export const EmailLayoutModal = (props) => {
             officeid: +officeId,
             clientid: +clientId,
             layoutName: layoutName,
-            layoutDetail: emailLayout
+            layoutDetail: layoutDetail
         }
         if (layoutId != 0 && layoutId != null) {
             _layout.layoutid = layoutId;
@@ -63,13 +64,15 @@ export const EmailLayoutModal = (props) => {
                 alert("Layout successfully saved.");
                 e.target.removeAttribute("disabled");
                 document.querySelector("body").style.cursor = "default";
-                reloadLayoutsList();
-                updateSelectedLayoutStates(response.data);
-                setLayoutHtml(response.data);
+                let localClient;
+                reloadLayoutsList(localClient, response.data);
+                //setLayoutHtml(response.data);
                 hideLayoutModal();
-                if (modalType == "new") {
-                    setEmailLayout("");
-                }
+                //updateSelectedLayoutStates(response.data);
+                //if (modalType == "new") {
+                //    setLayoutDetail("");
+                //    setLayoutName("");
+                //}
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
@@ -91,13 +94,18 @@ export const EmailLayoutModal = (props) => {
 
         const jsonData = await response.json();
         if (jsonData != null) {
-            setLayoutHtml(jsonData);
-            setEmailLayout(jsonData.layoutDetail)
+            //setLayoutHtml(jsonData);
+            setLayoutDetail(jsonData.layoutDetail);
+            setLayoutName(jsonData.layoutName);
         }
     }
 
     const handleLayoutEditorChange = (content) => {
-        setEmailLayout(content.target.value);
+        setLayoutDetail(content.target.value);
+    }
+
+    const onChangeHandlerLayoutName = (e) => {
+        setLayoutName(e.target.value);
     }
 
 
@@ -119,7 +127,7 @@ export const EmailLayoutModal = (props) => {
                             <div className="row">
                                 <div className="col-sm-12 col-md-12 mb-3">
                                     <label className="me-3">Layout Name</label>
-                                    <input type="text" id="newLayoutName" className="form-control" />
+                                    <input type="text" id="newLayoutName" className="form-control" onChange={onChangeHandlerLayoutName} />
                                 </div>
                                 <div className="col-sm-12 col-md-12 mb-3">
                                     <label className="me-3">Layout</label>
@@ -148,12 +156,12 @@ export const EmailLayoutModal = (props) => {
                                 <div className="row">
                                     <div className="col-sm-12 col-md-12 mb-3">
                                         <label className="me-3">Layout Name</label>
-                                        <input type="text" id="newLayoutName" defaultValue={layoutHtml.layoutName} className="form-control" />
+                                        <input type="text" id="newLayoutName" className="form-control" defaultValue={layoutName} onChange={onChangeHandlerLayoutName} />
                                     </div>
                                     <div className="col-sm-12 col-md-12 mb-3">
                                         <label className="me-3">Layout</label>
                                         <div className="d-flex">
-                                            <textarea className="form-control h-100" rows="15" id="textAreaEmailLayout" defaultValue={emailLayout} 
+                                            <textarea className="form-control h-100" rows="15" id="textAreaEmailLayout" defaultValue={layoutDetail} 
                                             onChange={handleLayoutEditorChange}  >
                                             </textarea>
                                         </div>
@@ -166,7 +174,7 @@ export const EmailLayoutModal = (props) => {
                             </>
 
                             :
-                        <div dangerouslySetInnerHTML={{ __html: layoutHtml.layoutDetail }} /> 
+                            <div dangerouslySetInnerHTML={{ __html: layoutDetail }} /> 
                 }
             </Modal.Body>
         </Modal>
