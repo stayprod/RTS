@@ -24,6 +24,13 @@ code {
     padding: 0.25rem 1rem;
 }
 
+.btn-delete {
+    border: 0;
+    background-color: #FF0000;
+    color: white;
+    padding: 0.25rem 1rem;
+}
+
 .btn-site-expand {
     border: 0;
     background-color: black;
@@ -91,9 +98,14 @@ code {
     max-width: 70%;
 }
 
-.confirmation-delete-modal .modal-dialog {
+.confirmation-delete-modal-small .modal-dialog {
+    max-width: 50%;
+}
+
+.confirmation-delete-modal-large .modal-dialog {
     max-width: 70%;
 }
+
 
 .btn-login {
     padding: 0.25rem 3rem;

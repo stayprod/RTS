@@ -1043,7 +1043,7 @@ export const Trigger = (props) => {
             }
 
             setShowModalTexteDelete(true);
-            setDeleteModalTexteTitle("Delete Texte");
+            setDeleteModalTexteTitle("Delete Texte Template");
             setDeleteModalTexteType("deletetexte");
 
             let textes = texteTemplateData;
@@ -1415,7 +1415,7 @@ export const Trigger = (props) => {
                                 <button className="btn-site ms-1" onClick={openLayoutModal}>
                                     Edit
                                 </button>
-                                <button className="btn-site ms-1" onClick={DeleteLayoutHandler}>
+                                <button className="btn-delete ms-1" onClick={DeleteLayoutHandler}>
                                     Delete
                                 </button>
 
@@ -1477,7 +1477,7 @@ export const Trigger = (props) => {
                                 <button className="btn-site ms-1" onClick={openLayoutModalTexte}>
                                     Edit
                                 </button>
-                                <button className="btn-site ms-1" onClick={deletetextehandler}>
+                                <button className="btn-delete ms-1" onClick={deletetextehandler}>
                                     Delete
                                 </button>
                                 <EamilTexteModal
