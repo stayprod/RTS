@@ -7,7 +7,8 @@ import { variables, editorButtons } from '../Variables';
 import { UseAuthContext } from '../context/AuthContext';
 
 export const EamilTexteModal = (props) => {
-    const { showModalTexte, modalTitleTexte, modalType, officeId, clientId, hideLayoutModalTexte, TexteLayoutId, reloadLayoutsList, UpdateSelectedTextelayoutChange } = props;
+    const { showModalTexte, texteModalTitle, modalType, officeId, clientId, hideTexteModal,
+        texteTemplateId, reloadTexteDropdown, updateTexteStates } = props;
 
     const [layoutHtml, setLayoutHtml] = useState("");
     const [emailLayout, setEmailLayout] = useState("");
@@ -75,8 +76,8 @@ export const EamilTexteModal = (props) => {
             DutchTexte: texteDutchArea,
         }
 
-        if (TexteLayoutId != 0 && TexteLayoutId != null) {
-            texteTemplate.TemplateId = TexteLayoutId;
+        if (texteTemplateId != 0 && texteTemplateId != null) {
+            texteTemplate.TemplateId = texteTemplateId;
         }
 
         let url = variables.API_URL + `TexteTemplate/SaveTexteTemplate?`;
@@ -94,9 +95,9 @@ export const EamilTexteModal = (props) => {
                 alert("Texte Template successfully saved.");
                 e.target.removeAttribute("disabled");
                 document.querySelector("body").style.cursor = "default";
-                reloadLayoutsList(response.data);
-                hideLayoutModalTexte();
-                //UpdateSelectedTextelayoutChange(response.data);
+                reloadTexteDropdown(response.data);
+                hideTexteModal(true);
+                //updateTexteStates(response.data);
                 setLayoutHtml(response.data);
                 setEmailLayout("");
             })
@@ -108,7 +109,7 @@ export const EamilTexteModal = (props) => {
 
     const getLayoutById = async () => {
 
-        let url = variables.API_URL + 'TexteTemplate/GetTexteTemplateById?templateId=' + TexteLayoutId;
+        let url = variables.API_URL + 'TexteTemplate/GetTexteTemplateById?templateId=' + texteTemplateId;
 
         const response = await fetch(url, {
             method: 'GET',
@@ -129,10 +130,10 @@ export const EamilTexteModal = (props) => {
     }
 
     useEffect(() => {
-        if (TexteLayoutId != "" && TexteLayoutId != 0 && TexteLayoutId != undefined) {
+        if (texteTemplateId != "" && texteTemplateId != 0 && texteTemplateId != undefined) {
             getLayoutById();
         }
-    }, [TexteLayoutId])
+    }, [texteTemplateId])
 
     const resetConditionDropdowns = (e) => {
         let value = e.target.value;
@@ -147,9 +148,9 @@ export const EamilTexteModal = (props) => {
     }
 
     return (
-        <Modal className="new-layout-modal" id={modalType + "EmailLayoutModal"} show={showModalTexte} onHide={hideLayoutModalTexte}>
+        <Modal className="new-layout-modal" id={modalType + "EmailLayoutModal"} show={showModalTexte} onHide={hideTexteModal}>
             <Modal.Header closeButton>
-                <Modal.Title>{modalTitleTexte}</Modal.Title>
+                <Modal.Title>{texteModalTitle}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 {

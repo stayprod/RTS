@@ -41,7 +41,7 @@ export const Trigger = (props) => {
     const [selectedTarget, setSelectedTarget] = useState([]);
     const [selectedLaytOutId, setSelectedLaytOutId] = useState(0);
     const [selectedLaytName, setSelectedLaytName] = useState("");
-    const [officeLayout, setOfficeLayout] = useState({});
+    const [officeLayout, setOfficeLayout] = useState([]);
     const [showLayoutModal, setShowLayoutModal] = useState(false);
     const [layoutModalTitle, setLayoutModalTitle] = useState("");
     const [layoutModalType, setLayoutModalType] = useState("");
@@ -58,18 +58,25 @@ export const Trigger = (props) => {
     const [selectedProperty, setSelectedProperty] = useState([]);
     /*   Start New code from Abdul Saboor */
 
-    const [showLayoutModalTextePop, setShowLayoutModalTextePop] = useState(false)
+    const [showTexteModal, setShowTexteModal] = useState(false)
     const [texteTemplateData, setTexteTemplateData] = useState([])
-    const [layoutModalTitleTexte, setLayoutModalTitleTexte] = useState("")
-    const [layoutModalTypeTexte, setLayoutModalTypeTexte] = useState("")
-    const [selectedLaytOutTexteId, setSelectedLaytOutTexteId] = useState(0);
-    const [selectedLaytNameTexte, setSelectedLaytNameTexte] = useState("");
+    const [texteModalTitle, setTexteModalTitle] = useState("")
+    const [texteModalType, setTexteModalType] = useState("")
+    const [selectedTexteId, setSelectedTexteId] = useState(0);
+    const [selectedTexteName, setSelectedTexteName] = useState("");
     const [showModalDelete, setShowModalDelete] = useState(false);
     const [deleteModalTitle, setDeleteModalTitle] = useState("");
     const [deleteModalType, setDeleteModalType] = useState("");
     const [recentlySavedLayout, setRecentlySavedLayout] = useState({});
     const [recentlySavedTexteTemplate, setRecentlySavedTexteTemplate] = useState({});
     const [layoutsListWithoutCurrentLayout, setLayoutsListWithoutCurrentLayout] = useState([]);
+
+    // new states for DeleteConfirmationModal Abdul Saboor
+    const [texteListByWithoutCurrentTexte, setTexteListByWithoutCurrentTexte] = useState([]);
+    const [showModalTexteDelete, setShowModalTexteDelete] = useState(false);
+    const [deleteModalTexteTitle, setDeleteModalTexteTitle] = useState("");
+    const [deleteModalTexteType, setDeleteModalTexteType] = useState("");
+
 
     const optionMultiSelect = [
         { label: 'To sale', value: '1' },
@@ -91,10 +98,10 @@ export const Trigger = (props) => {
         //selected office detail from whise
         setWhiseOfficeDetail(location.state.WhiseOffice);
         setLocalOfficeDetail(location.state.LocalOfficeDetail);
-        setClientDetail(location.state.ClientDetail)
-        setWhiseOfficesList(location.state.AllWhiseOffices)
+        setClientDetail(location.state.ClientDetail);
+        setWhiseOfficesList(location.state.AllWhiseOffices);
         getListOfLayoutsByOffice(location.state.ClientDetail.localclient.client, "");
-        getListOfTexteEmailLayout();
+        getListOfTexteTemplates();
 
         if (location.state.TriggerDetail != undefined) {
             loadTriggerDetailInEdit(location.state.TriggerDetail);
@@ -121,6 +128,11 @@ export const Trigger = (props) => {
         if (_localclient == undefined) {
             _localclient = location.state.ClientDetail.localclient.client;
         }
+
+        if (authUser == null) {
+            return
+        }
+
         const response = await fetch(variables.API_URL + 'Layout/GetLayoutsByClients?clientId=' + _localclient.clientid, {
             method: 'GET',
             headers: {
@@ -171,9 +183,8 @@ export const Trigger = (props) => {
         let participantIndex = document.getElementById("participent1").selectedIndex;
         let participantText = document.getElementById("participent1")[participantIndex].text;
         triggerNameBuilder["participent1"] = participantText;
-        console.log("transaction type=" + trigger.transactionType);
 
-         /*get multi select values from database */
+        /*get multi select values from database */
         const fetchMultiSelectResult = trigger.transactionType.split(",")
         const filterData = optionMultiSelect.filter(el => fetchMultiSelectResult.includes(el.value));
         setSelectedProperty(filterData);
@@ -188,8 +199,8 @@ export const Trigger = (props) => {
 
         const transactionStatus = document.getElementById("transactionStatus");
 
-        
-       /* transactionType.value = trigger.transactionType;*/
+
+        /* transactionType.value = trigger.transactionType;*/
         transactionStatus.value = trigger.transactionStatus;
 
 
@@ -567,7 +578,7 @@ export const Trigger = (props) => {
     const OnChangeHandlerEmailLayout = (e) => {
         let value = e.target.value;
         if (value != "") {
-            setSelectedLaytOutId(value);
+            setSelectedLaytOutId(+value);
             var index = e.target.selectedIndex;
             setSelectedLaytName(e.target[index].text);
         }
@@ -578,11 +589,23 @@ export const Trigger = (props) => {
 
     const hideLayoutModal = (e) => {
         setShowLayoutModal(false);
+
+        if (e == undefined) {
+            if (layoutModalType == "new") {
+                let layoutDropdown = document.getElementById("layoutDropdown");
+                let layoutId = layoutDropdown.value;
+                if (layoutId != "") {
+                    let selectedIndex = layoutDropdown.selectedIndex;
+                    setSelectedLaytOutId(layoutId);
+                    setSelectedLaytName(layoutDropdown[selectedIndex].text);
+                }
+            }
+        }
     }
 
     const openLayoutModal = (e) => {
         if (e.target.innerText == "New") {
-            setSelectedLaytOutId('0');
+            setSelectedLaytOutId(0);
             setSelectedLaytName("");
             setShowLayoutModal(true);
             setLayoutModalTitle("New Layout");
@@ -596,7 +619,7 @@ export const Trigger = (props) => {
                 return
             }
             setShowLayoutModal(true);
-            setLayoutModalTitle(selectedLaytName + "Edit Layout");
+            setLayoutModalTitle(selectedLaytName + " Edit Layout");
             setLayoutModalType("edit");
             setOfficeId(localOfficeDetail.officeid);
             setClientId(clientDetail.localclient.client.clientid);
@@ -614,13 +637,17 @@ export const Trigger = (props) => {
         }
     }
 
-    const handleChangeSelected = (item) => { 
+    const handleChangeSelected = (item) => {
 
         setSelectedProperty(item)
-   
+
     }
- 
-    const getListOfTexteEmailLayout = async(_savedTexteTemplate) => {
+
+    const getListOfTexteTemplates = async (_savedTexteTemplate) => {
+
+        if (authUser == null) {
+            return
+        }
         const response = await fetch(variables.API_URL + 'TexteTemplate/GetAllTexteTemplates', {
             method: 'GET',
             headers: {
@@ -639,81 +666,70 @@ export const Trigger = (props) => {
     }
 
     const updateTexteTemplateState = (_texteLayout) => {
-        setSelectedLaytOutTexteId(_texteLayout.templateId);
-        setSelectedLaytNameTexte(_texteLayout.templateName);
-        document.getElementById("layoutDropdowntexte").value = _texteLayout.templateId;
+        setSelectedTexteId(_texteLayout.templateId);
+        setSelectedTexteName(_texteLayout.templateName);
+        document.getElementById("texteDropdown").value = _texteLayout.templateId;
     }
 
     const setSelectedEmailLayoutTexte = (e) => {
         let value = e.target.value;
         if (value != "") {
-            setSelectedLaytOutTexteId(value);
+            setSelectedTexteId(value);
             var index = e.target.selectedIndex;
-            setSelectedLaytNameTexte(e.target[index].text);
+            setSelectedTexteName(e.target[index].text);
         }
         else {
-            setSelectedLaytNameTexte("");
+            setSelectedTexteName("");
         }
     }
 
     const openLayoutModalTexte = (e) => {
         if (e.target.innerText == "New") {
-            setSelectedLaytOutTexteId("0");
-            setSelectedLaytNameTexte("");
-            setShowLayoutModalTextePop(true);
-            setLayoutModalTitleTexte("New Texte Template");
-            setLayoutModalTypeTexte("new");
+            setSelectedTexteId("0");
+            setSelectedTexteName("");
+            setShowTexteModal(true);
+            setTexteModalTitle("New Texte Template");
+            setTexteModalType("new");
             setOfficeId(localOfficeDetail.officeid);
             setClientId(clientDetail.localclient.client.clientid);
         }
         else if (e.target.innerText == "Edit") {
-            if (document.getElementById("layoutDropdowntexte").value == "") {
+            if (document.getElementById("texteDropdown").value == "") {
                 alert("No texte selected for edit");
-                return
+                return;
             }
-            setShowLayoutModalTextePop(true);
-            setLayoutModalTitleTexte(selectedLaytNameTexte + " Preview");
-            setLayoutModalTypeTexte("edit");
+            setShowTexteModal(true);
+            setTexteModalTitle(selectedTexteName + " Edit");
+            setTexteModalType("edit");
             setOfficeId(localOfficeDetail.officeid);
             setClientId(clientDetail.localclient.client.clientid);
         }
         else {
-            if (document.getElementById("layoutDropdowntexte").value == "") {
+            if (document.getElementById("texteDropdown").value == "") {
                 alert("No texte selected for preview");
-                return
+                return;
             }
-            setShowLayoutModalTextePop(true);
-            setLayoutModalTitleTexte(selectedLaytNameTexte + " Preview");
-            setLayoutModalTypeTexte("preview");
+            setShowTexteModal(true);
+            setTexteModalTitle(selectedTexteName + " Preview");
+            setTexteModalType("preview");
             setOfficeId(localOfficeDetail.officeid);
             setClientId(clientDetail.localclient.client.clientid);
         }
     }
- 
-    const hideLayoutModalTexte = (e) => {
-        setShowLayoutModalTextePop(false)
-    }
 
-    const DeleteLayoutHandle = (e) => {
-        if (e.target.innerText == "Delete") {
-            if (document.getElementById("layoutDropdown").value == "") {
-                alert("No layout selected for delete");
-                return
+    const hideTexteModal = (e) => {
+        setShowTexteModal(false);
+        if (e == undefined) {
+            if (texteModalType == "new") {
+                let texteDropdown = document.getElementById("texteDropdown");
+                let texteId = texteDropdown.value;
+                if (texteId != "") {
+                    let selectedIndex = texteDropdown.selectedIndex;
+                    setSelectedTexteId(texteId);
+                    setSelectedTexteName(texteDropdown[selectedIndex].text);
+                }
             }
-            setShowModalDelete(true);
-            setDeleteModalTitle("Delete Layout");
-            setDeleteModalType("deletelayout");
-            let layouts = officeLayout;
-
-            let filteredLayouts = layouts.filter(e => {
-                return e.layoutid != selectedLaytOutId;
-            })
-            setLayoutsListWithoutCurrentLayout(filteredLayouts);
         }
-    }
-
-    const hideModalDelete = (e) => {
-        setShowModalDelete(false);
     }
 
     /*   End New code from Abdul Saboor */
@@ -785,7 +801,7 @@ export const Trigger = (props) => {
         const frenchSubject = "";// document.getElementById("texteFrSubject");
         const dutchSubject = "";// document.getElementById("texteDuSubject");
         const targetParticipent = document.getElementById("participent1");
-        const selectedTexteOption = document.getElementById("layoutDropdowntexte");
+        const selectedTexteOption = document.getElementById("texteDropdown");
 
         if (keymomentDropdown.value == "") {
             keymomentDropdown.style.borderColor = "red";
@@ -849,15 +865,15 @@ export const Trigger = (props) => {
         //array convert into string and store in database 
         const getMultiValue = selectedProperty;
         let getFinalMultiSelectValue = "";
-        const loopLength = (getMultiValue.length)-1;
+        const loopLength = (getMultiValue.length) - 1;
         if (getMultiValue != "") {
             for (let i = 0; i < getMultiValue.length; i++) {
                 if (i == loopLength) {
                     getFinalMultiSelectValue += getMultiValue[i].value;
                 } else {
-                    getFinalMultiSelectValue += getMultiValue[i].value + ","; 
+                    getFinalMultiSelectValue += getMultiValue[i].value + ",";
                 }
-                
+
             }
         }
 
@@ -899,7 +915,7 @@ export const Trigger = (props) => {
             TransactionStatus: transactionStatus.value,
             SurveyLink: document.getElementById("inputSurveyLink").value,
             ContactPreference: contactPreference,
-            texteTemplateId: +selectedLaytOutTexteId
+            texteTemplateId: +selectedTexteId
         }
         let triggerurl = variables.API_URL + `OfficeTrigger/SaveOfficeTriggerDetail?`;
         return axios.post(triggerurl, JSON.stringify(objOfficeTrigger), jsonconfig)
@@ -945,6 +961,120 @@ export const Trigger = (props) => {
     const handleEditorChangeDutch = (content) => {
         setEmailTexteDutch(content);
     }
+
+    const DeleteLayoutHandler = (e) => {
+        if (e.target.innerText == "Delete") {
+            if (document.getElementById("layoutDropdown").value == "") {
+                alert("No layout selected for delete");
+                return
+            }
+            setShowModalDelete(true);
+            setDeleteModalTitle("Delete Layout");
+            setDeleteModalType("deletelayout");
+            let layouts = officeLayout;
+
+            let filteredLayouts = layouts.filter(e => {
+                return e.layoutid != selectedLaytOutId;
+            })
+            setLayoutsListWithoutCurrentLayout(filteredLayouts);
+        }
+    }
+
+    const updateLayoutStatesAfterDelete = (updatedLayoutId, updatedLayoutName) => {
+        let currentTriggerDetail = triggerDetail;
+        if (updatedLayoutId !== "") {
+            getUpdatedTriggerDetail();
+            //setSelectedLaytOutId(updatedLayoutId)
+            //setSelectedLaytName(updatedLayoutName);
+            //document.getElementById("layoutDropdown").value = updatedLayoutId;
+            //currentTriggerDetail.layoutid = updatedLayoutId;
+            //setTriggerDetail(currentTriggerDetail);
+        }
+        else {
+            setSelectedLaytOutId(0)
+            setSelectedLaytName("");
+            document.getElementById("layoutDropdown").value = "";
+        }
+    }
+
+    const hideModalDelete = (e) => {
+        setShowModalDelete(false);
+    }
+
+    const getUpdatedTriggerDetail = () => {
+        const jsonconfig = {
+            headers: {
+                'Authorization': `Bearer ${authUser.tokenValue}`,
+                'Content-Type': 'application/json'
+            }
+        };
+        const url = variables.API_URL + `OfficeTrigger/GetOfficeTriggerDetail?triggerId=` + triggerDetail.officeTriggerid;
+        axios.get(url, jsonconfig) // ASP.NET Core API endpoint with headers
+            .then(response => {
+                const stateBuilder = {
+                    LocalOfficeDetail: location.state.LocalOfficeDetail,
+                    WhiseOffice: location.state.WhiseOffice,
+                    ClientDetail: location.state.ClientDetail,
+                    AllWhiseOffices: location.state.AllWhiseOffices,
+                    LocalOfficesList: location.state.LocalOfficesList
+                }
+                if (response.data != undefined) {
+                    stateBuilder.TriggerDetail = response.data;
+                }
+
+                const url = "/trigger/" + localOfficeDetail.officeid;
+                navigate(url, {
+                    state: stateBuilder
+                })
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+    }
+
+
+    // new methods for texte Delete ConfirmationModal
+
+    const deletetextehandler = (e) => {
+        if (e.target.innerText == "Delete") {
+            if (document.getElementById("texteDropdown").value == "") {
+                alert("No texte selected for delete");
+                return
+            }
+
+            setShowModalTexteDelete(true);
+            setDeleteModalTexteTitle("Delete Texte");
+            setDeleteModalTexteType("deletetexte");
+
+            let textes = texteTemplateData;
+
+            let filteredtextes = textes.filter(e => {
+                return e.templateId != selectedTexteId;
+            })
+            setTexteListByWithoutCurrentTexte(filteredtextes);
+        }
+    }
+
+    const hidetexteModalDelete = (e) => {
+        setShowModalTexteDelete(false)
+    }
+
+    const updateTexeteStatesAfterDelete = (updatedTexteId) => {
+
+        let currentTriggerDetail = triggerDetail;
+        if (updatedTexteId != "") {
+
+            getUpdatedTriggerDetail();
+
+        } else {
+            setSelectedTexteId("0")
+            setSelectedTexteName("");
+            document.getElementById("texteDropdown").value = "0";
+        }
+    }
+
+
+
 
     useEffect(() => {
         if (location.state != null) {
@@ -1039,22 +1169,24 @@ export const Trigger = (props) => {
     }, [token])
 
     useEffect(() => {
-        if (location.state.TriggerDetail != undefined) {
-            //document.getElementById("whiseAppointmentType").value = location.state.TriggerDetail.appointmentType;
-        }
-    }, [data])
-
-    useEffect(() => {
-        if (location.state.TriggerDetail != undefined) {
+        if (location.state.TriggerDetail != undefined && officeLayout.length != 0) {
             setSelectedLaytOutId(location.state.TriggerDetail.layoutid);
             document.getElementById("layoutDropdown").value = location.state.TriggerDetail.layoutid;
+            let filteredLayouts = officeLayout.filter(item => {
+                return item.layoutid == location.state.TriggerDetail.layoutid
+            })
+            setSelectedLaytName(filteredLayouts[0].layoutName);
         }
     }, [officeLayout])
 
     useEffect(() => {
-        if (location.state.TriggerDetail != undefined) {
-            setSelectedLaytOutTexteId(location.state.TriggerDetail.texteTemplateId);
-            document.getElementById("layoutDropdowntexte").value = location.state.TriggerDetail.texteTemplateId;
+        if (location.state.TriggerDetail != undefined && texteTemplateData.length != 0) {
+            setSelectedTexteId(location.state.TriggerDetail.texteTemplateId);
+            document.getElementById("texteDropdown").value = location.state.TriggerDetail.texteTemplateId;
+            let filteredTemplates = texteTemplateData.filter(item => {
+                return item.templateId == location.state.TriggerDetail.texteTemplateId
+            })
+            setSelectedTexteName(filteredTemplates[0].templateName);
         }
     }, [texteTemplateData])
 
@@ -1069,8 +1201,17 @@ export const Trigger = (props) => {
     }, [recentlySavedLayout]);
 
     useEffect(() => {
-        updateTexteTemplateState(recentlySavedTexteTemplate);
+        if (recentlySavedTexteTemplate.templateId != undefined) {
+            updateTexteTemplateState(recentlySavedTexteTemplate);
+        }
     }, [recentlySavedTexteTemplate])
+
+    useEffect(() => {
+        if (location.state.TriggerDetail != undefined) {
+            document.getElementById("whiseAppointmentType").value = location.state.TriggerDetail.appointmentType;
+        }
+    }, [data])
+
 
     return (
         <>
@@ -1082,7 +1223,7 @@ export const Trigger = (props) => {
                                 <FontAwesomeIcon icon={faArrowLeft} />
                             </span>
                             <span id="addTrigger">Add Trigger</span>
-                            
+
                         </h4>
                     </div>
                     <div className="col-sm-12">
@@ -1175,7 +1316,7 @@ export const Trigger = (props) => {
                                 <option value="2">No Participant</option>
                             </select>
                         </div>
-                      
+
                     </div>
                     <div>
                         <h6 className="sub-heading fw-bold mb-3">Condition:</h6>
@@ -1196,13 +1337,13 @@ export const Trigger = (props) => {
                         <div className="col-sm-12 col-md-4 mb-3">
                             <label>Property Transaction Type</label>
 
-                                <MultiSelect
-                                  id="transactionType"
-                                  value={selectedProperty}
-                                    options={optionMultiSelect}
-                                    onChange={handleChangeSelected}
-                                    labelledBy="Select an option"
-                                />
+                            <MultiSelect
+                                id="transactionType"
+                                value={selectedProperty}
+                                options={optionMultiSelect}
+                                onChange={handleChangeSelected}
+                                labelledBy="Select an option"
+                            />
 
                         </div>
                         <div className="col-sm-12 col-md-4 mb-3">
@@ -1274,12 +1415,11 @@ export const Trigger = (props) => {
                                 <button className="btn-site ms-1" onClick={openLayoutModal}>
                                     Edit
                                 </button>
-                                {/*<button className="btn-site ms-1" onClick={DeleteLayoutHandle}>*/}
-                                {/*    Delete*/}
-                                {/*</button>*/}
+                                <button className="btn-site ms-1" onClick={DeleteLayoutHandler}>
+                                    Delete
+                                </button>
 
                                 <EmailLayoutModal
-
                                     showModal={showLayoutModal}
                                     modalTitle={layoutModalTitle}
                                     modalType={layoutModalType}
@@ -1297,7 +1437,13 @@ export const Trigger = (props) => {
                                     deleteModalType={deleteModalType}
                                     hideModalDelete={hideModalDelete}
                                     itemId={selectedLaytOutId}
-                                    layoutsList={layoutsListWithoutCurrentLayout}
+                                    itemName={selectedLaytName}
+                                    dropdownItemsList={layoutsListWithoutCurrentLayout}
+                                    client={clientDetail}
+                                    office={localOfficeDetail}
+                                    reloadSelectedItemDropdown={getListOfLayoutsByOffice}
+                                    updateDropdownStatesAfterDelete={updateLayoutStatesAfterDelete}
+                                    triggerDetail={triggerDetail}
                                 />
                             </div>
                         </div>
@@ -1310,7 +1456,7 @@ export const Trigger = (props) => {
                         <div className="col-sm-12 col-md-5 mb-3">
                             <label className="me-3">Texte Template</label>
                             <div className="d-flex">
-                                <select className="form-select" id="layoutDropdowntexte" onChange={setSelectedEmailLayoutTexte}>
+                                <select className="form-select" id="texteDropdown" onChange={setSelectedEmailLayoutTexte}>
                                     <option value="">--Select Texte Template--</option>
                                     {
                                         texteTemplateData.length > 0 ? texteTemplateData.map((item) => {
@@ -1331,21 +1477,38 @@ export const Trigger = (props) => {
                                 <button className="btn-site ms-1" onClick={openLayoutModalTexte}>
                                     Edit
                                 </button>
-                                {/*<button className="btn-site ms-1">*/}
-                                {/*    Delete*/}
-                                {/*</button>*/}
+                                <button className="btn-site ms-1" onClick={deletetextehandler}>
+                                    Delete
+                                </button>
                                 <EamilTexteModal
-                                    showModalTexte={showLayoutModalTextePop}
-                                    modalTitleTexte={layoutModalTitleTexte}
-                                    modalType={layoutModalTypeTexte}
+                                    showModalTexte={showTexteModal}
+                                    texteModalTitle={texteModalTitle}
+                                    modalType={texteModalType}
                                     officeId={officeId}
                                     clientId={clientId}
-                                    hideLayoutModalTexte={hideLayoutModalTexte}
-                                    TexteLayoutId={selectedLaytOutTexteId}
-                                    reloadLayoutsList={getListOfTexteEmailLayout}
-                                    UpdateSelectedTextelayoutChange={updateTexteTemplateState}
+                                    hideTexteModal={hideTexteModal}
+                                    texteTemplateId={selectedTexteId}
+                                    reloadTexteDropdown={getListOfTexteTemplates}
+                                    updateTexteStates={updateTexteTemplateState}
                                 />
-                             
+
+                                <DeleteConfirmationModal
+                                    showModelDelete={showModalTexteDelete}
+                                    deleteModalTitle={deleteModalTexteTitle}
+                                    deleteModalType={deleteModalTexteType}
+                                    hideModalDelete={hidetexteModalDelete}
+                                    itemId={selectedTexteId}
+                                    itemName={selectedTexteName}
+                                    dropdownItemsList={texteListByWithoutCurrentTexte}
+                                    client={clientDetail}
+                                    office={localOfficeDetail}
+                                    reloadSelectedItemDropdown={getListOfTexteTemplates}
+                                    updateDropdownStatesAfterDelete={updateTexeteStatesAfterDelete}
+                                    triggerDetail={triggerDetail}
+                                />
+
+
+
                             </div>
                         </div>
                     </div>

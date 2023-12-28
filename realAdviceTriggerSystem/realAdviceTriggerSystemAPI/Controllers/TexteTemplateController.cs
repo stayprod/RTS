@@ -144,7 +144,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
                 using (var con = new RealadviceTriggeringSystemContext())
                 {
                     List<OfficeTrigger>? _triggers = con.OfficeTriggers.Where(c => c.TexteTemplateId == templateId).ToList();
-                    if (_triggers == null)
+                    if (_triggers.Count == 0)
                     {
                         TexteTemplate _templateToRemove = con.TexteTemplates.Where(d => d.TemplateId == templateId).First();
                         if (_templateToRemove != null)

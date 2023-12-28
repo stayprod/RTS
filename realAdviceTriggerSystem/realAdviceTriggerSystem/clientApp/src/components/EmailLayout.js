@@ -67,7 +67,7 @@ export const EmailLayoutModal = (props) => {
                 let localClient;
                 reloadLayoutsList(localClient, response.data);
                 //setLayoutHtml(response.data);
-                hideLayoutModal();
+                hideLayoutModal(true);
                 //updateSelectedLayoutStates(response.data);
                 //if (modalType == "new") {
                 //    setLayoutDetail("");

@@ -23,13 +23,13 @@ namespace realAdviceTriggerSystemAPI.Controllers
 
         [HttpGet]
         [Route("GetOfficeTriggerDetail")]
-        public JsonResult GetOfficeTriggerDetail(int officeId)
+        public JsonResult GetOfficeTriggerDetail(int triggerId)
         {
             try
             {
                 using (var con = new RealadviceTriggeringSystemContext())
                 {
-                    OfficeTrigger? _officeTrigger = con.OfficeTriggers.Where(c => c.Officeid == officeId).FirstOrDefault();
+                    OfficeTrigger? _officeTrigger = con.OfficeTriggers.Where(c => c.OfficeTriggerid == triggerId).FirstOrDefault();
                     return new JsonResult(_officeTrigger);
                 }
             }
@@ -192,6 +192,33 @@ namespace realAdviceTriggerSystemAPI.Controllers
                         }
                     }
                     return new JsonResult("Triggers layout updated successfully");
+                }
+            }
+            catch (Exception exp)
+            {
+                _exceptionWriter.WriteException(exp);
+                return new JsonResult(exp.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("UpdateTriggersTexteTemplate")]
+        public JsonResult UpdateTriggersTexteTemplate(List<OfficeTrigger> _trigger)
+        {
+            try
+            {
+                using (var con = new RealadviceTriggeringSystemContext())
+                {
+                    foreach (var trigger in _trigger)
+                    {
+                        OfficeTrigger _triggerToUpdate = con.OfficeTriggers.Where(d => d.OfficeTriggerid == trigger.OfficeTriggerid).First();
+                        if (_triggerToUpdate != null)
+                        {
+                            _triggerToUpdate.TexteTemplateId = trigger.TexteTemplateId;
+                            con.SaveChanges();
+                        }
+                    }
+                    return new JsonResult("Triggers texte template updated successfully");
                 }
             }
             catch (Exception exp)
