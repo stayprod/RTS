@@ -578,6 +578,9 @@ export const Trigger = (props) => {
     const OnChangeHandlerEmailLayout = (e) => {
         let value = e.target.value;
         if (value != "") {
+            if (e.target.style.borderColor == "red") {
+                e.target.style.borderColor = "#ced4da";
+            }
             setSelectedLaytOutId(+value);
             var index = e.target.selectedIndex;
             setSelectedLaytName(e.target[index].text);
@@ -630,7 +633,7 @@ export const Trigger = (props) => {
                 return
             }
             setShowLayoutModal(true);
-            setLayoutModalTitle(selectedLaytName + " Layout Preview");
+            setLayoutModalTitle(selectedLaytName.length > 55 ? (selectedLaytName.slice(0, 55) + ".. Layout Preview") : (selectedLaytName.slice(0, 55) + " Layout Preview"));
             setLayoutModalType("preview");
             setOfficeId(localOfficeDetail.officeid);
             setClientId(clientDetail.localclient.client.clientid);
@@ -638,6 +641,13 @@ export const Trigger = (props) => {
     }
 
     const handleChangeSelected = (item) => {
+
+        let value = item.target.value;
+        if (value != "") {
+            if (item.target.style.borderColor == "red") {
+                item.target.style.borderColor = "#ced4da";
+            }
+        }
 
         setSelectedProperty(item)
 
@@ -674,6 +684,9 @@ export const Trigger = (props) => {
     const setSelectedEmailLayoutTexte = (e) => {
         let value = e.target.value;
         if (value != "") {
+            if (e.target.style.borderColor == "red") {
+                e.target.style.borderColor = "#ced4da";
+            }
             setSelectedTexteId(value);
             var index = e.target.selectedIndex;
             setSelectedTexteName(e.target[index].text);
@@ -699,7 +712,7 @@ export const Trigger = (props) => {
                 return;
             }
             setShowTexteModal(true);
-            setTexteModalTitle(selectedTexteName + " Edit");
+            setTexteModalTitle(selectedTexteName + " Edit Texte Template");
             setTexteModalType("edit");
             setOfficeId(localOfficeDetail.officeid);
             setClientId(clientDetail.localclient.client.clientid);
@@ -710,7 +723,7 @@ export const Trigger = (props) => {
                 return;
             }
             setShowTexteModal(true);
-            setTexteModalTitle(selectedTexteName + " Preview");
+            setTexteModalTitle(selectedTexteName.length > 55 ? (selectedTexteName.slice(0, 55) + ".. Preview") : (selectedTexteName.slice(0, 55) + " Preview")  );
             setTexteModalType("preview");
             setOfficeId(localOfficeDetail.officeid);
             setClientId(clientDetail.localclient.client.clientid);
@@ -801,12 +814,13 @@ export const Trigger = (props) => {
         const frenchSubject = "";// document.getElementById("texteFrSubject");
         const dutchSubject = "";// document.getElementById("texteDuSubject");
         const targetParticipent = document.getElementById("participent1");
+        const layoutDropdown = document.getElementById("layoutDropdown");
         const selectedTexteOption = document.getElementById("texteDropdown");
 
         if (keymomentDropdown.value == "") {
             keymomentDropdown.style.borderColor = "red";
             isFRequiredFieldsEmpty = true;
-        } // 
+        } 
         if (triggerTypeDropdown.value == "") {
             triggerTypeDropdown.style.borderColor = "red";
             isFRequiredFieldsEmpty = true;
@@ -828,32 +842,26 @@ export const Trigger = (props) => {
             isFRequiredFieldsEmpty = true;
         }
 
-        //if (selectedTexteOption.value == "") {
-        //    selectedTexteLayout.style.borderColor = "red";
+
+        //if (transactionStatus.value == "") {
+        //    transactionStatus.style.borderColor = "red";
         //    isFRequiredFieldsEmpty = true;
         //}
-
 
         //if (transactionType.value == "") {
         //    transactionType.style.borderColor = "red";
         //    isFRequiredFieldsEmpty = true;
         //}
-        //if (transactionStatus.value == "") {
-        //    transactionStatus.style.borderColor = "red";
-        //    isFRequiredFieldsEmpty = true;
-        //}
-        //if (englishSubject.value == "") {
-        //    englishSubject.style.borderColor = "red";
-        //    isFRequiredFieldsEmpty = true;
-        //}
-        //if (frenchSubject.value == "") {
-        //    frenchSubject.style.borderColor = "red";
-        //    isFRequiredFieldsEmpty = true;
-        //}
-        //if (dutchSubject.value == "") {
-        //    dutchSubject.style.borderColor = "red";
-        //    isFRequiredFieldsEmpty = true;
-        //}
+        if (layoutDropdown.value == "") {
+            layoutDropdown.style.borderColor = "red";
+            isFRequiredFieldsEmpty = true;
+        }
+        if (selectedTexteOption.value == "") {
+            texteDropdown.style.borderColor = "red";
+            isFRequiredFieldsEmpty = true;
+        }
+       
+    
 
         if (isFRequiredFieldsEmpty == true) {
             alert("Please fill the required fields");
@@ -1399,7 +1407,7 @@ export const Trigger = (props) => {
                                     {
                                         officeLayout.length > 0 ? officeLayout.map((item) => {
                                             return (
-                                                <option value={item.layoutid}>{item.layoutName}</option>
+                                                <option key={item.layoutid} value={item.layoutid}>{item.layoutName}</option>
                                             )
                                         })
                                             :
@@ -1461,7 +1469,7 @@ export const Trigger = (props) => {
                                     {
                                         texteTemplateData.length > 0 ? texteTemplateData.map((item) => {
                                             return (
-                                                <option value={item.templateId}>{item.templateName}</option>
+                                                <option key={item.templateId} value={item.templateId}>{item.templateName}</option>
                                             )
                                         })
                                             :

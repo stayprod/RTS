@@ -249,7 +249,7 @@ export const ClientSettings = (props) => {
                 {
                     whiseOffices.length > 0 ? whiseOffices.map(item => {
                         return (
-                            <button className="name-tiles" onClick={officeSettingClickHandler} officedetail={JSON.stringify(item)}>{
+                            <button key={item.id} className="name-tiles" onClick={officeSettingClickHandler} officedetail={JSON.stringify(item)}>{
                                 item.name
                             }</button>
                         )

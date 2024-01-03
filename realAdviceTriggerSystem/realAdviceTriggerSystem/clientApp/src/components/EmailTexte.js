@@ -159,7 +159,7 @@ export const EamilTexteModal = (props) => {
                             <div className="row">
                                 <div className="col-sm-12 col-md-12 mb-3">
                                     <label className="me-3">Texte Name</label>
-                                    <input type="text" id="newTexteTemplateName" className="form-control" />
+                                    <input type="text" id="newTexteTemplateName" maxLength={ 500} className="form-control" />
                                 </div>
                                 <div className="col-sm-12 col-md-12 mb-3">
                                     <label className="me-3">Texte Details</label>
@@ -247,7 +247,7 @@ export const EamilTexteModal = (props) => {
                                 <div className="row">
                                     <div className="col-sm-12 col-md-12 mb-3">
                                         <label className="me-3">Texte Name</label>
-                                        <input type="text" id="newTexteTemplateName" defaultValue={layoutHtml.templateName} className="form-control" />
+                                        <input type="text" id="newTexteTemplateName" maxLength={500} defaultValue={layoutHtml.templateName} className="form-control" />
                                     </div>
                                     <div className="col-sm-12 col-md-12 mb-3">
                                         <label className="me-3">Texte Details</label>
@@ -329,7 +329,7 @@ export const EamilTexteModal = (props) => {
                                 {/*<div dangerouslySetInnerHTML={{ __html: layoutHtml.englishSubject }} />*/}
                                 {/*</div>*/}
                                 <div className="col-sm-12 col-md-12 mb-3">
-                                    <label className="me-3 mb-2">Texte Details</label>
+                                    <label className="me-3 mb-2 fw-bold ">Texte Details :</label>
                                     <div className="">
                                        
                                         <Tabs
@@ -341,11 +341,11 @@ export const EamilTexteModal = (props) => {
                                             <Tab eventKey="english" title="English">
                                                 <div className="row">
                                                     <div className="mb-3">
-                                                        <label htmlFor="texteEnglishSubject" className="form-label">Subject :</label>
+                                                        <label htmlFor="texteEnglishSubject" className="form-label fw-bold">Subject :</label>
                                                     <div dangerouslySetInnerHTML={{ __html: layoutHtml.englishSubject }} />
                                                     </div>
                                                     <div className="col-sm-12 col-md-12 mb-3">
-                                                        <label>Texte :</label>
+                                                        <label className="fw-bold">Texte :</label>
                                                         <div className="d-flex">
                                                         <div dangerouslySetInnerHTML={{ __html: layoutHtml.englishTexte }} />
                                                         </div>
@@ -356,12 +356,12 @@ export const EamilTexteModal = (props) => {
                                             <Tab eventKey="french" title="French">
                                                 <div className="row">
                                                     <div className="mb-3">
-                                                        <label>Subject :</label>
+                                                        <label className="fw-bold">Subject :</label>
                                                     <div dangerouslySetInnerHTML={{ __html: layoutHtml.frenchSubject }} />
 
                                                     </div>
                                                 <div className="col-sm-12 col-md-12 mb-3">
-                                                        <label>Texte :</label>
+                                                        <label className="fw-bold">Texte :</label>
                                                         <div className="d-flex">
                                                         <div dangerouslySetInnerHTML={{ __html: layoutHtml.frenchTexte }} />
                                                         </div>
@@ -371,12 +371,12 @@ export const EamilTexteModal = (props) => {
                                             <Tab eventKey="dutch" title="Dutch">
                                                 <div className="row">
                                                     <div className="mb-3">
-                                                        <label>Subject :</label>
+                                                        <label className="fw-bold">Subject :</label>
                                                     <div dangerouslySetInnerHTML={{ __html: layoutHtml.dutchSubject}} />
                                                     </div>
 
                                                     <div className="col-sm-12 col-md-12 mb-3">
-                                                        <label>Texte :</label>
+                                                        <label className="fw-bold">Texte :</label>
 
                                                         <div className="d-flex">
                                                         <div dangerouslySetInnerHTML={{ __html: layoutHtml.dutchTexte}} />

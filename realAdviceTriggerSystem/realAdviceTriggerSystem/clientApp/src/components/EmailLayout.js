@@ -127,7 +127,7 @@ export const EmailLayoutModal = (props) => {
                             <div className="row">
                                 <div className="col-sm-12 col-md-12 mb-3">
                                     <label className="me-3">Layout Name</label>
-                                    <input type="text" id="newLayoutName" className="form-control" onChange={onChangeHandlerLayoutName} />
+                                    <input type="text" id="newLayoutName" className="form-control" maxLength={500} onChange={onChangeHandlerLayoutName} />
                                 </div>
                                 <div className="col-sm-12 col-md-12 mb-3">
                                     <label className="me-3">Layout</label>
@@ -156,7 +156,7 @@ export const EmailLayoutModal = (props) => {
                                 <div className="row">
                                     <div className="col-sm-12 col-md-12 mb-3">
                                         <label className="me-3">Layout Name</label>
-                                        <input type="text" id="newLayoutName" className="form-control" defaultValue={layoutName} onChange={onChangeHandlerLayoutName} />
+                                        <input type="text" id="newLayoutName" className="form-control" maxLength={ 500} defaultValue={layoutName} onChange={onChangeHandlerLayoutName} />
                                     </div>
                                     <div className="col-sm-12 col-md-12 mb-3">
                                         <label className="me-3">Layout</label>

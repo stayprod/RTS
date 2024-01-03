@@ -66,7 +66,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
             {
                 using (var con = new RealadviceTriggeringSystemContext())
                 {
-                    List<TexteTemplate>? _layouts = con.TexteTemplates.Where(c => c.CreatedbyOfficeId == officeId).ToList();
+                    List<TexteTemplate>? _layouts = con.TexteTemplates.Where(c => c.CreatedbyOfficeId == officeId && c.Active == 1).ToList();
                     return new JsonResult(_layouts);
                 }
             }
@@ -85,7 +85,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
             {
                 using (var con = new RealadviceTriggeringSystemContext())
                 {
-                    List<TexteTemplate>? _layouts = con.TexteTemplates.ToList();
+                    List<TexteTemplate>? _layouts = con.TexteTemplates.Where(t => t.Active == 1).ToList();
                     return new JsonResult(_layouts);
                 }
             }
@@ -149,7 +149,8 @@ namespace realAdviceTriggerSystemAPI.Controllers
                         TexteTemplate _templateToRemove = con.TexteTemplates.Where(d => d.TemplateId == templateId).First();
                         if (_templateToRemove != null)
                         {
-                            con.TexteTemplates.Remove(_templateToRemove);
+                            _templateToRemove.Active = 0;
+                            //con.TexteTemplates.Remove(_templateToRemove);
                             con.SaveChanges();
                         }
                         return new JsonResult("Texte template successfully deleted.");

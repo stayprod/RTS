@@ -150,6 +150,10 @@ public partial class RealadviceTriggeringSystemContext : DbContext
             entity.Property(e => e.Layoutid)
                 .HasColumnType("int(11)")
                 .HasColumnName("layoutid");
+            entity.Property(e => e.Active)
+                .HasDefaultValueSql("b'1'")
+                .HasColumnType("bit(1)")
+                .HasColumnName("active");
             entity.Property(e => e.Clientid)
                 .HasColumnType("int(11)")
                 .HasColumnName("clientid");

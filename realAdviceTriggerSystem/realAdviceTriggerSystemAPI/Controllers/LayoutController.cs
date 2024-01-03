@@ -28,7 +28,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
             {
                 using (var con = new RealadviceTriggeringSystemContext())
                 {
-                    Layout? _layout = con.Layouts.Where(c => c.Layoutid == layoutId).FirstOrDefault();
+                    Layout? _layout = con.Layouts.Where(c => c.Layoutid == layoutId && c.Active == 1).FirstOrDefault();
                     return new JsonResult(_layout);
                 }
             }
@@ -47,7 +47,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
             {
                 using (var con = new RealadviceTriggeringSystemContext())
                 {
-                    List<Layout>? _layouts = con.Layouts.Where(c => c.Clientid == clientId).ToList();
+                    List<Layout>? _layouts = con.Layouts.Where(c => c.Clientid == clientId && c.Active == 1).ToList();
                     return new JsonResult(_layouts);
                 }
             }
@@ -66,7 +66,7 @@ namespace realAdviceTriggerSystemAPI.Controllers
             {
                 using (var con = new RealadviceTriggeringSystemContext())
                 {
-                    Layout _layout = con.Layouts.Where(l => l.Layoutid == layout.Layoutid).FirstOrDefault();
+                    Layout? _layout = con.Layouts.Where(l => l.Layoutid == layout.Layoutid).FirstOrDefault();
                     if(_layout != null)
                     {
                         _layout.LayoutDetail = layout.LayoutDetail;
@@ -103,7 +103,8 @@ namespace realAdviceTriggerSystemAPI.Controllers
                         Layout _layoutToRemove = con.Layouts.Where(d => d.Layoutid == layoutId).First();
                         if (_layoutToRemove != null)
                         {
-                            con.Layouts.Remove(_layoutToRemove);
+                            _layoutToRemove.Active = 0;
+                            //con.Layouts.Remove(_layoutToRemove);
                             con.SaveChanges();
                         }
                         return new JsonResult("Layout successfully deleted.");

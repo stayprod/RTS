@@ -118,7 +118,7 @@ export const DeleteConfirmationModal = (props) => {
         axios.delete(url, jsonconfig)
             .then((response) => {
                 if (response.data == "Texte template successfully deleted.") {
-                    alert("Texte Successfully Delete.");
+                    alert("Texte template successfully deleted");
                     hideModalDelete();
                     setIsLayoutInUsed(false);
                     setTriggersListByItemId([]);
@@ -242,7 +242,7 @@ export const DeleteConfirmationModal = (props) => {
                                                     <tbody>
                                                         {
                                                             triggersListByItemId.map(item => {
-                                                                return (<tr>
+                                                                return (<tr key={item.officeTriggerid}  >
                                                                     <td className="px-1 py-1 border">{client.name}</td>
                                                                     <td className="px-1 py-1 border">{office.commercialName}</td>
                                                                     <td className="px-1 py-1 border">{item.triggerName}</td>
@@ -254,7 +254,7 @@ export const DeleteConfirmationModal = (props) => {
                                                                             {
                                                                                 dropdownItemsList.length > 0 ? dropdownItemsList.map((d) => {
                                                                                     return (
-                                                                                        <option value={d.layoutid}>{d.layoutName}</option>
+                                                                                        <option key={d.layoutid} value={d.layoutid}>{d.layoutName}</option>
                                                                                     )
                                                                                 })
                                                                                     :
@@ -316,7 +316,7 @@ export const DeleteConfirmationModal = (props) => {
                                                     <tbody>
                                                         {
                                                             triggersListByItemId.map(item => {
-                                                                return (<tr>
+                                                                return (<tr key={item.officeTriggerid}>
                                                                     <td className="px-1 py-1 border">{client.name}</td>
                                                                     <td className="px-1 py-1 border">{office.commercialName}</td>
                                                                     <td className="px-1 py-1 border">{item.triggerName}</td>
@@ -328,7 +328,7 @@ export const DeleteConfirmationModal = (props) => {
                                                                             {
                                                                                 dropdownItemsList.length > 0 ? dropdownItemsList.map((d) => {
                                                                                     return (
-                                                                                        <option value={d.templateId}>{d.templateName}</option>
+                                                                                        <option key={d.templateId} value={d.templateId}>{d.templateName}</option>
                                                                                     )
                                                                                 })
                                                                                     :

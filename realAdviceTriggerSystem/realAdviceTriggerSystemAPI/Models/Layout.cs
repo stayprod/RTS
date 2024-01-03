@@ -16,4 +16,6 @@ public partial class Layout
     public string? LayoutDetail { get; set; }
 
     public DateTime? CreatedOn { get; set; }
+
+    public ulong Active { get; set; }
 }

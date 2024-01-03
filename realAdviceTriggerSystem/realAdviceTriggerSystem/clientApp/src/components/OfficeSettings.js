@@ -650,10 +650,11 @@ export const OfficeSettings = (props) => {
         }
     }, [authUser])
 
+
     return (
         <section className="client-setting">
             <div className="row py-3">
-                <div className="col-sm-6">
+                <div className="col-sm-6" >
                     <h4>{currentClient.name}</h4>
                 </div>
             </div>
@@ -663,7 +664,7 @@ export const OfficeSettings = (props) => {
                         let activeClass = item.id == whiseOffice.id ? "office-active" : "";
 
                         return (
-                            <button className={"name-tiles " + activeClass} onClick={officeSettingClickHandler} officedetail={JSON.stringify(item)}>{
+                            <button key={item.id} className={"name-tiles " + activeClass} onClick={officeSettingClickHandler} officedetail={JSON.stringify(item)}>{
                                 item.name
                             }</button>
                         )
@@ -793,7 +794,7 @@ export const OfficeSettings = (props) => {
                                         //new Date();
                                         const createdOn = moment(item.createdOn).format('MMMM Do YYYY, h:mm:ss a');
                                         return (
-                                            <tr>
+                                            <tr key={item.officeTriggerid}>
                                                 <td className="border-start border-end border-bottom p-2 justify-content-center">{EnumobjKeyMoments[item.keyMoment]}</td>
                                                 <td className="border-end border-bottom p-2 justify-content-center">{item.triggerName}</td>
                                                 <td className="border-end border-bottom p-2 justify-content-center">{EnumobjTriggerType[item.triggerType]}</td>
