@@ -650,11 +650,10 @@ export const OfficeSettings = (props) => {
         }
     }, [authUser])
 
-
     return (
         <section className="client-setting">
             <div className="row py-3">
-                <div className="col-sm-6" >
+                <div className="col-sm-6">
                     <h4>{currentClient.name}</h4>
                 </div>
             </div>

@@ -105,9 +105,6 @@ code {
 .confirmation-delete-modal-large .modal-dialog {
     max-width: 65%;
 }
-.confirmation-delete-modal-large .form-select{
-    width: 155px;
-}
 
 .btn-login {
     padding: 0.25rem 3rem;
@@ -135,19 +132,3 @@ textarea {
     cursor: pointer;
     right: 10px;
 }
-#layoutDropdown{
-    width: 230px;
-}
-#texteDropdown{
-    width: 230px;
-
-}
-
-
-
-
-
-
-
-
-

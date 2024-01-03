@@ -642,13 +642,6 @@ export const Trigger = (props) => {
 
     const handleChangeSelected = (item) => {
 
-        let value = item.target.value;
-        if (value != "") {
-            if (item.target.style.borderColor == "red") {
-                item.target.style.borderColor = "#ced4da";
-            }
-        }
-
         setSelectedProperty(item)
 
     }
@@ -712,7 +705,7 @@ export const Trigger = (props) => {
                 return;
             }
             setShowTexteModal(true);
-            setTexteModalTitle(selectedTexteName + " Edit Texte Template");
+            setTexteModalTitle(selectedTexteName + " Edit");
             setTexteModalType("edit");
             setOfficeId(localOfficeDetail.officeid);
             setClientId(clientDetail.localclient.client.clientid);
@@ -723,7 +716,7 @@ export const Trigger = (props) => {
                 return;
             }
             setShowTexteModal(true);
-            setTexteModalTitle(selectedTexteName.length > 55 ? (selectedTexteName.slice(0, 55) + ".. Preview") : (selectedTexteName.slice(0, 55) + " Preview")  );
+            setTexteModalTitle(selectedTexteName.length > 55 ? (selectedTexteName.slice(0, 55) + ".. Preview") : (selectedTexteName.slice(0, 55) + " Preview"));
             setTexteModalType("preview");
             setOfficeId(localOfficeDetail.officeid);
             setClientId(clientDetail.localclient.client.clientid);
@@ -820,7 +813,7 @@ export const Trigger = (props) => {
         if (keymomentDropdown.value == "") {
             keymomentDropdown.style.borderColor = "red";
             isFRequiredFieldsEmpty = true;
-        } 
+        } // 
         if (triggerTypeDropdown.value == "") {
             triggerTypeDropdown.style.borderColor = "red";
             isFRequiredFieldsEmpty = true;
@@ -842,16 +835,6 @@ export const Trigger = (props) => {
             isFRequiredFieldsEmpty = true;
         }
 
-
-        //if (transactionStatus.value == "") {
-        //    transactionStatus.style.borderColor = "red";
-        //    isFRequiredFieldsEmpty = true;
-        //}
-
-        //if (transactionType.value == "") {
-        //    transactionType.style.borderColor = "red";
-        //    isFRequiredFieldsEmpty = true;
-        //}
         if (layoutDropdown.value == "") {
             layoutDropdown.style.borderColor = "red";
             isFRequiredFieldsEmpty = true;
@@ -860,8 +843,28 @@ export const Trigger = (props) => {
             texteDropdown.style.borderColor = "red";
             isFRequiredFieldsEmpty = true;
         }
-       
-    
+
+
+        //if (transactionType.value == "") {
+        //    transactionType.style.borderColor = "red";
+        //    isFRequiredFieldsEmpty = true;
+        //}
+        //if (transactionStatus.value == "") {
+        //    transactionStatus.style.borderColor = "red";
+        //    isFRequiredFieldsEmpty = true;
+        //}
+        //if (englishSubject.value == "") {
+        //    englishSubject.style.borderColor = "red";
+        //    isFRequiredFieldsEmpty = true;
+        //}
+        //if (frenchSubject.value == "") {
+        //    frenchSubject.style.borderColor = "red";
+        //    isFRequiredFieldsEmpty = true;
+        //}
+        //if (dutchSubject.value == "") {
+        //    dutchSubject.style.borderColor = "red";
+        //    isFRequiredFieldsEmpty = true;
+        //}
 
         if (isFRequiredFieldsEmpty == true) {
             alert("Please fill the required fields");
@@ -1178,23 +1181,27 @@ export const Trigger = (props) => {
 
     useEffect(() => {
         if (location.state.TriggerDetail != undefined && officeLayout.length != 0) {
-            setSelectedLaytOutId(location.state.TriggerDetail.layoutid);
-            document.getElementById("layoutDropdown").value = location.state.TriggerDetail.layoutid;
             let filteredLayouts = officeLayout.filter(item => {
                 return item.layoutid == location.state.TriggerDetail.layoutid
             })
-            setSelectedLaytName(filteredLayouts[0].layoutName);
+            if (filteredLayouts.length > 0) {
+                setSelectedLaytOutId(filteredLayouts[0].layoutid);
+                document.getElementById("layoutDropdown").value = filteredLayouts[0].layoutid;
+                setSelectedLaytName(filteredLayouts[0].layoutName);
+            }
         }
     }, [officeLayout])
 
     useEffect(() => {
         if (location.state.TriggerDetail != undefined && texteTemplateData.length != 0) {
-            setSelectedTexteId(location.state.TriggerDetail.texteTemplateId);
-            document.getElementById("texteDropdown").value = location.state.TriggerDetail.texteTemplateId;
             let filteredTemplates = texteTemplateData.filter(item => {
                 return item.templateId == location.state.TriggerDetail.texteTemplateId
             })
-            setSelectedTexteName(filteredTemplates[0].templateName);
+            if (filteredTemplates.length > 0) {
+                setSelectedTexteId(filteredTemplates[0].templateId);
+                document.getElementById("texteDropdown").value = filteredTemplates[0].templateId;
+                setSelectedTexteName(filteredTemplates[0].templateName);
+            }
         }
     }, [texteTemplateData])
 
@@ -1399,7 +1406,7 @@ export const Trigger = (props) => {
                     {/*Email Layout */}
 
                     <div className="row">
-                        <div className="col-sm-12 col-md-5 mb-3">
+                        <div className="col-sm-12 col-md-6 mb-3">
                             <label className="me-3">Layout</label>
                             <div className="d-flex">
                                 <select className="form-select" id="layoutDropdown" onChange={OnChangeHandlerEmailLayout}>
@@ -1461,7 +1468,7 @@ export const Trigger = (props) => {
                     {/* Texte Layout*/}
 
                     <div className="row">
-                        <div className="col-sm-12 col-md-5 mb-3">
+                        <div className="col-sm-12 col-md-6 mb-3">
                             <label className="me-3">Texte Template</label>
                             <div className="d-flex">
                                 <select className="form-select" id="texteDropdown" onChange={setSelectedEmailLayoutTexte}>

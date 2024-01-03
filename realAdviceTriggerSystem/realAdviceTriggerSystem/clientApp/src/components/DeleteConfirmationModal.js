@@ -1,4 +1,4 @@
-﻿import React, { Component, useEffect, useRef, useState } from 'react';
+﻿import React, { Component, useEffect, useState } from 'react';
 import { Row, Col, Nav, Form, Image, Button, Navbar, Dropdown, Container, ListGroup, InputGroup, NavDropdown, Modal, Tab, Tabs } from 'react-bootstrap';
 import { variables, editorButtons } from '../Variables';
 import axios from 'axios';
@@ -14,7 +14,7 @@ export const DeleteConfirmationModal = (props) => {
     const [isLayoutInUsed, setIsLayoutInUsed] = useState(false);
     const [updatedItemIdForCurrentTrigger, setUpdatedItemIdForCurrentTrigger] = useState(0);
     const [updatedItemNameForCurrentTrigger, setUpdatedItemNameForCurrentTrigger] = useState("");
-    const [modalClass, setModalClass] = useState("confirmation-delete-modal-small");
+        const [modalClass, setModalClass] = useState("confirmation-delete-modal-small");
 
     const {
         authUser,
@@ -194,7 +194,6 @@ export const DeleteConfirmationModal = (props) => {
         setIsLayoutInUsed(false);
         setTriggersListByItemId([]);
         setModalClass("confirmation-delete-modal-small");
-
     }
 
     useEffect(() => {
@@ -203,30 +202,25 @@ export const DeleteConfirmationModal = (props) => {
         }
     }, [triggersListByItemId])
 
-
     return (
         <Modal className={modalClass} show={showModelDelete} onHide={hideModalAndClearTriggers}>
-
-             <Modal.Header closeButton>
+            <Modal.Header closeButton>
                 <Modal.Title>{deleteModalTitle}</Modal.Title>
-             </Modal.Header>
-
+            </Modal.Header>
             {
                 deleteModalType == "deletelayout" ?
                     <>
-                        <Modal.Body >
+                        <Modal.Body>
                             <div>
                                 {
                                     triggersListByItemId.length > 0 ?
                                         <>
-
                                             {
                                                 triggersListByItemId.length > 1 ?
-                                                    <h6 className="mb-4"> The "layout" you are trying to delete is used in the following triggers, please assign any other "layout" before confirming:</h6> 
-                                                    : 
-                                                    <h6 className="mb-4"> The "layout" you are trying to delete is used in the following trigger, please assign any other "layout" before confirming:</h6> 
+                                                    <h6 className="mb-4"> The "layout" you are trying to delete is used in the following triggers, please assign any other "layout" before confirming:</h6>
+                                                    :
+                                                    <h6 className="mb-4"> The "layout" you are trying to delete is used in the following trigger, please assign any other "layout" before confirming:</h6>
                                             }
-                                           
                                             <div className="py-3 m-0-auto">
                                                 <table>
                                                     <thead>
@@ -242,12 +236,12 @@ export const DeleteConfirmationModal = (props) => {
                                                     <tbody>
                                                         {
                                                             triggersListByItemId.map(item => {
-                                                                return (<tr key={item.officeTriggerid}  >
+                                                                return (<tr key={item.officeTriggerid}>
                                                                     <td className="px-1 py-1 border">{client.name}</td>
                                                                     <td className="px-1 py-1 border">{office.commercialName}</td>
                                                                     <td className="px-1 py-1 border">{item.triggerName}</td>
                                                                     <td className="px-1 py-1 border">{itemName}</td>
-                                                                    <td className="px-0 py-0 border">Replace with</td>
+                                                                    <td className="px-1 py-1 border">Replace with</td>
                                                                     <td className="px-1 py-1 border">
                                                                         <select className="form-select" id={"layoutsDropdown" + item.officeTriggerid} triggerid={item.officeTriggerid} onChange={onChangeHandlerDeleteModalLayoutDropdown}>
                                                                             <option value="">Select Layout</option>
@@ -271,7 +265,7 @@ export const DeleteConfirmationModal = (props) => {
                                             </div>
                                         </>
                                         :
-                                        <h6>Are you sure you want to delete this Layout?</h6>
+                                        <h6 className="texteConfirmHeading">Are you sure you want to delete this Layout?</h6>
                                 }
 
                             </div>
@@ -287,20 +281,18 @@ export const DeleteConfirmationModal = (props) => {
                     </>
                     :
                     <>
-                        <Modal.Body >
+                        <Modal.Body>
                             <div>
                                 {
                                     triggersListByItemId.length > 0 ?
                                         <>
                                             {
-                                               triggersListByItemId.length > 1 ?
-                                                        <h6 className="mb-4"> The "texte template" you are trying to delete is used in the following triggers, please assign any other "texte template" before confirming: </h6>
-                                                        :
-                                                        <h6 className="mb-4"> The "texte template" you are trying to delete is used in the following trigger, please assign any other "texte template" before confirming: </h6>
+                                                triggersListByItemId.length > 1 ?
+                                                    <h6 className="mb-4"> The "texte template" you are trying to delete is used in the following triggers, please assign any other "texte template" before confirming: </h6>
+                                                    :
+                                                    <h6 className="mb-4"> The "texte template" you are trying to delete is used in the following trigger, please assign any other "texte template" before confirming: </h6>
 
-                                            }     
-
-                                        
+                                            }  
                                             <div className="py-3 m-0-auto">
                                                 <table>
                                                     <thead>
@@ -360,7 +352,6 @@ export const DeleteConfirmationModal = (props) => {
                         </Modal.Footer>
                     </>
             }
-
         </Modal>
     )
 
@@ -399,10 +390,10 @@ export const DeleteConfirmationModal = (props) => {
     //                                                                <td className="px-1 py-1 border">{office.commercialName}</td>
     //                                                                <td className="px-1 py-1 border">{item.triggerName}</td>
     //                                                                <td className="px-1 py-1 border">{itemName}</td>
-    //                                                                <td className="px-1 py-1 border">replace with</td>
+    //                                                                <td className="px-1 py-1 border">Replace with</td>
     //                                                                <td className="px-1 py-1 border">
     //                                                                    <select className="form-select" id={"layoutsDropdown" + item.officeTriggerid} triggerid={item.officeTriggerid} onChange={onChangeHandlerDeleteModalLayoutDropdown}>
-    //                                                                        <option value="">--Select Layout--</option>
+    //                                                                        <option value="">Select Layou</option>
     //                                                                        {
     //                                                                            dropdownItemsList.length > 0 ? dropdownItemsList.map((d) => {
     //                                                                                return (

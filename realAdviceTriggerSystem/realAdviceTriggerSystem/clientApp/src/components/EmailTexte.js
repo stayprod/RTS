@@ -247,7 +247,7 @@ export const EamilTexteModal = (props) => {
                                 <div className="row">
                                     <div className="col-sm-12 col-md-12 mb-3">
                                         <label className="me-3">Texte Name</label>
-                                        <input type="text" id="newTexteTemplateName" maxLength={500} defaultValue={layoutHtml.templateName} className="form-control" />
+                                        <input type="text" id="newTexteTemplateName" maxLength={ 500} defaultValue={layoutHtml.templateName} className="form-control" />
                                     </div>
                                     <div className="col-sm-12 col-md-12 mb-3">
                                         <label className="me-3">Texte Details</label>
@@ -329,7 +329,7 @@ export const EamilTexteModal = (props) => {
                                 {/*<div dangerouslySetInnerHTML={{ __html: layoutHtml.englishSubject }} />*/}
                                 {/*</div>*/}
                                 <div className="col-sm-12 col-md-12 mb-3">
-                                    <label className="me-3 mb-2 fw-bold ">Texte Details :</label>
+                                    <label className="me-3 mb-2 fw-bold">Texte Details</label>
                                     <div className="">
                                        
                                         <Tabs
@@ -360,7 +360,7 @@ export const EamilTexteModal = (props) => {
                                                     <div dangerouslySetInnerHTML={{ __html: layoutHtml.frenchSubject }} />
 
                                                     </div>
-                                                <div className="col-sm-12 col-md-12 mb-3">
+                                                    <div className="col-sm-12 col-md-12 mb-3">
                                                         <label className="fw-bold">Texte :</label>
                                                         <div className="d-flex">
                                                         <div dangerouslySetInnerHTML={{ __html: layoutHtml.frenchTexte }} />
