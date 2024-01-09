@@ -578,7 +578,7 @@ export const Trigger = (props) => {
     const OnChangeHandlerEmailLayout = (e) => {
         let value = e.target.value;
         if (value != "") {
-            if (e.target.style.borderColor == "red") {
+            if (e.target.style.borderColor == "red" ) {
                 e.target.style.borderColor = "#ced4da";
             }
             setSelectedLaytOutId(+value);
@@ -705,7 +705,7 @@ export const Trigger = (props) => {
                 return;
             }
             setShowTexteModal(true);
-            setTexteModalTitle(selectedTexteName + " Edit");
+            setTexteModalTitle(selectedTexteName + " Edit Texte Template");
             setTexteModalType("edit");
             setOfficeId(localOfficeDetail.officeid);
             setClientId(clientDetail.localclient.client.clientid);
@@ -716,7 +716,7 @@ export const Trigger = (props) => {
                 return;
             }
             setShowTexteModal(true);
-            setTexteModalTitle(selectedTexteName.length > 55 ? (selectedTexteName.slice(0, 55) + ".. Preview") : (selectedTexteName.slice(0, 55) + " Preview"));
+            setTexteModalTitle(selectedTexteName.length > 50 ? (selectedTexteName.slice(0, 50) + ".. Preview Texte Template") : (selectedTexteName.slice(0, 50) + " Preview Texte Template"));
             setTexteModalType("preview");
             setOfficeId(localOfficeDetail.officeid);
             setClientId(clientDetail.localclient.client.clientid);
@@ -1012,6 +1012,8 @@ export const Trigger = (props) => {
         setShowModalDelete(false);
     }
 
+
+
     const getUpdatedTriggerDetail = () => {
         const jsonconfig = {
             headers: {
@@ -1083,7 +1085,6 @@ export const Trigger = (props) => {
             document.getElementById("texteDropdown").value = "0";
         }
     }
-
 
 
 
@@ -1190,6 +1191,13 @@ export const Trigger = (props) => {
                 setSelectedLaytName(filteredLayouts[0].layoutName);
             }
         }
+
+        const layoutDropdown = document.getElementById("layoutDropdown");
+
+        if (layoutDropdown.style.borderColor == "red") {
+            layoutDropdown.style.borderColor = "#ced4da";
+        }
+
     }, [officeLayout])
 
     useEffect(() => {
@@ -1203,6 +1211,12 @@ export const Trigger = (props) => {
                 setSelectedTexteName(filteredTemplates[0].templateName);
             }
         }
+
+        const texteDropdown = document.getElementById("texteDropdown");
+        if (texteDropdown.style.borderColor == "red") {
+            texteDropdown.style.borderColor = "#ced4da";
+        }
+
     }, [texteTemplateData])
 
     useEffect(() => {

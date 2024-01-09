@@ -124,7 +124,7 @@ export const Offices = (props) => {
             {
                 whiseOfficesList.length > 0 ? whiseOfficesList.map((item, i) => {
                     return (
-                        <table className={i == whiseOfficesList.length - 1 ? "table mb-0" : "table"} id='expandable-table'>
+                        <table className={i == whiseOfficesList.length - 1 ? "table mb-0" : "table"} id='expandable-table' key={item.id}>
                             <tbody id='table-body'>
                                 <tr>
                                     <td>

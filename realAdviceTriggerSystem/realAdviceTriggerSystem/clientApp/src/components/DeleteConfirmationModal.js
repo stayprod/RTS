@@ -14,7 +14,7 @@ export const DeleteConfirmationModal = (props) => {
     const [isLayoutInUsed, setIsLayoutInUsed] = useState(false);
     const [updatedItemIdForCurrentTrigger, setUpdatedItemIdForCurrentTrigger] = useState(0);
     const [updatedItemNameForCurrentTrigger, setUpdatedItemNameForCurrentTrigger] = useState("");
-        const [modalClass, setModalClass] = useState("confirmation-delete-modal-small");
+    const [modalClass, setModalClass] = useState("confirmation-delete-modal-small");
 
     const {
         authUser,
@@ -38,6 +38,7 @@ export const DeleteConfirmationModal = (props) => {
                     hideModalDelete();
                     setIsLayoutInUsed(false);
                     setTriggersListByItemId([]);
+                    setModalClass("confirmation-delete-modal-small");
                     reloadSelectedItemDropdown();
                     updateDropdownStatesAfterDelete(updatedItemIdForCurrentTrigger);
                 }
@@ -122,6 +123,7 @@ export const DeleteConfirmationModal = (props) => {
                     hideModalDelete();
                     setIsLayoutInUsed(false);
                     setTriggersListByItemId([]);
+                    setModalClass("confirmation-delete-modal-small");
                     reloadSelectedItemDropdown();
                     updateDropdownStatesAfterDelete(updatedItemIdForCurrentTrigger);
 
@@ -153,6 +155,7 @@ export const DeleteConfirmationModal = (props) => {
                 }
                 item.texteTemplateId = document.getElementById(elementId).value;
                 updatedTriggersList.push(item);
+           
             })
             if (isDropdownEmpty == true) {
                 return;
@@ -175,7 +178,9 @@ export const DeleteConfirmationModal = (props) => {
                 .catch(error => {
                     alert('Error fetching data:', error);
                 });
+           /* setModalClass("confirmation-delete-modal-small");*/
         }
+      
     }
 
     const onChangeHandlerDeleteModalTexteDropdown = (e) => {
@@ -242,7 +247,7 @@ export const DeleteConfirmationModal = (props) => {
                                                                     <td className="px-1 py-1 border">{item.triggerName}</td>
                                                                     <td className="px-1 py-1 border">{itemName}</td>
                                                                     <td className="px-1 py-1 border">Replace with</td>
-                                                                    <td className="px-1 py-1 border">
+                                                                    <td className="px-1 py-1 border layoutFormSelect"  >
                                                                         <select className="form-select" id={"layoutsDropdown" + item.officeTriggerid} triggerid={item.officeTriggerid} onChange={onChangeHandlerDeleteModalLayoutDropdown}>
                                                                             <option value="">Select Layout</option>
                                                                             {
@@ -314,7 +319,7 @@ export const DeleteConfirmationModal = (props) => {
                                                                     <td className="px-1 py-1 border">{item.triggerName}</td>
                                                                     <td className="px-1 py-1 border">{itemName}</td>
                                                                     <td className="px-1 py-1 border">Replace with</td>
-                                                                    <td className="px-1 py-1 border">
+                                                                    <td className="px-1 py-1 border texteFormSelect">
                                                                         <select className="form-select" id={"texteDropdown" + item.officeTriggerid} triggerid={item.officeTriggerid} onChange={onChangeHandlerDeleteModalTexteDropdown}>
                                                                             <option value="">Select Texte</option>
                                                                             {

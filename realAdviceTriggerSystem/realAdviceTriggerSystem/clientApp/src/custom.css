@@ -132,3 +132,19 @@ textarea {
     cursor: pointer;
     right: 10px;
 }
+.layoutFormSelect .form-select {
+    padding: 0.25rem 0.75rem;
+    width: 140px;
+}
+.texteFormSelect .form-select {
+    padding: 0.25rem 0.75rem;
+    width: 140px;
+}
+
+
+
+
+
+
+
+
